@@ -1,0 +1,33 @@
+<exp> = <ws> exp <ws>
+      | OpExp
+      | VarExp
+      | IFEXP
+      | AssignExp
+      | SeqExp
+      | WhileExp
+      | INT
+
+OpExp = exp <ws> OPER <ws> exp
+
+VarExp = ID
+ID = #'[a-zA-Z]+[a-zA-Z0-9_]*'
+
+IFEXP = <'if'> exp <'then'> exp <'else'> exp
+
+AssignExp = VarExp <ws> ':=' exp
+
+SeqExp = <'('> <ws> exp <ws> OptExp <ws> <')'>
+<OptExp> = <';'> <ws> exp <ws> OptExp <ws> | eps (* broken *)
+
+ParenExp = <'('> <ws> OptParenExp <ws> <')'>
+<OptParenExp> = exp | eps
+
+WhileExp = <'while'> test <'do'> body
+test = exp
+body = exp
+
+
+<ws> = (#'\s+')*
+OPER = '+' | '-' | '=' | '!=' | '<' | '>' | '<=' | '>='
+INT = digit+
+<digit> = #'[0-9]'
