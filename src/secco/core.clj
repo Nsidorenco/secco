@@ -3,14 +3,15 @@
             [clojure.java.io :as io]])
 
 (def grm
-  (insta/parser (io/resource "secco.grm")))
+  (insta/parser (io/resource "secco.grm")
+                :auto-whitespace :standard))
 
-(grm (slurp (io/resource "test1.sec")))
-(grm (slurp (io/resource "iftest1.sec")))
-(grm (slurp (io/resource "whiletest1.sec")))
-(grm "1 +  2")
-(grm "var123 := 4")
-(grm "(1; 2; 3)")
+(insta/parses grm (slurp (io/resource "test1.sec")))
+(insta/parses grm (slurp (io/resource "iftest1.sec")))
+(insta/visualize (insta/parses grm (slurp (io/resource "whiletest1.sec"))))
+(insta/parses grm "1 +  2")
+(insta/parses grm "var123 := 4")
+(insta/parses grm "(1; 2; 3)")
 
 (defn foo
   "I don't do a whole lot."
