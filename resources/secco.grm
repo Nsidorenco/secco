@@ -10,7 +10,7 @@
 OpExp = exp OPER exp (* TODO: fix precedens *)
 
 VarExp = ID
-ID = #'[a-zA-Z]+[a-zA-Z0-9_]*'
+<ID> = #'[a-zA-Z]+[a-zA-Z0-9_]*'
 
 IFEXP = <'if'> exp <'then'> exp <'else'> exp
 
@@ -23,8 +23,8 @@ ParenExp = <'('> OptParenExp <')'>
 <OptParenExp> = exp | eps
 
 WhileExp = <'while'> test <'do'> body
-test = exp
-body = exp
+<test> = exp
+<body> = exp
 
 
 OPER = '*' | '+' | '-' | '=' | '!=' | '<' | '>' | '<=' | '>='
