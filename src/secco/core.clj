@@ -16,11 +16,12 @@
 
 (def parse-tree->sexp
   {:OpExp (fn [exp1, oper, exp2]
-            `(+ ~exp1 ~exp2)),
-   :OPER `clojure.core/+,
+            `(~oper ~exp1 ~exp2)),
+   :OPER read-string,
    :INT read-string})
 
-(insta/transform parse-tree->sexp (grm "1 + 2"))
+(insta/transform parse-tree->sexp (grm "20 + 35"))
+(eval (first (insta/transform parse-tree->sexp (grm "20 - 35"))))
 
 (defn mark
    ([exp] exp)
