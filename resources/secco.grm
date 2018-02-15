@@ -14,7 +14,7 @@ VarExp = ID
 
 IFEXP = <'if'> exp <'then'> exp <'else'> exp
 
-AssignExp = VarExp ':=' exp
+AssignExp = VarExp <':='> exp
 
 SeqExp = <'('> exp OptExp <')'>
 <OptExp> = <';'> exp OptExp | eps (* broken *)

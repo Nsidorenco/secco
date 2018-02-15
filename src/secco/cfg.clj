@@ -33,13 +33,6 @@
                 (print-path testnode (get-t testnode))
                 (print-path bodynode (get-t bodynode))
                 ))
-   :INT read-string
-   :OpExp (fn [exp1 opr exp2]
-            (str exp1 opr exp2))
-   :OPER read-string
-   :VarExp read-string
-   :AssignExp (fn [v a exp]
-                (str v a exp))
    })
 
 (defn build 
