@@ -8,10 +8,25 @@
 
 (insta/parses grm (slurp (io/resource "test1.sec")))
 (insta/parses grm (slurp (io/resource "iftest1.sec")))
-(insta/visualize (insta/parses grm (slurp (io/resource "whiletest1.sec"))))
+(insta/visualize (insta/parse grm (slurp (io/resource "whiletest1.sec"))))
 (insta/parses grm "1 +  2")
 (insta/parses grm "var123 := 4")
 (insta/parses grm "(1; 2; 3)")
+(insta/parse grm "(1 + 2 * 5)")
+
+(def parse-tree->sexp
+  {:OpExp (fn [exp1, oper, exp2]
+            `(+ ~exp1 ~exp2)),
+   :OPER `clojure.core/+,
+   :INT read-string})
+
+(insta/transform parse-tree->sexp (grm "1 + 2"))
+
+(defn mark
+   ([exp] exp)
+   ([oper, exp] `(+ ~(mark exp))))
+ 
+(mark 1 "hej")
 
 (defn foo
   "I don't do a whole lot."
