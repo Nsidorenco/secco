@@ -1,5 +1,6 @@
 (ns secco.interpreter
-  [:require [instaparse.core :as insta]])
+  [:require [instaparse.core :as insta] ]
+  [:use  [secco.cfg]])
 
 (def venv
   {})
@@ -8,17 +9,18 @@
   [exp]
   (insta/transform 
     {:INT read-string,
-     :OPER (comp read-string str),
+     :OPER read-string,
      :OpExp (fn [exp1 oper exp2]
-              (println oper)
-              (if (= oper "PLUS")
+              (if (= (str oper) "+")
                 (+ exp1 exp2)
-                (println oper "PLUS")))}
+                (println oper "+")))}
     exp))
 
 (defn interpret [node]
   (let [guard (.exp node)]
-    (if guard (interpret (get-t node) (interpret (get-f node))))))
+    (if guard 
+      (interpret (get-t node))
+      (interpret (get-f node)))))
 
-(interpret-expression [:OpExp [:Int "4"] [:OPER "PLUS"] [:INT "4"]])
+(interpret-expression [:OpExp [:INT "4"] [:OPER "+"] [:INT "4"]])
 (interpret-expression [:OPER "+"])
