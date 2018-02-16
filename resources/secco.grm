@@ -1,3 +1,5 @@
+root = exp
+
 <exp> = exp 
       | OpExp
       | VarExp
