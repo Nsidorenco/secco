@@ -24,43 +24,36 @@
   (toString [_] (str "Node: <" nam ">, Exp: " exp)))
 
 (defn parse-tree->cfg
-  ([prog] ; TODO: we should make a default [prog path] logic instead
+  ([prog] (parse-tree->cfg prog []))
+  ([prog path]
   (let [[exp & exps] prog]
     (match [exp]
-      [:root] (let [node (parse-tree->cfg (first exps))] 
+      [:root] (let [node (parse-tree->cfg (first exps) [])] 
                 (->Node "root" "" node node))
-      [:OpExp] (->Node "oper" prog [] [])
+      [:OpExp] (->Node "oper" prog path path)
       [:WhileExp] (let [
                          [guard body] exps 
-                         gnode (parse-tree->cfg guard)
+                         gnode (parse-tree->cfg guard [])
                          bnode (parse-tree->cfg body gnode)
                        ]
                     (set-t gnode bnode)
                     gnode)
-      [:INT] (->Node "int" prog [] []) 
-      [:VarExp] (->Node "varexp" prog [] [])
-      [:AssignExp] (->Node "assignexp" prog [] [])
+      [:INT] (->Node "int" prog path path) 
+      [:VarExp] (->Node "varexp" prog path path)
+      [:AssignExp] (->Node "assignexp" prog path path)
       [:IFEXP] (let [
                       [guard tru fal] exps
-                      gnode (parse-tree->cfg guard)
+                      gnode (parse-tree->cfg guard [])
                       tnode (parse-tree->cfg tru gnode)
                       fnode (parse-tree->cfg fal gnode)
                     ]
                   (set-t gnode tnode)
                   (set-f gnode fnode)
                  gnode)
-      [:ParenExp] (parse-tree->cfg exps) 
+      [:ParenExp] (parse-tree->cfg exps []) 
       [:SeqExp] (reduce (fn [x node] (parse-tree->cfg x node)) (first exps) (rest exps))
       )))
-  ([prog path]
-  (let [[exp & exps] prog]
-    (match [exp]
-      [:OpExp] (->Node "oper2" prog path path) 
-      [:INT] (->Node "int2" prog path path)
-      [:VarExp] (->Node "varexp2" prog path path)
-      [:AssignExp] (->Node "assignexp2" prog path path)
-   ))
-  ))
+  )
 
   
 (defn build [program]
@@ -69,5 +62,6 @@
 (get-t(get-t(parse-tree->cfg (grm "if x>2 then x else 0"))))
 (get-f(get-t(parse-tree->cfg (grm "if x>2 then x else 0"))))
 (parse-tree->cfg (grm "(2+2)")) ; TODO: becomes SeqExp, fix in grammar?
+(get-t(parse-tree->cfg (grm "(0;1)")))
 (get-t(get-t(parse-tree->cfg (grm "(0;1)"))))
 (parse-tree->cfg (grm "4+4"))
