@@ -55,13 +55,12 @@
       )))
   )
 
-  
 (defn build [program]
-  (insta/transform parse-tree->cfg (grm program)))
+  (parse-tree->cfg (grm program)))
 
-(get-t(get-t(parse-tree->cfg (grm "if x>2 then x else 0"))))
-(get-f(get-t(parse-tree->cfg (grm "if x>2 then x else 0"))))
-(parse-tree->cfg (grm "(2+2)")) ; TODO: becomes SeqExp, fix in grammar?
-(get-t(parse-tree->cfg (grm "(0;1)")))
-(get-t(get-t(parse-tree->cfg (grm "(0;1)"))))
-(parse-tree->cfg (grm "4+4"))
+(get-t(get-t(build "if x>2 then x else 0")))
+(get-f(get-t(build "if x>2 then x else 0")))
+(get-t(build "(2+2)*(3+2)")) ; TODO: becomes SeqExp, fix in grammar?
+(get-t(build "(0;1)"))
+(get-t(get-t(build "(0;1)")))
+(build "4+4")
