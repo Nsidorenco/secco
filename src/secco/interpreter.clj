@@ -18,11 +18,13 @@
 
 (defn interpret [node]
   (let [guard (.exp node)]
-    (if guard 
-      (interpret (get-t node))
+    (if (interpret-expression guard)
+      (interpret (get-t node))      ; TODO: what if []?
       (interpret (get-f node)))))
 
 (interpret-expression [:OpExp [:INT "4"] [:OPER "+"] [:INT "4"]])
 (interpret-expression [:OPER "+"])
 
-
+(interpret-expression (.exp (get-t(build "4+4"))))
+(interpret (->Node "oper" (.exp (get-t(build "4+4"))) [] []))
+(interpret (build "4+4"))
