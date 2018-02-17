@@ -24,16 +24,16 @@
   (toString [_] (str "Node: <" nam ">, Exp: " exp)))
 
 (defn parse-tree->cfg
-  ([prog] (parse-tree->cfg prog []))
+  ([prog] (parse-tree->cfg prog nil))
   ([prog path]
   (let [[exp & exps] prog]
     (match [exp]
-      [:root] (let [node (parse-tree->cfg (first exps) [])] 
+      [:root] (let [node (parse-tree->cfg (first exps))] 
                 (->Node "root" "" node node))
       [:OpExp] (->Node "oper" prog path path)
       [:WhileExp] (let [
                          [guard body] exps 
-                         gnode (parse-tree->cfg guard [])
+                         gnode (parse-tree->cfg guard)
                          bnode (parse-tree->cfg body gnode)
                        ]
                     (set-t gnode bnode)
@@ -43,14 +43,14 @@
       [:AssignExp] (->Node "assignexp" prog path path)
       [:IFEXP] (let [
                       [guard tru fal] exps
-                      gnode (parse-tree->cfg guard [])
+                      gnode (parse-tree->cfg guard)
                       tnode (parse-tree->cfg tru gnode)
                       fnode (parse-tree->cfg fal gnode)
                     ]
                   (set-t gnode tnode)
                   (set-f gnode fnode)
                  gnode)
-      [:ParenExp] (parse-tree->cfg exps []) 
+      [:ParenExp] (parse-tree->cfg exps) 
       [:SeqExp] (reduce (fn [x node] (parse-tree->cfg x node)) (first exps) (rest exps))
       )))
   )
