@@ -5,6 +5,8 @@
 (def venv
   {})
 
+(def res (atom 0))
+
 (defn interpret-expression
   [exp]
   (insta/transform 
@@ -12,15 +14,17 @@
      :OPER read-string,
      :OpExp (fn [exp1 oper exp2]
               (if (= (str oper) "+")
-                (+ exp1 exp2)
+                (reset! res (+ exp1 exp2))
                 (println oper "+")))}
     exp))
 
 (defn interpret [node]
-  (let [guard (.exp node)]
-    (if (interpret-expression guard)
-      (interpret (get-t node))      ; TODO: nil => end program / no path?
-      (interpret (get-f node)))))
+  (if (instance? secco.cfg.CFGNode node)
+    (let [guard (.exp node)]
+      (if (interpret-expression guard)
+        (interpret (get-t node))
+        (interpret (get-f node))))
+    (println @res)))
 
 (interpret-expression [:OpExp [:INT "4"] [:OPER "+"] [:INT "4"]])
 (interpret-expression [:OPER "+"])
@@ -28,3 +32,5 @@
 (interpret-expression (.exp (get-t(build "4+4"))))
 (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
 (interpret (build "4+4"))
+
+(instance? secco.cfg.CFGNode "")
