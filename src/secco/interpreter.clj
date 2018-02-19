@@ -19,7 +19,13 @@
                       (interpret-expression exp2)
                       (let [exp2 @res oper (interpret-expression oper)]
                         (cond (= (str oper) "+") (reset! res (+ exp1 exp2))
+                              (= (str oper) "-") (reset! res (- exp1 exp2))
                               (= (str oper) "<") (reset! res (< exp1 exp2))
+                              (= (str oper) ">") (reset! res (> exp1 exp2))
+                              (= (str oper) "<=") (reset! res (<= exp1 exp2))
+                              (= (str oper) ">=") (reset! res (>= exp1 exp2))
+                              (= (str oper) "=") (reset! res (= exp1 exp2))
+                              (= (str oper) "!=") (reset! res (not= exp1 exp2))
                               :else (println "oper not supported")))))
          [:AssignExp] (let [[_ varexp body] exp]
                         (let [varname (second varexp)]
@@ -43,9 +49,10 @@
 ; (interpret (build "(x := 4; x := 7; x := 1021212131)"))
 (reset! venv {})
 (interpret (build "(x := 4; x := 7; y := 5; z:=3; x := y; y:=2)"))
-(interpret (build "(z := x; x := 2)"))
+(interpret (build "(x := 1; y := 2; z := x+y; x := 2)"))
 (get @venv "y")
 (println @venv)
+(println "")
 ; (interpret (build "if 3 < 2 then 4 else 5"))
 ; (interpret-expression (.exp (get-t(build "4+4"))))
 ; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
