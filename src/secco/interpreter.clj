@@ -12,7 +12,7 @@
   (match [(first exp)]
          [:INT] (reset! res (read-string (second exp)))
          [:OPER] (read-string (second exp))
-         [:VarExp] (reset! res (read-string (second exp)))
+         [:VarExp] (reset! res (get @venv (second exp)))
          [:OpExp] (let [[_ exp1 oper exp2] exp]
                     (interpret-expression exp1)
                     (let [exp1 @res]
@@ -22,10 +22,10 @@
                               (= (str oper) "<") (reset! res (< exp1 exp2))
                               :else (println "oper not supported")))))
          [:AssignExp] (let [[_ varexp body] exp]
-                        (interpret-expression varexp)
-                        (let [varname @res]
+                        (let [varname (second varexp)]
                           (interpret-expression body)
-                          (swap! venv conj {varname @res})))
+                          (if (= @res nil)(println "Error! Variable not declared")
+                            (swap! venv conj {varname @res}))))
          [_] @res))
 
 (defn interpret [node]
@@ -41,7 +41,11 @@
 ; (interpret-expression [:OPER "+"])
 
 ; (interpret (build "(x := 4; x := 7; x := 1021212131)"))
-; (println @venv)
+(reset! venv {})
+(interpret (build "(x := 4; x := 7; y := 5; z:=3; x := y; y:=2)"))
+(interpret (build "(z := x; x := 2)"))
+(get @venv "y")
+(println @venv)
 ; (interpret (build "if 3 < 2 then 4 else 5"))
 ; (interpret-expression (.exp (get-t(build "4+4"))))
 ; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
