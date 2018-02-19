@@ -31,10 +31,20 @@
                           ]
                       (swap! graph conj {ex [(build-tree (get-t node))]}) 
                       ex)
+           ["varexp"] (let [
+                            ex (second (.exp node))
+                            ]
+                        (swap! graph conj {ex [(build-tree (get-t node))]})
+                        ex)
+           ["assignexp"] (let [
+                            ex (second (.exp node))
+                            ]
+                        (swap! graph conj {ex [(build-tree (get-t node))]})
+                        ex)
            )
     :end))
 
 (reset! graph {})
-(visualize (build-tree (cfg/build "if 3<4 then 1 else 0")))
+(visualize (build-tree (cfg/build "(x := 0;if x < 10 then 1 else 0)")))
 (println @graph)
 ;(visualize graph)
