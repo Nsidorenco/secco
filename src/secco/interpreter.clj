@@ -3,8 +3,8 @@
             [clojure.core.match :refer [match]]]
   [:use  [secco.cfg]])
 
+; define mutable variables
 (def venv (atom {}))
-
 (def res (atom 0))
 
 (defn interpret-expression
@@ -37,13 +37,13 @@
         (interpret (get-f node))))
     (println @res)))
 
-(interpret-expression [:OpExp [:INT "4"] [:OPER "+"] [:INT "4"]])
-(interpret-expression [:OPER "+"])
+; (interpret-expression [:OpExp [:INT "4"] [:OPER "+"] [:INT "4"]])
+; (interpret-expression [:OPER "+"])
 
-(interpret (build "(x := 4; x := 7; x := 1021212131)"))
-(println @venv)
-(interpret (build "if 3 < 2 then 4 else 5"))
-(interpret-expression (.exp (get-t(build "4+4"))))
-(interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
-(interpret (build "4+4"))
+; (interpret (build "(x := 4; x := 7; x := 1021212131)"))
+; (println @venv)
+; (interpret (build "if 3 < 2 then 4 else 5"))
+; (interpret-expression (.exp (get-t(build "4+4"))))
+; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
+; (interpret (build "4+4"))
 
