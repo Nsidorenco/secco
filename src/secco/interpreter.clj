@@ -55,4 +55,4 @@
 ; (interpret (build "4+4"))
 
 (get-t(get-t(get-t(get-t (build "(x:=0;z:=0;while x<6 do (x := x+1; while z<6 do z := z+1))")))))
-(get-t (build "(x:=0;z:=0;while x<6 do (x := x+1; while z<6 do z := z+1))"))
+(get-f(get-t(get-t(get-t (get-t (get-t (build "(x:=0;z:=0;while x<6 do (x := x+1; while z<6 do z := z+1))")))))))
