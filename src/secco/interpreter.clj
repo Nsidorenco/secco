@@ -12,7 +12,9 @@
   (match [(first exp)]
          [:INT] (reset! res (read-string (second exp)))
          [:OPER] (read-string (second exp))
-         [:VarExp] (reset! res (get @venv (second exp)))
+         [:VarExp] (let [varname (get @venv (second exp))]
+                    (reset! res varname)
+                    (assert (not= @res nil) "Variable not declared"))
          [:OpExp] (let [[_ exp1 oper exp2] exp]
                     (interpret-expression exp1)
                     (let [exp1 @res]
@@ -30,8 +32,7 @@
          [:AssignExp] (let [[_ varexp body] exp]
                         (let [varname (second varexp)]
                           (interpret-expression body)
-                          (if (= @res nil)(println "Error! Variable not declared")
-                            (swap! venv conj {varname @res}))))
+                          (swap! venv conj {varname @res})))
          [_] @res))
 
 (defn interpret [node]
@@ -53,3 +54,5 @@
 ; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
 ; (interpret (build "4+4"))
 
+(get-t(get-t(get-t(get-t (build "(x:=0;z:=0;while x<6 do (x := x+1; while z<6 do z := z+1))")))))
+(get-t (build "(x:=0;z:=0;while x<6 do (x := x+1; while z<6 do z := z+1))"))
