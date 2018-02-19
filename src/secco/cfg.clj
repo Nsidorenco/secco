@@ -33,7 +33,7 @@
       [:OpExp] (->Node "oper" prog path path)
       [:WhileExp] (let [
                          [guard body] exps 
-                         gnode (parse-tree->cfg guard)
+                         gnode (parse-tree->cfg guard path)
                          bnode (parse-tree->cfg body gnode)
                        ]
                     (set-t gnode bnode)
@@ -44,8 +44,8 @@
       [:IFEXP] (let [
                       [guard tru fal] exps
                       gnode (parse-tree->cfg guard)
-                      tnode (parse-tree->cfg tru)
-                      fnode (parse-tree->cfg fal)
+                      tnode (parse-tree->cfg tru path)
+                      fnode (parse-tree->cfg fal path)
                     ]
                   (set-t gnode tnode)
                   (set-f gnode fnode)
