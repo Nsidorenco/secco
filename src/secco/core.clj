@@ -1,6 +1,7 @@
 (ns secco.core
   [:require [secco.cfg :as cfg]
-            [secco.interpreter :as ip]]
+            [secco.interpreter :as ip]
+            [clojure.java.io :as io]]
   (:gen-class))
 
 ; (ip/interpret (cfg/build "4+4"))
@@ -9,5 +10,9 @@
 (defn -main
   "Main function"
   [prog]
-  (-> (cfg/build prog)
+  (-> (slurp (io/resource prog))
+      (cfg/build)
       (ip/interpret)))
+
+
+(-main "whiletest1.sec")
