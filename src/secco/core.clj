@@ -13,6 +13,3 @@
   (-> (slurp (io/resource prog))
       (cfg/build)
       (ip/interpret)))
-
-
-(-main "whiletest1.sec")
