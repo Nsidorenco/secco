@@ -32,9 +32,8 @@
          [:AssignExp] (let [[_ varexp body] exp
                             varname (second varexp)]
                         (interpret-expression body)
-                        (if (= @res nil)
-                          (println "Error! Variable not declared")
-                          (swap! venv conj {varname @res})))
+                        (assert (not= @res nil) (println "Error! Variable not declared"))
+                        (swap! venv conj {varname @res}))
          [_] @res))
 
 (defn interpret [node]
