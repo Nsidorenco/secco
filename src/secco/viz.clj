@@ -40,7 +40,7 @@
                              exist (get @graph ex) ]
                          (if (= exist nil)
                            ((swap! labels conj {getsym ex})
-                           (swap! graph conj {getsym [(build-tree (get-t node) (+ counter 1)) (build-tree (get-f node) (+ counter 2))]}))
+                           (swap! graph conj {getsym [(build-tree (get-t node) (+ counter 1)) (build-tree (get-f node) (+ counter 10))]}))
                            ())
                          getsym)
               ["int"]  (let [
@@ -76,6 +76,6 @@
 (println @graph)
 (println @labels)
 (visualize (graphic (cfg/build "x:=42")))
-(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then y := x +1 else x)")))
+(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 (visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
 ;(visualize graph)
