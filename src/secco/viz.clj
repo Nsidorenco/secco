@@ -77,7 +77,6 @@
                                   og (.exp node)
                                   ]
                               (swap! labels conj {getsym ex})
-                              (println mark)
                               (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
                               getsym)
               ))
