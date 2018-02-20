@@ -1,0 +1,12 @@
+(months := 12;
+days := 30;
+month := 0;
+day := 0;
+i := 0;
+while month<months do
+    (month := month+1;
+    while day<days do
+        (day := day+1;
+        i := i+1);
+    day := 0);
+i)
