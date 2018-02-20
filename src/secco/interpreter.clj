@@ -42,8 +42,8 @@
     (let [guard (.exp node)]
       (interpret-expression guard)
       (if @res
-        (interpret (get-t node))
-        (interpret (get-f node))))
+        (recur (get-t node))
+        (recur (get-f node))))
     (println "res = " @res " venv = " @venv)))
 
 ; (println "venv = " @venv)
@@ -51,7 +51,7 @@
 ; (interpret-expression [:OPER "+"])
 
 ; (interpret (build "(x := 4; x := 7; x := 1021212131)"))
-; (interpret (build "if 3 < 2 then 4 else 5"))
+; (interpret (build "if 3 < 2 then 4 else if 1 < 2 then 6 else 7"))
 ; (interpret-expression (.exp (get-t(build "4+4"))))
 ; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
 ; (interpret (build "4+4"))
