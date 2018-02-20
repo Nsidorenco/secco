@@ -5,8 +5,7 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"],
                  [instaparse "1.4.8"],
-                 [org.clojure/core.match "0.3.0-alpha5"]
-                 [com.microsoft/z3 "4.5.1"]]
+                 [org.clojure/core.match "0.3.0-alpha5"]]
   :profiles {:dev {:dependencies
                    [[rhizome "0.2.9"]]}}
   :scm {:name "git"
