@@ -66,14 +66,14 @@
                          (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]}) 
                          getsym)
               ["varexp"] (let [
-                               ex (second (.exp node))
+                               ex (.exp node)
                                ]
                            (swap! labels conj {getsym ex})
                            (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
                            getsym)
               ["assignexp"] (let [
                                   [_ varexp body] (.exp node)
-                                  ex (str (second varexp) ":=" (second body))
+                                  ex (str (second varexp) ":=" body)
                                   og (.exp node)
                                   ]
                               (swap! labels conj {getsym ex})
