@@ -7,31 +7,33 @@
 (def venv (atom {}))
 (def res (atom 0))
 
+
+(defmacro set-res
+  ([value]
+  `(reset! res ~value))
+  ([exp1 oper exp2]
+  `(set-res ((resolve ~oper) ~exp1 ~exp2))))
+
+
 (defn interpret-expression
   [exp]
   (match [(first exp)]
-         [:INT] (reset! res (read-string (second exp)))
+         [:INT] (set-res (read-string (second exp)))
          [:OPER] (read-string (second exp))
          [:VarExp] (let [varname (get @venv (second exp))]
-                    (reset! res varname)
+                    (set-res varname)
                     (assert (not= @res nil) "Variable not declared"))
          [:OpExp] (let [[_ exp1 oper exp2] exp]
                     (interpret-expression exp1)
                     (let [exp1 @res]
                       (interpret-expression exp2)
                       (let [exp2 @res oper (interpret-expression oper)]
-                        (cond (= (str oper) "+") (reset! res (+ exp1 exp2))
-                              (= (str oper) "-") (reset! res (- exp1 exp2))
-                              (= (str oper) "<") (reset! res (< exp1 exp2))
-                              (= (str oper) ">") (reset! res (> exp1 exp2))
-                              (= (str oper) "<=") (reset! res (<= exp1 exp2))
-                              (= (str oper) ">=") (reset! res (>= exp1 exp2))
-                              (= (str oper) "=") (reset! res (= exp1 exp2))
-                              (= (str oper) "!=") (reset! res (not= exp1 exp2))
-                              :else (println "oper not supported")))))
-         [:AssignExp] (let [[_ varexp body] exp]
-                        (let [varname (second varexp)]
-                          (interpret-expression body)
+                        (set-res exp1 oper exp2))))
+         [:AssignExp] (let [[_ varexp body] exp
+                            varname (second varexp)]
+                        (interpret-expression body)
+                        (if (= @res nil)
+                          (println "Error! Variable not declared")
                           (swap! venv conj {varname @res})))
          [_] @res))
 
@@ -40,8 +42,8 @@
     (let [guard (.exp node)]
       (interpret-expression guard)
       (if @res
-        (interpret (get-t node))
-        (interpret (get-f node))))
+        (recur (get-t node))
+        (recur (get-f node))))
     (println "res = " @res " venv = " @venv)))
 
 ; (println "venv = " @venv)
@@ -49,10 +51,7 @@
 ; (interpret-expression [:OPER "+"])
 
 ; (interpret (build "(x := 4; x := 7; x := 1021212131)"))
-; (interpret (build "if 3 < 2 then 4 else 5"))
+; (interpret (build "if 3 < 2 then 4 else if 1 < 2 then 6 else 7"))
 ; (interpret-expression (.exp (get-t(build "4+4"))))
 ; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
 ; (interpret (build "4+4"))
-
-(get-t(get-t(get-t(get-t (build "(x:=0;z:=0;while x<6 do (x := x+1; while z<6 do z := z+1))")))))
-(get-f(get-t(get-t(get-t (get-t (get-t (build "(x:=0;z:=0;while x<6 do (x := x+1; while z<6 do z := z+1))")))))))
