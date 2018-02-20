@@ -19,16 +19,25 @@
                     (subsets (dec n) (rest items)))
                   (subsets n (rest items)))))
 
-(def symbols (map (fn [x] (str x)) (subsets 3 alphabet)))
+(def symbols (map (fn [x] (keyword (clojure.string/join x))) (subsets 3 alphabet)))
 
-(def graph
-  {:a [:b]
-   :b []})
+(def g
+    {:a [:b :c]
+     :b [:c]
+     :c [:a]})
+
+(def g-edges
+  {:a {:b :makes
+       :c :takes}
+   :b {:c :takes}
+   :c {:a :makes}})
 
 (def labels (atom {}))
+(def edges (atom {}))
 
 (defn visualize [graph] (r/view-graph (keys graph) graph
              :node->descriptor (fn [n] {:label (get @labels n)})
+             :edge->descriptor (fn [src dst] {:label (dst (src @edges))})
              ))
 
 (def graph (atom {}))
@@ -50,9 +59,10 @@
            getsym (nth symbols counter)
            ]
        (match [(.nam node)]
-              ["root"] (let [ex (read-string (.nam node))]
+              ["root"] (let [ex (read-string (.nam node))
+                             tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
                          (swap! labels conj {getsym "start"})
-                         (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
+                         (swap! graph conj {getsym [tnode]})
                          getsym)
               ["oper"] (let [
                              [_ exp1 oper exp2] (.exp node)
@@ -64,8 +74,9 @@
                                      :end)
                              ]
                          (if (not(contains? mark node))
-                           ((swap! labels conj {getsym ex})
-                           (swap! graph conj {getsym [tnode fnode]})
+                           (let [] (swap! labels conj {getsym ex})
+                            (swap! edges conj {getsym {tnode "true" fnode "false"}})
+                            (swap! graph conj {getsym [tnode fnode]})
                            getsym)
                            (get mark node)))
               ["int"]  (let [
@@ -94,13 +105,15 @@
 (defn graphic [node]
   (reset! graph {:end []})
   (reset! labels {:end "end"})
+  (reset! edges {:end {}})
   (build-tree node)
   @graph)
 
 ; TODO: stop uending loops
-;(println @graph)
-;(println @labels)
-;(visualize (graphic (cfg/build "x:=42")))
-;(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
+(println @graph)
+(println @labels)
+(println @edges)
+(visualize (graphic (cfg/build "x:=42")))
+(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 ;(visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
-;(visualize graph)
+;(visualize g)
