@@ -52,7 +52,7 @@
                  gnode)
       [:ParenExp] (parse-tree->cfg exps) 
       [:SeqExp] (reduce (fn [node x] (parse-tree->cfg x node)) 
-                        (parse-tree->cfg (last exps))
+                        (parse-tree->cfg (last exps) path)
                         (rest (reverse exps)))
       )))
   )
