@@ -37,8 +37,9 @@
   (match [(first body)]
          [:VarExp] (second body)
          [:INT] (second body)
+         [:OPER] (second body)
          [:OpExp] (let [[_ exp1 oper exp2] body] 
-                    (pretty exp1) (pretty oper) (pretty exp2))
+                    (str (pretty exp1) (pretty oper) (pretty exp2)))
          [_] body))
 
 (defn build-tree 
