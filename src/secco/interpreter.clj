@@ -55,5 +55,6 @@
 ; (interpret (build "if 3 < 2 then 4 else if 1 < 2 then 6 else 7"))
 ; (interpret-expression (.exp (get-t(build "4+4"))))
 ; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
-; (interpret (build "2 * (3 + 3)"))
+ 
+ (interpret (build "2 * (3 + 3)"))
 
