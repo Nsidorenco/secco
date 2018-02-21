@@ -49,6 +49,7 @@
          [:OPER] (second body)
          [:OpExp] (let [[_ exp1 oper exp2] body] 
                     (str (pretty exp1) (pretty oper) (pretty exp2)))
+         [:ParenExp] (str "(" (pretty (second body)) ")")
          [_] body))
 
 (defn build-tree 
@@ -110,10 +111,11 @@
   @graph)
 
 ; TODO: stop uending loops
-(println @graph)
-(println @labels)
-(println @edges)
-(visualize (graphic (cfg/build "x:=42")))
-(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
+;(println @graph)
+;(println @labels)
+;(println @edges)
+;(visualize (graphic (cfg/build "x:=42")))
+;(visualize (graphic (cfg/build "(x:=(2+3);x)")))
+;(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 ;(visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
 ;(visualize g)
