@@ -74,12 +74,17 @@
                                      (build-tree (cfg/get-f node) (+ counter 256) (conj mark {node getsym}))
                                      :end)
                              ]
-                         (if (not(contains? mark node))
-                           (let [] (swap! labels conj {getsym ex})
-                            (swap! edges conj {getsym {tnode "true" fnode "false"}})
-                            (swap! graph conj {getsym [tnode fnode]})
-                           getsym)
-                           (get mark node)))
+                         (match [(second oper)]
+                                ["+"] (let []     (swap! labels conj {getsym ex})
+                                                  (swap! graph conj {getsym [tnode]}) getsym) 
+                                ["-"] (let []     (swap! labels conj {getsym ex})
+                                                  (swap! graph conj {getsym [tnode]}) getsym) 
+                                [_] (if (not(contains? mark node))
+                                      (let [] (swap! labels conj {getsym ex})
+                                        (swap! edges conj {getsym {tnode "true" fnode "false"}})
+                                        (swap! graph conj {getsym [tnode fnode]})
+                                        getsym)
+                                      (get mark node))))
               ["int"]  (let [
                              ex (second (.exp node))
                              ]
