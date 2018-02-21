@@ -1,0 +1,22 @@
+% gcd(a,b) %
+(
+    a := 22;
+    b := 7;
+    while b != 0 do
+        (
+            c := b;
+
+            i := a;
+            while i > 0 do
+                i := i - b;
+
+            if i < 0 then
+                i := i + b
+            else
+                i;
+
+            b := i; 
+            a := c
+        );
+    a+b
+)
