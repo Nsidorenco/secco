@@ -6,6 +6,7 @@ A language build in Clojure, for usage in concolic execution (symbolic and concr
 ```lein run "program.sec" <options>```
 
 ```-ast``` For Abstract Syntax Tree made in Graphviz (Rhizome)
+
 ```-cfg``` For Control Flow Graph made in Graphviz (Rhizome)
 
 
