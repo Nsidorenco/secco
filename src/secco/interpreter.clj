@@ -19,6 +19,12 @@
   (match [(first exp)]
          [:INT] (set-res (read-string (second exp)))
          [:OPER] (read-string (second exp))
+         [:add] (let [[_ exp1 exp2] exp]
+                    (reset! res (+  (interpret-expression exp1) (interpret-expression exp2))))
+         [:sub] (let [[_ exp1 exp2] exp]
+                    (reset! res (-  (interpret-expression exp1) (interpret-expression exp2))))
+         [:mul] (let [[_ exp1 exp2] exp]
+                    (reset! res (*  (interpret-expression exp1) (interpret-expression exp2))))
          [:VarExp] (let [varname (get @venv (second exp))]
                     (set-res varname)
                     (assert (not= @res nil) "Variable not declared"))
@@ -55,6 +61,3 @@
 ; (interpret (build "if 3 < 2 then 4 else if 1 < 2 then 6 else 7"))
 ; (interpret-expression (.exp (get-t(build "4+4"))))
 ; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
- 
- (interpret (build "2 * (3 + 3)"))
-
