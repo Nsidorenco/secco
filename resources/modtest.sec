@@ -1,0 +1,12 @@
+%a mod b = i%
+(a := 112;
+b := 9;
+i := a;
+while i>0 do
+    i := i-b;
+if i<0 then
+    i := i+b
+else
+    i;
+i
+)
