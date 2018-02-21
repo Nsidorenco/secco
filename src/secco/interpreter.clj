@@ -12,8 +12,7 @@
   ([value]
   `(reset! res ~value))
   ([exp1 oper exp2]
-  `(set-res ((resolve ~oper) ~exp1 ~exp2))))
-
+   `(set-res ((resolve ~oper) ~exp1 ~exp2))))
 
 (defn interpret-expression
   [exp]
@@ -28,7 +27,9 @@
                     (let [exp1 @res]
                       (interpret-expression exp2)
                       (let [exp2 @res oper (interpret-expression oper)]
-                        (set-res exp1 oper exp2))))
+                        (if (= "!=" (str oper))
+                          (set-res (not (= exp1 exp2)))
+                          (set-res exp1 oper exp2)))))
          [:AssignExp] (let [[_ varexp body] exp
                             varname (second varexp)]
                         (interpret-expression body)
@@ -53,4 +54,4 @@
 ; (interpret (build "if 3 < 2 then 4 else if 1 < 2 then 6 else 7"))
 ; (interpret-expression (.exp (get-t(build "4+4"))))
 ; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
-; (interpret (build "4+4"))
+(interpret (build "4 != 4"))
