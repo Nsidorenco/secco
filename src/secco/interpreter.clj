@@ -20,11 +20,23 @@
          [:INT] (set-res (read-string (second exp)))
          [:OPER] (read-string (second exp))
          [:add] (let [[_ exp1 exp2] exp]
-                    (reset! res (+  (interpret-expression exp1) (interpret-expression exp2))))
+                    (interpret-expression exp1)
+                    (let [exp1 @res]
+                      (interpret-expression exp2)
+                        (let [exp2 @res]
+                          (reset! res (+ exp1 exp2)))))
          [:sub] (let [[_ exp1 exp2] exp]
-                    (reset! res (-  (interpret-expression exp1) (interpret-expression exp2))))
+                    (interpret-expression exp1)
+                    (let [exp1 @res]
+                      (interpret-expression exp2)
+                        (let [exp2 @res]
+                          (reset! res (- exp1 exp2)))))
          [:mul] (let [[_ exp1 exp2] exp]
-                    (reset! res (*  (interpret-expression exp1) (interpret-expression exp2))))
+                    (interpret-expression exp1)
+                    (let [exp1 @res]
+                      (interpret-expression exp2)
+                        (let [exp2 @res]
+                          (reset! res (* exp1 exp2)))))
          [:VarExp] (let [varname (get @venv (second exp))]
                     (set-res varname)
                     (assert (not= @res nil) "Variable not declared"))

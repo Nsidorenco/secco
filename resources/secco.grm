@@ -18,7 +18,7 @@ add = add-sub <'+'> mul-term
 sub = add-sub <'-'> mul-term
 <mul-term> = term | mul
 mul = mul-term <'*'> term
-<term> = INT | <'('> add-sub <')'>
+<term> = VarExp | INT | <'('> add-sub <')'>
 
 VarExp = ID
 <ID> = #'[a-zA-Z]+[a-zA-Z0-9_]*'
