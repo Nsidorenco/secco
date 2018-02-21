@@ -29,6 +29,9 @@
   "Not"
   [exp]
     `(list (symbol (first ~exp)) (list ~'(symbol 'not) (second ~exp))))
+  
+(def sat?  
+  (list 'check-sat))
 
 (def test_exp (assert 1 < 9))
 (def k (first test_exp))
@@ -37,7 +40,4 @@
 ; (def test_model (conj [] (list 'declare-const 'a 'Int) 
 ;                          (list 'assert (list '> 'a '10))))
 
-; (def test_model2 (conj [] (const b Int) (assert b > 10) (assert b < 5)))
-
-; (check-sat test_model2)
-;(sh "z3" "-in" :in (str (s/join (conj [] (list 'declare-const "x" 'Int) sat?))))
+(def test_model2 (conj [] (const 'b 'Int) (assert 'b > 10) (assert 'b < 5)))
