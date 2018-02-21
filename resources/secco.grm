@@ -8,6 +8,7 @@ root = exp
       | SeqExp
       | WhileExp
       | INT
+      | Comment
 
 OpExp = exp OPER exp (* TODO: fix precedens *)
 
@@ -28,6 +29,9 @@ WhileExp = <'while'> test <'do'> body
 <test> = exp
 <body> = exp
 
+<Comment> = <'%'> <text> <'%'> exp
+
+text = #'[^%]*'
 
 OPER = '*' | '+' | '-' | '=' | '!=' | '<' | '>' | '<=' | '>='
 INT = digits

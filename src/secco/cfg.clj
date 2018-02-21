@@ -31,6 +31,7 @@
       [:root] (let [node (parse-tree->cfg (first exps))] 
                 (->Node "root" "" node node))
       [:OpExp] (->Node "oper" prog path path)
+      [:Comment] (parse-tree->cfg exps path)
       [:WhileExp] (let [
                          [guard body] exps 
                          gnode (parse-tree->cfg guard path)
@@ -66,3 +67,4 @@
 ; (get-t(build "(0;1;2;3;4;5)"))
 ; (get-t(get-t(build "(0;1)")))
 ; (build "4+4")
+; (get-t (build "%dette er en kommentar% (x:=1; if x=3 then 1 else 2)"))
