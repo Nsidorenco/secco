@@ -13,7 +13,7 @@
 
 (deftest parentest
 	(interpret (build "3*(3+2)"))
-	(testing "precedence"
+	(testing "precedence paren"
 		(is (= @res 15))))
 
 (deftest branchingtest
@@ -36,3 +36,7 @@
 	(testing "venv of modtest.sec"
 		(is (= @venv {"a" 112, "b" 9, "i" 4}))))
 
+(deftest precedencetest
+	(interpret (build "1+2*3+4-5"))
+	(testing "precedence"
+		(is (= @res 6))))
