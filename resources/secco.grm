@@ -1,6 +1,6 @@
 root = exp
 
-<exp> = exp 
+<exp> = ParenExp 
       | OpExp
       | VarExp
       | IFEXP
@@ -8,8 +8,13 @@ root = exp
       | SeqExp
       | WhileExp
       | INT
+      | Comment
 
-OpExp = exp OPER exp (* TODO: fix precedens *)
+OpExp = exp '*' exp
+      | exp '/' exp
+      | exp '+' exp
+      | exp '-' exp
+      | exp OPER exp (* TODO: fix precedens *)
 
 VarExp = ID
 <ID> = #'[a-zA-Z]+[a-zA-Z0-9_]*'
@@ -18,16 +23,19 @@ IFEXP = <'if'> exp <'then'> exp <'else'> exp
 
 AssignExp = VarExp <':='> exp
 
-SeqExp = <'('> exp OptExp <')'>
-<OptExp> = <';'> exp OptExp | eps (* broken *)
-
 ParenExp = <'('> OptParenExp <')'>
 <OptParenExp> = exp | eps
+
+SeqExp = <'('> exp <';'> exp OptExp <')'>
+<OptExp> = <';'> exp OptExp | eps (* broken *)
 
 WhileExp = <'while'> test <'do'> body
 <test> = exp
 <body> = exp
 
+<Comment> = <'%'> <text> <'%'> exp
+
+text = #'[^%]*'
 
 OPER = '*' | '+' | '-' | '=' | '!=' | '<' | '>' | '<=' | '>='
 INT = digits

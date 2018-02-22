@@ -1,6 +1,7 @@
 (ns secco.core
   [:require [secco.cfg :as cfg]
             [secco.interpreter :as ip]
+            [instaparse.core :as insta]
             [clojure.java.io :as io]
             [secco.viz :as viz]]
   (:gen-class))
@@ -17,7 +18,9 @@
       (cfg/build)
       (ip/interpret)))
   ([prog opt]
-   (when (clojure.string/includes? opt "-g")
-    (viz/visualize(viz/graphic (cfg/build (slurp (io/resource prog))))))
-  (-main prog)
+   (cond (clojure.string/includes? opt "-cfg")
+         (viz/visualize(viz/graphic (cfg/build (slurp (io/resource prog)))))
+         (clojure.string/includes? opt "-ast")
+         (insta/visualize (cfg/grm (slurp (io/resource prog)))))
+   (-main prog)
    ))
