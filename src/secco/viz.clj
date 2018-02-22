@@ -81,14 +81,13 @@
                                       getsym)
                                     (get mark node)))
               ["arith"] (let [type (first (.exp node))]
-                            (println (.exp node))
                             (let [
                                   oper (str (match [type]
                                               [:add] "+"
                                               [:sub] "-"
                                               [:mul] "*"))
                                   [_ exp1 exp2] (.exp node)
-                                  ex (str (second exp1) oper (second exp2))
+                                  ex (str (find exp1) oper (find exp2))
                                   tnode (build-tree (cfg/get-t node) (+ counter 1) mark)
                                 ]
                              (swap! labels conj {getsym ex})
@@ -117,6 +116,16 @@
               ))
      :end)))
 
+(defn find [exp]
+  (match [(first exp)]
+    [:add] (let [[_ exp1 exp2] exp]
+              (str (find exp1) "+" (find exp2)))
+    [:sub] (let [[_ exp1 exp2] exp]
+              (str (find exp1) "-" (find exp2)))
+    [:mul] (let [[_ exp1 exp2] exp]
+              (str (find exp1) "*" (find exp2)))
+    :else (second exp)))
+
 (defn graphic [node]
   (reset! graph {:end []})
   (reset! labels {:end "end"})
@@ -133,4 +142,4 @@
 ;(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 ;(visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
 ;(visualize g)
-;(visualize (graphic (cfg/build "if 1<2 then 3+4 else 5-6")))
+;(visualize (graphic (cfg/build "1+2+3*4-5+6")))
