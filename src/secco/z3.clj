@@ -29,15 +29,8 @@
   "Not"
   [exp]
     `(list (symbol (first ~exp)) (list ~'(symbol 'not) (second ~exp))))
-  
-(def sat?  
-  (list 'check-sat))
-
-(def test_exp (assert 1 < 9))
-(def k (first test_exp))
-(not test_exp)
 
 ; (def test_model (conj [] (list 'declare-const 'a 'Int) 
 ;                          (list 'assert (list '> 'a '10))))
 
-(def test_model2 (conj [] (const 'b 'Int) (assert 'b > 10) (assert 'b < 5)))
+; (def test_model2 (conj [] (const 'b 'Int) (assert 'b > 10) (assert 'b < 5)))
