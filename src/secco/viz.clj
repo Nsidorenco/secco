@@ -1,25 +1,12 @@
 (ns secco.viz
   [:require [clojure.core.match :refer [match]]
-   :require [secco.cfg :as cfg]])
+   :require [secco.cfg :as cfg]
+            [secco.util :as util]])
 
 (try
   (require '[rhizome.viz :as r])
   (catch Exception e
     (println "Needs rhizome.viz")))
-
-(def alphabet 
-  (map char (range 97 123)))
-
-(defn subsets [n items]
-(cond
-    (= n 0) '(())
-    (empty? items) '()
-    :else (concat (map
-                    #(cons (first items) %)
-                    (subsets (dec n) (rest items)))
-                  (subsets n (rest items)))))
-
-(def symbols (map (fn [x] (keyword (clojure.string/join x))) (subsets 3 alphabet)))
 
 (def g
     {:a [:b :c]
@@ -57,7 +44,7 @@
   ([node counter mark]
    (if (instance? secco.cfg.CFGNode node)
      (let [
-           getsym (nth symbols counter)
+           getsym (nth util/symbols counter)
            ]
        (match [(.nam node)]
               ["root"] (let [ex (read-string (.nam node))
