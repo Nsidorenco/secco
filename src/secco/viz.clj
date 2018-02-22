@@ -74,17 +74,26 @@
                                      (build-tree (cfg/get-f node) (+ counter 256) (conj mark {node getsym}))
                                      :end)
                              ]
-                         (match [(second oper)]
-                                ["+"] (let []     (swap! labels conj {getsym ex})
-                                                  (swap! graph conj {getsym [tnode]}) getsym) 
-                                ["-"] (let []     (swap! labels conj {getsym ex})
-                                                  (swap! graph conj {getsym [tnode]}) getsym) 
-                                [_] (if (not(contains? mark node))
-                                      (let [] (swap! labels conj {getsym ex})
-                                        (swap! edges conj {getsym {tnode "true" fnode "false"}})
-                                        (swap! graph conj {getsym [tnode fnode]})
-                                        getsym)
-                                      (get mark node))))
+                              (if (not(contains? mark node))
+                                    (let [] (swap! labels conj {getsym ex})
+                                      (swap! edges conj {getsym {tnode "true" fnode "false"}})
+                                      (swap! graph conj {getsym [tnode fnode]})
+                                      getsym)
+                                    (get mark node)))
+              ["arith"] (let [type (first (.exp node))]
+                            (println (.exp node))
+                            (let [
+                                  oper (str (match [type]
+                                              [:add] "+"
+                                              [:sub] "-"
+                                              [:mul] "*"))
+                                  [_ exp1 exp2] (.exp node)
+                                  ex (str (second exp1) oper (second exp2))
+                                  tnode (build-tree (cfg/get-t node) (+ counter 1) mark)
+                                ]
+                             (swap! labels conj {getsym ex})
+                             (swap! graph conj {getsym [tnode]}))
+                             getsym)
               ["int"]  (let [
                              ex (second (.exp node))
                              ]
@@ -124,3 +133,4 @@
 ;(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 ;(visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
 ;(visualize g)
+;(visualize (graphic (cfg/build "if 1<2 then 3+4 else 5-6")))
