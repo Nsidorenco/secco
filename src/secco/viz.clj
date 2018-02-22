@@ -67,7 +67,7 @@
                          getsym)
               ["oper"] (let [
                              [_ exp1 oper exp2] (.exp node)
-                             ex (str (second exp1) (second oper) (second exp2))
+                             ex (str (find exp1) (second oper) (find exp2))
                              tnode (when (not (contains? mark node)) 
                                      (build-tree (cfg/get-t node) (+ counter 1) (conj mark {node getsym})))
                              fnode (if (not (contains? mark node)) 
@@ -142,4 +142,4 @@
 ;(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 ;(visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
 ;(visualize g)
-;(visualize (graphic (cfg/build "1+2+3*4-5+6")))
+;(visualize (graphic (cfg/build "if 1+2+3*4-5+6>2 then 2 else 3")))
