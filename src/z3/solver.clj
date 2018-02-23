@@ -1,4 +1,4 @@
-(ns secco.z3
+(ns z3.solver
   [:require [clojure.string :as s] ]
   [:use [clojure.java.shell :only [sh]]])
 
@@ -26,7 +26,7 @@
   `(list ~'(symbol 'assert) (list ~oper ~exp1 ~exp2)))
 
 (defmacro not
-  "Not"
+  "Converts s-exp `(keyword comp-exp)` to `(keyword (not comp-exp)`"
   [exp]
     `(list (symbol (first ~exp)) (list ~'(symbol 'not) (second ~exp))))
 

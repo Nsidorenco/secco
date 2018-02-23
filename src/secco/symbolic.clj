@@ -1,7 +1,7 @@
 (ns secco.symbolic
   [:require [instaparse.core :as insta]
             [secco.cfg :as cfg]
-            [secco.z3 :as z3]
+            [z3.solver :as z3]
             [secco.util :as util]
             [clojure.core.match :refer [match]]])
 
