@@ -58,9 +58,3 @@
 
 ;z3/check-sat (model (cfg/build "(x:=0;y:=8;while x<y do x:=x+1;y:=5)")))
 
-(def whilemodel (conj [] 
-                      (z3/const x Int)
-                      (z3/const y Int)
-                      (z3/assert x < y)))
-
-(z3/check-sat whilemodel)

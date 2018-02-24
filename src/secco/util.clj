@@ -1,5 +1,4 @@
-(ns secco.util
-  )
+(ns secco.util)
 
 (def alphabet 
   (map char (range 97 123)))

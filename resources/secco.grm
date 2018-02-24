@@ -8,13 +8,17 @@ root = exp
       | SeqExp
       | WhileExp
       | INT
+      | add-sub
       | Comment
 
-OpExp = exp '*' exp
-      | exp '/' exp
-      | exp '+' exp
-      | exp '-' exp
-      | exp OPER exp (* TODO: fix precedens *)
+OpExp = exp OPER exp
+
+<add-sub> = mul-term | add | sub
+add = add-sub <'+'> mul-term
+sub = add-sub <'-'> mul-term
+<mul-term> = term | mul
+mul = mul-term <'*'> term
+<term> = VarExp | INT | <'('> add-sub <')'>
 
 VarExp = ID
 <ID> = #'[a-zA-Z]+[a-zA-Z0-9_]*'
@@ -37,6 +41,6 @@ WhileExp = <'while'> test <'do'> body
 
 text = #'[^%]*'
 
-OPER = '*' | '+' | '-' | '=' | '!=' | '<' | '>' | '<=' | '>='
+OPER = '=' | '!=' | '<' | '>' | '<=' | '>='
 INT = digits
 <digits> = #'[0-9]+'

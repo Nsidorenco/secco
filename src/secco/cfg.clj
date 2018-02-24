@@ -31,7 +31,9 @@
       [:root] (let [node (parse-tree->cfg (first exps))] 
                 (->Node "root" "" node node))
       [:OpExp] (->Node "oper" prog path path)
-      [:Comment] (parse-tree->cfg exps path)
+      [:add] (->Node "arith" prog path path)
+      [:sub] (->Node "arith" prog path path)
+      [:mul] (->Node "arith" prog path path)
       [:WhileExp] (let [
                          [guard body] exps 
                          gnode (parse-tree->cfg guard path)
