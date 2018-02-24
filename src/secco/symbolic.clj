@@ -9,6 +9,12 @@
 (def venv (atom {}))
 (def sym (atom (into [] util/literals)))
 
+
+(defmacro arithmetic
+  [sym exp1 exp2]
+  `(list (symbol '~sym) ~exp1 ~exp2))
+
+
 (defn sym-exp
   [exp]
   (let [getsym (util/pop-head! sym)]
@@ -22,13 +28,17 @@
                          e1 (sym-exp exp1)
                          op (sym-exp oper)
                          e2 (sym-exp exp2)]
+                    (println "here")
                     (z3/assert e1 op e2))
+         [:add] (let [[_ exp1 exp2] exp]
+                  (arithmetic + (sym-exp exp1) (sym-exp exp2)))
          [:AssignExp] (let [[_ varexp bodyexp] exp
                             varname (second varexp)
                             body (sym-exp bodyexp)]
-                        (swap! venv conj {varname getsym})
-                        (z3/const (get @venv varname) Int))
+                        (swap! venv conj {varname body})
+                        ;TODO: Add symbolic values for variables)
          [_] "")))
+
 
 (defn model 
   ([node] (model node []))
@@ -38,17 +48,19 @@
        (if (instance? clojure.lang.PersistentList last_cond)
          (let [t_pc (conj pc last_cond)
                f_pc (conj pc (z3/not last_cond))]
+           (println "t_pc :" t_pc " f_pc :" f_pc)
            (when (z3/check-sat t_pc) 
              (model (cfg/get-t node) t_pc))
            (when (z3/check-sat f_pc) 
              (model (cfg/get-f node) f_pc))
            (when-not (or (z3/check-sat t_pc) (z3/check-sat f_pc))
-             (println "pc: " pc)
+             (println "terminated pc: " pc)
              pc))
          (do 
            (model (cfg/get-t node) pc))))
      (println "pc: "pc))))
 
+; (model (cfg/build "(a := 1 + 1; if a > 1 then 2 else 3)"))
 ;(z3/check-sat (conj [] (z3/const x Int)))
 ; (reset! venv {})
 ; (println @venv)
