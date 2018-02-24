@@ -16,9 +16,19 @@
 
 (defn interpret-expression
   [exp]
+  (let [arithmetic (fn [exp oper]
+          (let [[_ exp1 exp2] exp]
+                (interpret-expression exp1)
+                (let [exp1 @res]
+                  (interpret-expression exp2)
+                    (let [exp2 @res]
+                      (reset! res (oper exp1 exp2))))))]
   (match [(first exp)]
          [:INT] (set-res (read-string (second exp)))
          [:OPER] (read-string (second exp))
+         [:add] (arithmetic exp +)
+         [:sub] (arithmetic exp -)
+         [:mul] (arithmetic exp *)
          [:VarExp] (let [varname (get @venv (second exp))]
                     (set-res varname)
                     (assert (not= @res nil) "Variable not declared"))
@@ -36,7 +46,7 @@
                         (interpret-expression body)
                         (assert (not= @res nil) (println "Error! Variable not declared"))
                         (swap! venv conj {varname @res}))
-         [_] @res))
+         [_] @res)))
 
 (defn interpret [node]
   (if (instance? secco.cfg.CFGNode node)
@@ -55,6 +65,4 @@
 ; (interpret (build "if 3 < 2 then 4 else if 1 < 2 then 6 else 7"))
 ; (interpret-expression (.exp (get-t(build "4+4"))))
 ; (interpret (->Node "oper" (.exp (get-t(build "4+4"))) nil nil))
- 
 ; (interpret (build "2 * (3 + 3)"))
-
