@@ -47,7 +47,13 @@
          [:VarExp] (second body)
          [:INT] (second body)
          [:OPER] (second body)
-         [:OpExp] (let [[_ exp1 oper exp2] body] 
+         [:add] (let [[_ exp1 exp2] body]
+                    (str (pretty exp1) "+" (pretty exp2)))
+         [:sub] (let [[_ exp1 exp2] body]
+                    (str (pretty exp1) "-" (pretty exp2)))
+         [:mul] (let [[_ exp1 exp2] body]
+                    (str (pretty exp1) "*" (pretty exp2)))
+         [:OpExp] (let [[_ exp1 oper exp2] body]
                     (str (pretty exp1) (pretty oper) (pretty exp2)))
          [:ParenExp] (str "(" (pretty (second body)) ")")
          [_] body))
@@ -58,6 +64,14 @@
    (if (instance? secco.cfg.CFGNode node)
      (let [
            getsym (nth symbols counter)
+           unfold (fn [exp] (match [(first exp)]
+                                [:add] (let [[_ exp1 exp2] exp]
+                                          (str (unfold exp1) "+" (unfold exp2)))
+                                [:sub] (let [[_ exp1 exp2] exp]
+                                          (str (unfold exp1) "-" (unfold exp2)))
+                                [:mul] (let [[_ exp1 exp2] exp]
+                                          (str (unfold exp1) "*" (unfold exp2)))
+                                :else (second exp)))
            ]
        (match [(.nam node)]
               ["root"] (let [ex (read-string (.nam node))
@@ -67,7 +81,7 @@
                          getsym)
               ["oper"] (let [
                              [_ exp1 oper exp2] (.exp node)
-                             ex (str (find exp1) (second oper) (find exp2))
+                             ex (str (unfold exp1) (second oper) (unfold exp2))
                              tnode (when (not (contains? mark node)) 
                                      (build-tree (cfg/get-t node) (+ counter 1) (conj mark {node getsym})))
                              fnode (if (not (contains? mark node)) 
@@ -87,7 +101,7 @@
                                               [:sub] "-"
                                               [:mul] "*"))
                                   [_ exp1 exp2] (.exp node)
-                                  ex (str (find exp1) oper (find exp2))
+                                  ex (str (unfold exp1) oper (unfold exp2))
                                   tnode (build-tree (cfg/get-t node) (+ counter 1) mark)
                                 ]
                              (swap! labels conj {getsym ex})
@@ -115,16 +129,6 @@
                               getsym)
               ))
      :end)))
-
-(defn find [exp]
-  (match [(first exp)]
-    [:add] (let [[_ exp1 exp2] exp]
-              (str (find exp1) "+" (find exp2)))
-    [:sub] (let [[_ exp1 exp2] exp]
-              (str (find exp1) "-" (find exp2)))
-    [:mul] (let [[_ exp1 exp2] exp]
-              (str (find exp1) "*" (find exp2)))
-    :else (second exp)))
 
 (defn graphic [node]
   (reset! graph {:end []})
