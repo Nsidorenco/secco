@@ -10,6 +10,7 @@ root = exp
       | INT
       | add-sub
       | Comment
+      | UserInput
 
 OpExp = exp OPER exp
 
@@ -44,3 +45,5 @@ text = #'[^%]*'
 OPER = '=' | '!=' | '<' | '>' | '<=' | '>='
 INT = digits
 <digits> = #'[0-9]+'
+
+UserInput = 'input()'
