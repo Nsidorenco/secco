@@ -59,7 +59,7 @@
 (defn build [program]
   (parse-tree->cfg (grm program)))
 
-(get-t(build "if x>2 then x else 0"))
+; (get-t(build "if x>2 then x else 0"))
 ; (get-f(get-t(build "if x>2 then x else 0")))
 ; (get-t(build "(2+2)*(3+2)")) ; TODO: becomes SeqExp, fix in grammar?
 ; (get-t(build "(0;1;2;3;4;5)"))
