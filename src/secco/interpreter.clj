@@ -29,6 +29,9 @@
          [:add] (arithmetic exp +)
          [:sub] (arithmetic exp -)
          [:mul] (arithmetic exp *)
+         [:UserInput] (do (println "Enter input: ")
+                          (flush)
+                          (set-res (read-string (read-line))))
          [:VarExp] (let [varname (get @venv (second exp))]
                     (set-res varname)
                     (assert (not= @res nil) "Variable not declared"))

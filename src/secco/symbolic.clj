@@ -21,6 +21,7 @@
   (match [(first exp)]
          [:INT] (read-string (second exp)) 
          [:OPER] (read-string (second exp))
+         [:UserInput] getsym
          [:VarExp] (let [varname (get @venv (second exp))]
                      (assert (not= varname nil) "Variable not declared")
                      varname)  
@@ -35,8 +36,9 @@
          [:AssignExp] (let [[_ varexp bodyexp] exp
                             varname (second varexp)
                             body (sym-exp bodyexp)]
-                        (swap! venv conj {varname body}))
-                        ;TODO: Add symbolic values for variables
+                        (swap! venv conj {varname body})
+                        (when (= (first bodyexp) :UserInput)
+                          (z3/const body Int)))
          [_] "")))
 
 
@@ -67,6 +69,4 @@
 ; (get @venv "x")
 ; (model (cfg/build "(x:=0;if x < 0 then 0 else x)")) 
 ; (model (cfg/build "if 1 < 2 then 3 else 41"))
-
 ;z3/check-sat (model (cfg/build "(x:=0;y:=8;while x<y do x:=x+1;y:=5)")))
-
