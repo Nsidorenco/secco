@@ -35,8 +35,8 @@
          [:AssignExp] (let [[_ varexp bodyexp] exp
                             varname (second varexp)
                             body (sym-exp bodyexp)]
-                        (swap! venv conj {varname body})
-                        ;TODO: Add symbolic values for variables)
+                        (swap! venv conj {varname body}))
+                        ;TODO: Add symbolic values for variables
          [_] "")))
 
 
