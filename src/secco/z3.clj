@@ -1,7 +1,6 @@
 (ns secco.z3
-  [:require [clojure.string :as s] ]
-  [:use [clojure.java.shell :only [sh]]])
-
+  (:require [clojure.string :as s])
+  (:use [clojure.java.shell :only [sh]]))
 
 (defn check-sat
   [model]
@@ -22,9 +21,8 @@
   [exp1 oper exp2]
   `(list ~'(symbol 'assert) (list '~oper '~exp1 '~exp2)))
 
-(def sat?  
+(def sat?
   (list 'check-sat))
-
 
 ; (def test_model (conj [] (list 'declare-const 'a 'Int) 
 ;                          (list 'assert (list '> 'a '10))))

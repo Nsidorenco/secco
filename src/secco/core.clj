@@ -1,9 +1,9 @@
 (ns secco.core
-  [:require [secco.cfg :as cfg]
+  (:require [secco.cfg :as cfg]
             [secco.interpreter :as ip]
             [instaparse.core :as insta]
             [clojure.java.io :as io]
-            [secco.viz :as viz]]
+            [secco.viz :as viz])
   (:gen-class))
 
 ; (ip/interpret (cfg/build "4+4"))
@@ -17,14 +17,13 @@
 (defn -main
   "Main function"
   ([prog]
-  (-> (slurp (file-path prog))
-      (cfg/build)
-      (ip/interpret)))
+   (-> (slurp (file-path prog))
+       (cfg/build)
+       (ip/interpret)))
   ([prog opt]
    (let [graph (cfg/build (slurp (io/resource prog)))]
      (cond (clojure.string/includes? opt "-cfg")
-            (viz/visualize(viz/graphic graph))
+           (viz/visualize (viz/graphic graph))
            (clojure.string/includes? opt "-ast")
-            (insta/visualize graph)))
-   (-main prog)
-   ))
+           (insta/visualize graph)))
+   (-main prog)))
