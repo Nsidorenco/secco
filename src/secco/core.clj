@@ -10,17 +10,21 @@
 ; (ip/interpret (cfg/build "while x < y do x := x + 1"))
 
 ;(viz/visualize(viz/graphic (cfg/build (slurp (io/resource "whiletest4.sec")))))
+(defn file-path
+  [prog]
+  (io/resource (str "test-programs/" prog)))
 
 (defn -main
   "Main function"
   ([prog]
-  (-> (slurp (io/resource prog))
+  (-> (slurp (file-path prog))
       (cfg/build)
       (ip/interpret)))
   ([prog opt]
-   (cond (clojure.string/includes? opt "-cfg")
-         (viz/visualize(viz/graphic (cfg/build (slurp (io/resource prog)))))
-         (clojure.string/includes? opt "-ast")
-         (insta/visualize (cfg/grm (slurp (io/resource prog)))))
+   (let [graph (cfg/build (slurp (io/resource prog)))]
+     (cond (clojure.string/includes? opt "-cfg")
+            (viz/visualize(viz/graphic graph))
+           (clojure.string/includes? opt "-ast")
+            (insta/visualize graph)))
    (-main prog)
    ))
