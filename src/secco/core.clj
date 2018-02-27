@@ -17,9 +17,12 @@
 (defn -main
   "Main function"
   ([prog]
-   (-> (slurp (file-path prog))
-       (cfg/build)
-       (ip/interpret)))
+   (try
+     (-> (slurp (file-path prog))
+         (cfg/build)
+         (ip/interpret))
+     (catch Exception ex
+       (println "File could not be read or was not a valid secco program"))))
   ([prog opt]
    (let [graph (cfg/build (slurp (io/resource prog)))]
      (cond (clojure.string/includes? opt "-cfg")
