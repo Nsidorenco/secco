@@ -24,7 +24,7 @@
      (catch Exception ex
        (println "File could not be read or was not a valid secco program"))))
   ([prog opt]
-   (let [graph (cfg/build (slurp (io/resource prog)))]
+   (let [graph (cfg/build (slurp (file-path prog)))]
      (cond (clojure.string/includes? opt "-cfg")
            (viz/visualize (viz/graphic graph))
            (clojure.string/includes? opt "-ast")
