@@ -1,13 +1,13 @@
 (ns secco.cfg
-  [:require [instaparse.core :as insta]
+  (:require [instaparse.core :as insta]
             [clojure.java.io :as io]
-            [clojure.core.match :refer [match]]])
+            [clojure.core.match :refer [match]]))
 
 (def grm
   (insta/parser (io/resource "secco.grm")
                 :auto-whitespace :standard))
 
-(defprotocol CFGNode 
+(defprotocol CFGNode
   (get-t [this])
   (get-f [this])
   (set-t [this node])
@@ -26,39 +26,33 @@
 (defn parse-tree->cfg
   ([prog] (parse-tree->cfg prog []))
   ([prog path]
-  (let [[exp & exps] prog]
-    (match [exp]
-      [:root] (let [node (parse-tree->cfg (first exps))] 
-                (->Node "root" "" node node))
-      [:OpExp] (->Node "oper" prog path path)
-      [:add] (->Node "arith" prog path path)
-      [:sub] (->Node "arith" prog path path)
-      [:mul] (->Node "arith" prog path path)
-      [:WhileExp] (let [
-                         [guard body] exps 
+   (let [[exp & exps] prog]
+     (match [exp]
+       [:root] (let [node (parse-tree->cfg (first exps))]
+                 (->Node "root" "" node node))
+       [:OpExp] (->Node "oper" prog path path)
+       [:add] (->Node "arith" prog path path)
+       [:sub] (->Node "arith" prog path path)
+       [:mul] (->Node "arith" prog path path)
+       [:WhileExp] (let [[guard body] exps
                          gnode (parse-tree->cfg guard path)
-                         bnode (parse-tree->cfg body gnode)
-                       ]
-                    (set-t gnode bnode)
-                    gnode)
-      [:INT] (->Node "int" prog path path) 
-      [:VarExp] (->Node "varexp" prog path path)
-      [:AssignExp] (->Node "assignexp" prog path path)
-      [:IFEXP] (let [
-                      [guard tru fal] exps
+                         bnode (parse-tree->cfg body gnode)]
+                     (set-t gnode bnode)
+                     gnode)
+       [:INT] (->Node "int" prog path path)
+       [:VarExp] (->Node "varexp" prog path path)
+       [:AssignExp] (->Node "assignexp" prog path path)
+       [:IFEXP] (let [[guard tru fal] exps
                       gnode (parse-tree->cfg guard)
                       tnode (parse-tree->cfg tru path)
-                      fnode (parse-tree->cfg fal path)
-                    ]
+                      fnode (parse-tree->cfg fal path)]
                   (set-t gnode tnode)
                   (set-f gnode fnode)
-                 gnode)
-      [:ParenExp] (parse-tree->cfg exps) 
-      [:SeqExp] (reduce (fn [node x] (parse-tree->cfg x node)) 
-                        (parse-tree->cfg (last exps) path)
-                        (rest (reverse exps)))
-      )))
-  )
+                  gnode)
+       [:ParenExp] (parse-tree->cfg exps)
+       [:SeqExp] (reduce (fn [node x] (parse-tree->cfg x node))
+                         (parse-tree->cfg (last exps) path)
+                         (rest (reverse exps)))))))
 
 (defn build [program]
   (parse-tree->cfg (grm program)))
