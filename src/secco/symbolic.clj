@@ -22,6 +22,7 @@
          [:INT] (read-string (second exp)) 
          [:OPER] (read-string (second exp))
          [:UserInput] getsym
+         [:Error] ; do something
          [:VarExp] (let [varname (get @venv (second exp))]
                      (assert (not= varname nil) "Variable not declared")
                      varname)  
@@ -29,7 +30,6 @@
                          e1 (sym-exp exp1)
                          op (sym-exp oper)
                          e2 (sym-exp exp2)]
-                    (println "here")
                     (z3/assert e1 op e2))
          [:add] (let [[_ exp1 exp2] exp]
                   (arithmetic + (sym-exp exp1) (sym-exp exp2)))
@@ -41,7 +41,6 @@
                           (z3/const body Int)))
          [_] "")))
 
-
 (defn model 
   ([node] (model node []))
   ([node pc] 
@@ -50,23 +49,22 @@
        (if (instance? clojure.lang.PersistentList last_cond)
          (let [t_pc (conj pc last_cond)
                f_pc (conj pc (z3/not last_cond))]
-           (println "t_pc :" t_pc " f_pc :" f_pc)
            (when (z3/check-sat t_pc) 
              (model (cfg/get-t node) t_pc))
            (when (z3/check-sat f_pc) 
              (model (cfg/get-f node) f_pc))
            (when-not (or (z3/check-sat t_pc) (z3/check-sat f_pc))
-             (println "terminated pc: " pc)
              pc))
          (do 
            (model (cfg/get-t node) pc))))
      (println "pc: "pc))))
 
 ; (model (cfg/build "(a := 1 + 1; if a > 1 then 2 else 3)"))
-;(z3/check-sat (conj [] (z3/const x Int)))
+; (z3/check-sat (conj [] (z3/const x Int)))
 ; (reset! venv {})
 ; (println @venv)
 ; (get @venv "x")
 ; (model (cfg/build "(x:=0;if x < 0 then 0 else x)")) 
 ; (model (cfg/build "if 1 < 2 then 3 else 41"))
-;z3/check-sat (model (cfg/build "(x:=0;y:=8;while x<y do x:=x+1;y:=5)")))
+;(z3/check-sat (model (cfg/build "(x:=0;y:=8;while x<y do x:=x+1;y:=5)")))
+(z3/check-sat (model (cfg/build "(x:=input();y:=input(); if x<y then x:=x+y else y:=x)")))
