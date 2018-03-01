@@ -120,32 +120,12 @@
                            (swap! labels conj {getsym ex})
                            (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
                            getsym)
-                      (get mark node)))
-         ["arith"] (let [type (first (.exp node))]
-                     (let [oper (str (match [type]
-                                       [:add] "+"
-                                       [:sub] "-"
-                                       [:mul] "*"))
-                           [_ exp1 exp2] (.exp node)
-                           ex (str (find exp1) oper (find exp2))
-                           tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
-                       (swap! labels conj {getsym ex})
-                       (swap! graph conj {getsym [tnode]}))
-                     getsym)
-         ["int"]  (let [ex (second (.exp node))]
-                    (swap! labels conj {getsym ex})
-                    (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
-                    getsym)
-         ["varexp"] (let [ex (second (.exp node))]
-                      (swap! labels conj {getsym ex})
-                      (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
-                      getsym)
-         ["assignexp"] (let [[_ varexp body] (.exp node)
-                             ex (str (second varexp) ":=" (pretty body))
-                             og (.exp node)]
-                         (swap! labels conj {getsym ex})
-                         (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
-                         getsym)))
+              ["assignexp"] (let [[_ varexp body] (.exp node)
+                                  ex (str (second varexp) ":=" (pretty body))
+                                  og (.exp node)]
+                              (swap! labels conj {getsym ex})
+                              (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
+                              getsym)))
      :end)))
 
 (defn graphic [node]
