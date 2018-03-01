@@ -1,8 +1,8 @@
 (ns z3.solver
-  [:require [clojure.string :as s] ]
-  [:use [clojure.java.shell :only [sh]]])
+  (:require [clojure.string :as s])
+  (:use [clojure.java.shell :only [sh]]))
 
-(def sat?  
+(def sat?
   (list 'check-sat))
 
 (defn check-sat
@@ -12,7 +12,7 @@
       :out
       s/trim
       (#(if (= % "sat")
-          true 
+          true
           false))))
 
 (defmacro const
@@ -28,7 +28,7 @@
 (defmacro not
   "Converts s-exp `(keyword comp-exp)` to `(keyword (not comp-exp)`"
   [exp]
-    `(list (symbol (first ~exp)) (list ~'(symbol 'not) (second ~exp))))
+  `(list (symbol (first ~exp)) (list ~'(symbol 'not) (second ~exp))))
 
 ; (def test_model (conj [] (list 'declare-const 'a 'Int) 
 ;                          (list 'assert (list '> 'a '10))))
