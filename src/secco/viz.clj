@@ -11,12 +11,12 @@
   (map char (range 97 123)))
 
 (defn subsets [n items]
-(cond
-    (= n 0) '(())
+  (cond
+    (zero? n) '(())
     (empty? items) '()
     :else (concat (map
-                    #(cons (first items) %)
-                    (subsets (dec n) (rest items)))
+                   #(cons (first items) %)
+                   (subsets (dec n) (rest items)))
                   (subsets n (rest items)))))
 
 (def symbols (map (fn [x] (keyword (clojure.string/join x))) (subsets 3 alphabet)))
@@ -58,21 +58,23 @@
          [:ParenExp] (str "(" (pretty (second body)) ")")
          [_] body))
 
+(defn unfold [exp]
+  (match [(first exp)]
+    [:add] (let [[_ exp1 exp2] exp]
+              (str (unfold exp1) "+" (unfold exp2)))
+    [:sub] (let [[_ exp1 exp2] exp]
+              (str (unfold exp1) "-" (unfold exp2)))
+    [:mul] (let [[_ exp1 exp2] exp]
+              (str (unfold exp1) "*" (unfold exp2)))
+    :else (second exp)))
+
 (defn build-tree 
   ([node] (build-tree node 0 {}))
   ([node counter mark]
    (if (instance? secco.cfg.CFGNode node)
      (let [
            getsym (nth symbols counter)
-           unfold (fn [exp] (match [(first exp)]
-                                [:add] (let [[_ exp1 exp2] exp]
-                                          (str (unfold exp1) "+" (unfold exp2)))
-                                [:sub] (let [[_ exp1 exp2] exp]
-                                          (str (unfold exp1) "-" (unfold exp2)))
-                                [:mul] (let [[_ exp1 exp2] exp]
-                                          (str (unfold exp1) "*" (unfold exp2)))
-                                :else (second exp)))
-           ]
+          ]
        (match [(.nam node)]
               ["root"] (let [ex (read-string (.nam node))
                              tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
@@ -146,4 +148,4 @@
 ;(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 ;(visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
 ;(visualize g)
-;(visualize (graphic (cfg/build "if 1+2+3*4-5+6>2 then 2 else 3")))
+(visualize (graphic (cfg/build "if 1+2+3*4-5+6>2 then 2 else 3")))
