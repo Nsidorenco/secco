@@ -11,6 +11,7 @@ root = exp
       | add-sub
       | Comment
       | UserInput
+      | Error
 
 OpExp = exp OPER exp
 
@@ -47,3 +48,4 @@ INT = digits
 <digits> = #'[0-9]+'
 
 UserInput = 'input()'
+Error = 'error()'
