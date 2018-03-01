@@ -1,36 +1,12 @@
 (ns secco.viz
   (:require [clojure.core.match :refer [match]]
-            [secco.cfg :as cfg]))
+            [secco.cfg :as cfg]
+            [secco.util :as util]))
 
 (try
   (require '[rhizome.viz :as r])
   (catch Exception e
     (println "Needs rhizome.viz")))
-
-(def alphabet
-  (map char (range 97 123)))
-
-(defn subsets [n items]
-  (cond
-    (zero? n) '(())
-    (empty? items) '()
-    :else (concat (map
-                   #(cons (first items) %)
-                   (subsets (dec n) (rest items)))
-                  (subsets n (rest items)))))
-
-(def symbols (map (fn [x] (keyword (clojure.string/join x))) (subsets 3 alphabet)))
-
-(def g
-  {:a [:b :c]
-   :b [:c]
-   :c [:a]})
-
-(def g-edges
-  {:a {:b :makes
-       :c :takes}
-   :b {:c :takes}
-   :c {:a :makes}})
 
 (def labels (atom {}))
 (def edges (atom {}))
@@ -55,7 +31,7 @@
   ([node] (build-tree node 0 {}))
   ([node counter mark]
    (if (instance? secco.cfg.CFGNode node)
-     (let [getsym (nth symbols counter)]
+     (let [getsym (nth util/symbols counter)]
        (match [(.nam node)]
          ["root"] (let [ex (read-string (.nam node))
                         tnode (build-tree (cfg/get-t node) (inc counter) mark)]
@@ -119,7 +95,6 @@
   (build-tree node)
   @graph)
 
-; TODO: stop uending loops
 ;(println @graph)
 ;(println @labels)
 ;(println @edges)
@@ -127,5 +102,4 @@
 ;(visualize (graphic (cfg/build "(x:=(2+3);x)")))
 ;(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 ;(visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
-;(visualize g)
 ;(visualize (graphic (cfg/build "if 1+2+3*4-5+6>2 then 2 else 3")))
