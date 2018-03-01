@@ -32,6 +32,7 @@
          [:UserInput] (do (println "Enter input: ")
                           (flush)
                           (set-res (read-string (read-line))))
+         [:Error] (throw (Exception. "Error state reached"))
          [:VarExp] (let [varname (get @venv (second exp))]
                     (set-res varname)
                     (assert (not= @res nil) "Variable not declared"))
