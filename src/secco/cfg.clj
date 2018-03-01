@@ -32,6 +32,7 @@
                 (->Node "root" "" node node))
       [:OpExp] (->Node "oper" prog path path)
       [:UserInput] (->Node "input()" prog path path)
+      [:Error] (->Node "error()" prog path path)
       [:add] (->Node "arith" prog path path)
       [:sub] (->Node "arith" prog path path)
       [:mul] (->Node "arith" prog path path)
