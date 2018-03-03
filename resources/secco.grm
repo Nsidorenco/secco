@@ -1,4 +1,10 @@
-root = exp
+root = decs exp | Comment decs exp
+
+<decs> = <'let'> VarDecs <'in'> | eps
+
+VarDecs = VarDec <';'> VarDecs
+        | eps
+VarDec = VarExp <':='> UserInput
 
 <exp> = ParenExp 
       | OpExp
@@ -10,7 +16,6 @@ root = exp
       | INT
       | add-sub
       | Comment
-      | UserInput
       | Error
 
 OpExp = exp OPER exp
@@ -32,7 +37,7 @@ AssignExp = VarExp <':='> exp
 ParenExp = <'('> OptParenExp <')'>
 <OptParenExp> = exp | eps
 
-SeqExp = <'('> exp <';'> exp OptExp <')'>
+SeqExp = exp <';'> exp OptExp
 <OptExp> = <';'> exp OptExp | eps (* broken *)
 
 WhileExp = <'while'> test <'do'> body

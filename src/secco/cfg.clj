@@ -26,18 +26,17 @@
 (defn parse-tree->cfg
   ([prog] (parse-tree->cfg prog []))
   ([prog path]
-  (let [[exp & exps] prog]
-    (match [exp]
-      [:root] (let [node (parse-tree->cfg (first exps))] 
-                (->Node "root" "" node node))
-      [:OpExp] (->Node "oper" prog path path)
-      [:UserInput] (->Node "input()" prog path path)
-      [:Error] (->Node "error()" prog path path)
-      [:add] (->Node "arith" prog path path)
-      [:sub] (->Node "arith" prog path path)
-      [:mul] (->Node "arith" prog path path)
-      [:WhileExp] (let [
-                         [guard body] exps 
+   (let [[exp & exps] prog]
+     (match [exp]
+       [:root] (let [node (parse-tree->cfg (first exps))]
+                 (->Node "root" "" node node))
+       [:OpExp] (->Node "oper" prog path path)
+       [:UserInput] (->Node "input()" prog path path)
+       [:Error] (->Node "error()" prog path path)
+       [:add] (->Node "arith" prog path path)
+       [:sub] (->Node "arith" prog path path)
+       [:mul] (->Node "arith" prog path path)
+       [:WhileExp] (let [[guard body] exps
                          gnode (parse-tree->cfg guard path)
                          bnode (parse-tree->cfg body gnode)]
                      (set-t gnode bnode)
@@ -63,7 +62,6 @@
 ; (get-t(get-t(build "if x>2 then x else 0")))
 ; (get-f(get-t(build "if x>2 then x else 0")))
 ; (get-t(build "(2+2)*(3+2)")) ; TODO: becomes SeqExp, fix in grammar?
-; (get-t(build "(0;1;2;3;4;5)"))
 ; (get-t(get-t(build "(0;1)")))
 ; (build "4+4")
 ; (get-t (build "%dette er en kommentar% (x:=1; if x=3 then 1 else 2)"))
