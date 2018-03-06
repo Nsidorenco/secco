@@ -23,7 +23,9 @@
 (defmacro assert
   "Converts s-exp `(assert var oper value)` to SMT format"
   [exp1 oper exp2]
-  `(list ~'(symbol 'assert) (list ~oper ~exp1 ~exp2)))
+  `(if (= (str ~oper) "!=")
+     (list ~'(symbol 'assert) (list ~'(symbol 'not) (list ~'(symbol '=) ~exp1 ~exp2)))
+     (list ~'(symbol 'assert) (list ~oper ~exp1 ~exp2))))
 
 (defmacro not
   "Converts s-exp `(keyword comp-exp)` to `(keyword (not comp-exp)`"
@@ -34,3 +36,4 @@
 ;                          (list 'assert (list '> 'a '10))))
 
 ; (def test_model2 (conj [] (const 'b 'Int) (assert 'b > 10) (assert 'b < 5)))
+(check-sat [])
