@@ -54,7 +54,9 @@
              (model (cfg/get-f node) f_pc)
              (model (cfg/get-t node) t_pc))
            (if (isa? ::Error last_cond)
-             (println "Reached error state with pc: " pc "and venv:" @venv)
+             (println "Reached error state on line: " (.start node)
+                      "," (.end node)
+                      "for expression: " (.exp node))
              (model (cfg/get-t node) pc))))
        (println "pc: " pc)))))
 
@@ -68,4 +70,4 @@
 ;(z3/check-sat (model (cfg/build "(x:=0;y:=8;while x<y do x:=x+1;y:=5)")))
 ; (model (cfg/build "(x:=input();y:=input(); if x<y then x:=x+y else y:=x)"))
 ; (model (cfg/build "(x:=input(); if x > 10 then error() else 1)"))
-;(model (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
+; (model (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
