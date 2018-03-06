@@ -3,7 +3,8 @@
             [secco.interpreter :as ip]
             [instaparse.core :as insta]
             [clojure.java.io :as io]
-            [secco.viz :as viz])
+            [secco.viz :as viz]
+            [secco.symbolic :as sym])
   (:gen-class))
 
 ; (ip/interpret (cfg/build "4+4"))
@@ -28,5 +29,6 @@
      (cond (clojure.string/includes? opt "-cfg")
            (viz/visualize (viz/graphic graph))
            (clojure.string/includes? opt "-ast")
-           (insta/visualize graph)))
-   (-main prog)))
+           (insta/visualize graph)
+           (clojure.string/includes? opt "-sym")
+           (sym/model graph)))))
