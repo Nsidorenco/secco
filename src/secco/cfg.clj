@@ -14,7 +14,7 @@
   (set-f [this node])
   (print-path [this node]))
 
-(deftype Node [nam exp ^:volatile-mutable t ^:volatile-mutable f]
+(deftype Node [nam exp ^:volatile-mutable t ^:volatile-mutable f start end]
   CFGNode
   (get-t [this] t)
   (get-f [this] f)
@@ -23,27 +23,33 @@
   (print-path [this node] (println node))
   (toString [_] (str "Node: <" nam ">, Exp: " exp)))
 
+(defn new-node
+  [nam prog t_path f_path]
+  (let [start (:instaparse.gll/start-line (meta prog))
+        end (:instaparse.gll/end-line (meta prog))]
+    (->Node nam prog t_path f_path start end)))
+
 (defn parse-tree->cfg
   ([prog] (parse-tree->cfg prog []))
   ([prog path]
    (let [[exp & exps] prog]
      (match [exp]
        [:root] (let [node (parse-tree->cfg (first exps))]
-                 (->Node "root" "" node node))
-       [:OpExp] (->Node "oper" prog path path)
-       [:UserInput] (->Node "input()" prog path path)
-       [:Error] (->Node "error()" prog path path)
-       [:add] (->Node "arith" prog path path)
-       [:sub] (->Node "arith" prog path path)
-       [:mul] (->Node "arith" prog path path)
+                 (new-node "root" "" node node))
+       [:OpExp] (new-node "oper" prog path path)
+       [:UserInput] (new-node "input()" prog path path)
+       [:Error] (new-node "error()" prog path path)
+       [:add] (new-node "arith" prog path path)
+       [:sub] (new-node "arith" prog path path)
+       [:mul] (new-node "arith" prog path path)
        [:WhileExp] (let [[guard body] exps
                          gnode (parse-tree->cfg guard path)
                          bnode (parse-tree->cfg body gnode)]
                      (set-t gnode bnode)
                      gnode)
-       [:INT] (->Node "int" prog path path)
-       [:VarExp] (->Node "varexp" prog path path)
-       [:AssignExp] (->Node "assignexp" prog path path)
+       [:INT] (new-node "int" prog path path)
+       [:VarExp] (new-node "varexp" prog path path)
+       [:AssignExp] (new-node "assignexp" prog path path)
        [:IFEXP] (let [[guard tru fal] exps
                       gnode (parse-tree->cfg guard)
                       tnode (parse-tree->cfg tru path)
@@ -57,12 +63,8 @@
                          (rest (reverse exps)))))))
 
 (defn build [program]
-  (parse-tree->cfg (grm program)))
-
-; (get-t(get-t(build "if x>2 then x else 0")))
-; (get-f(get-t(build "if x>2 then x else 0")))
-; (get-t(build "(2+2)*(3+2)")) ; TODO: becomes SeqExp, fix in grammar?
-; (get-t(get-t(build "(0;1)")))
-; (build "4+4")
-; (get-t (build "%dette er en kommentar% (x:=1; if x=3 then 1 else 2)"))
-; (get-t (build "x := input()"))
+  (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))
+        tree (parse-tree->cfg ast)]
+    (if (insta/failure? ast)
+      (throw (Exception. "Invalid test program"))
+      tree)))
