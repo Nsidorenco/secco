@@ -25,10 +25,10 @@
      (catch Exception ex
        (println "File could not be read or was not a valid secco program"))))
   ([prog opt]
-   (let [graph (cfg/build (slurp (file-path prog)))]
+   (let [file (slurp (file-path prog))]
      (cond (clojure.string/includes? opt "-cfg")
-           (viz/visualize (viz/graphic graph))
+           (viz/visualize (viz/graphic (cfg/build file)))
            (clojure.string/includes? opt "-ast")
-           (insta/visualize graph)
+           (insta/visualize (cfg/grm file))
            (clojure.string/includes? opt "-sym")
-           (sym/model graph)))))
+           (sym/model (cfg/build file))))))
