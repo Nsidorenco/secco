@@ -56,7 +56,8 @@
            (if (isa? ::Error last_cond)
              (println "Reached error state on line: " (.start node)
                       "," (.end node)
-                      "for expression: " (.exp node))
+                      "for expression: " (.exp node)
+                      "with solution: " (z3/solve pc))
              (model (cfg/get-t node) pc))))
        (println "pc: " pc)))))
 

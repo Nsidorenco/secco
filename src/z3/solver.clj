@@ -15,6 +15,16 @@
           true
           false))))
 
+(defn solve
+  [model]
+  (let [res (-> (sh "z3" "-in" :in (str (s/join (conj model
+                                                      sat?
+                                                      (list 'get-model)))))
+                :out)
+        variables (map s/trim (re-seq #" \w\w\w " res))
+        values (re-seq #"\d+" res)]
+    (map vector variables values)))
+
 (defmacro const
   "Coverts s-exp `(const name type)` to SMT format"
   [cname ctype]
