@@ -27,6 +27,5 @@
            (clojure.string/includes? opt "-ast")
            (insta/visualize (cfg/grm file))
            (clojure.string/includes? opt "-sym")
-           (do (sym/model (cfg/build file))
-               (Thread/sleep 4000)
-               (System/exit 0))))))
+           (do (sym/execute (cfg/build file))
+               (shutdown-agents))))))
