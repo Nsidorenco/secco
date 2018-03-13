@@ -2,7 +2,6 @@
   (:require [secco.cfg :as cfg]
             [z3.solver :as z3]
             [secco.util :as util]
-            [clojure.core.async :as async]
             [clojure.core.match :refer [match]]))
 
 ; define mutable variables
@@ -10,12 +9,12 @@
 (def sym (atom (vec util/literals)))
 
 ; define an channel responsible for passing error states
-(def error-channel (async/chan 10))
+(def error-queue (java.util.concurrent.LinkedBlockingQueue.))
 
 ; Async consumer
-(future
-  (while true
-    (println (async/<!! error-channel))))
+; (future
+;   (while true
+;     (println (async/<!! error-channel))))
 
 (defmacro arithmetic
   [sym exp1 exp2]
@@ -63,14 +62,20 @@
              (future (model (cfg/get-f node) f_pc))
              (recur (cfg/get-t node) t_pc))
            (if (isa? ::Error last_cond)
-             (async/>!! error-channel
-                        (str "Reached error state on line: " (.start node)
-                             "," (.end node)
-                             " for expression: " (.exp node)
-                             "\n with solution: " (vec (z3/solve pc))
-                             " for: " @venv))
+             (.put error-queue
+                   (str "Reached error state on line: " (.start node)
+                        "," (.end node)
+                        " for expression: " (.exp node)
+                        "\n with solution: " (vec (z3/solve pc))
+                        " for: " @venv))
              (model (cfg/get-t node) pc))))))))
 
+(defn execute
+  [cfg]
+  (do (model cfg)
+      (Thread/sleep 2000)
+      (while (not (.isEmpty error-queue))
+        (println (.take error-queue)))))
 
 ; (model (cfg/build "(a := 1 + 1; if a > 1 then 2 else 3)"))
 ; (z3/check-sat (conj [] (z3/const x Int)))
