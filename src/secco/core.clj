@@ -7,10 +7,6 @@
             [secco.symbolic :as sym])
   (:gen-class))
 
-; (ip/interpret (cfg/build "4+4"))
-; (ip/interpret (cfg/build "while x < y do x := x + 1"))
-
-;(viz/visualize(viz/graphic (cfg/build (slurp (io/resource "whiletest4.sec")))))
 (defn file-path
   [prog]
   (io/resource (str "test-programs/" prog)))

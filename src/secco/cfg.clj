@@ -63,8 +63,7 @@
                          (rest (reverse exps)))))))
 
 (defn build [program]
-  (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))
-        tree (parse-tree->cfg ast)]
+  (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))]
     (if (insta/failure? ast)
       (throw (Exception. "Invalid test program"))
       tree)))
