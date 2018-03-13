@@ -63,17 +63,7 @@
                          (rest (reverse exps)))))))
 
 (defn build [program]
-  (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))
-        tree (parse-tree->cfg ast)]
+  (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))]
     (if (insta/failure? ast)
-      (throw (Exception. "Invalid test program"))
-      tree)))
-
-; (get-f(get-t(build "if x>2 then x else 0")))
-; (get-t(build "(2+2)*(3+2)")) ; TODO: becomes SeqExp, fix in grammar?
-; (get-t (build "(0;1;2;3;4;5)"))
-; (get-t(get-t(build "(0;1)")))
-; (.start (get-t (build "4+4")))
-; (get-t (build "%dette er en kommentar% (x:=1; if x=3 then 1 else 2)"))
-; (get-t (build "x := input()"))
-; (def file (slurp (clojure.java.io/resource "test-programs/iftest2.sec")))
+      ast
+      (parse-tree->cfg ast))))
