@@ -9,6 +9,8 @@ A language build in Clojure, for usage in concolic execution (symbolic and concr
 
 ```-cfg``` For Control Flow Graph made in Graphviz (Rhizome)
 
+```-sym``` For Symbolic Execution
+
 
 ## License
 
