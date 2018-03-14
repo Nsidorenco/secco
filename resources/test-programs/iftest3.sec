@@ -1,0 +1,8 @@
+(x := input();
+ if x > 10 then
+  if x > 20 then
+    if x < 30 then
+      x+1
+    else error() 
+  else error() 
+ else error())

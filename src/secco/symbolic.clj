@@ -50,26 +50,25 @@
 (defn model
   ([node] (model node []))
   ([node pc]
-   (when (z3/check-sat pc)
-     (when (instance? secco.cfg.CFGNode node)
-       (swap! nodes-visited inc)
-       (let [last_cond (sym-exp (.exp node))]
-         (if (instance? clojure.lang.PersistentList last_cond)
-           (let [t_pc (conj pc last_cond)
-                 f_pc (conj pc (z3/not last_cond))]
-             (future (do
-                       (swap! active-threads inc)
-                       (model (cfg/get-f node) f_pc)
-                       (swap! active-threads dec)))
-             (recur (cfg/get-t node) t_pc))
-           (if (isa? ::Error last_cond)
-             (.put error-queue
-                   (str "Reached error state on line: " (.start node)
-                        "," (.end node)
-                        " for expression: " (.exp node)
-                        "\n with solution: " (vec (z3/solve pc))
-                        " for: " *venv*))
-             (model (cfg/get-t node) pc))))))))
+   (when (and (z3/check-sat pc) (instance? secco.cfg.CFGNode node))
+     (swap! nodes-visited inc)
+     (let [last_cond (sym-exp (.exp node))]
+       (if (instance? clojure.lang.PersistentList last_cond)
+         (let [t_pc (conj pc last_cond)
+               f_pc (conj pc (z3/not last_cond))]
+           (future (do
+                     (swap! active-threads inc)
+                     (model (cfg/get-f node) f_pc)
+                     (swap! active-threads dec)))
+           (recur (cfg/get-t node) t_pc))
+         (if (isa? ::Error last_cond)
+           (.put error-queue
+                 (str "Reached error state on line: " (.start node)
+                      "," (.end node)
+                      " for expression: " (.exp node)
+                      "\n with solution: " (vec (z3/solve pc))
+                      " for: " *venv*))
+           (model (cfg/get-t node) pc)))))))
 
 (defn execute
   [cfg]
@@ -77,10 +76,10 @@
   (reset! active-threads 0)
   (binding [*venv* {}]
     (model cfg)
-    (println "active-threads" @active-threads)
     (while (or (> @active-threads 0) (not (.isEmpty error-queue)))
       (println (.take error-queue)))
-    (println "Coverage was:" (* (/ @nodes-visited @cfg/node-count) 100) "%")))
+    (println "Coverage was:" (* (/ @nodes-visited @cfg/node-count) 100) "%"))
+  (shutdown-agents))
 
 ; (model (cfg/build "(a := 1 + 1; if a > 1 then 2 else 3)"))
 ; (z3/check-sat (conj [] (z3/const x Int)))
