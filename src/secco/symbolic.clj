@@ -5,16 +5,13 @@
             [clojure.core.match :refer [match]]))
 
 ; define mutable variables
-(def venv (atom {}))
+(def ^:dynamic *venv* {})
 (def sym (atom (vec util/literals)))
+(def nodes-visited (atom 0))
+(def active-threads (atom 0))
 
 ; define an channel responsible for passing error states
 (def error-queue (java.util.concurrent.LinkedBlockingQueue.))
-
-; Async consumer
-; (future
-;   (while true
-;     (println (async/<!! error-channel))))
 
 (defmacro arithmetic
   [sym exp1 exp2]
@@ -28,7 +25,7 @@
       [:OPER] (read-string (second exp))
       [:UserInput] getsym
       [:Error] ::Error
-      [:VarExp] (let [varname (get @venv (second exp))]
+      [:VarExp] (let [varname (get *venv* (second exp))]
                   (assert (not= varname nil) "Variable not declared")
                   varname)
       [:OpExp] (let [[_ exp1 oper exp2] exp
@@ -45,7 +42,7 @@
       [:AssignExp] (let [[_ varexp bodyexp] exp
                          varname (second varexp)
                          body (sym-exp bodyexp)]
-                     (swap! venv conj {varname body})
+                     (set! *venv* (conj *venv* {varname body}))
                      (if (= (first bodyexp) :UserInput)
                        (z3/const body Int)))
       [_] "")))
@@ -55,11 +52,15 @@
   ([node pc]
    (when (z3/check-sat pc)
      (when (instance? secco.cfg.CFGNode node)
+       (swap! nodes-visited inc)
        (let [last_cond (sym-exp (.exp node))]
          (if (instance? clojure.lang.PersistentList last_cond)
            (let [t_pc (conj pc last_cond)
                  f_pc (conj pc (z3/not last_cond))]
-             (future (model (cfg/get-f node) f_pc))
+             (future (do
+                       (swap! active-threads inc)
+                       (model (cfg/get-f node) f_pc)
+                       (swap! active-threads dec)))
              (recur (cfg/get-t node) t_pc))
            (if (isa? ::Error last_cond)
              (.put error-queue
@@ -67,22 +68,23 @@
                         "," (.end node)
                         " for expression: " (.exp node)
                         "\n with solution: " (vec (z3/solve pc))
-                        " for: " @venv))
+                        " for: " *venv*))
              (model (cfg/get-t node) pc))))))))
 
 (defn execute
   [cfg]
-  (do (model cfg)
-      (Thread/sleep 2000)
-      (while (not (.isEmpty error-queue))
-        (println (.take error-queue)))))
+  (reset! nodes-visited 0)
+  (reset! active-threads 0)
+  (binding [*venv* {}]
+    (model cfg)
+    (println "active-threads" @active-threads)
+    (while (or (> @active-threads 0) (not (.isEmpty error-queue)))
+      (println (.take error-queue)))
+    (println "Coverage was:" (* (/ @nodes-visited @cfg/node-count) 100) "%")))
 
 ; (model (cfg/build "(a := 1 + 1; if a > 1 then 2 else 3)"))
 ; (z3/check-sat (conj [] (z3/const x Int)))
-; (reset! venv {})
-; (println @venv)
-; (get @venv "x")
-; (model (cfg/build "(x:=0;if x < 0 then 0 else x)")) 
+; (execute (cfg/build "(x:= input();if x < 0 then error() else error())"))
 ; (model (cfg/build "if 1 < 2 then 3 else 41"))
 ;(z3/check-sat (model (cfg/build "(x:=0;y:=8;while x<y do x:=x+1;y:=5)")))
 ; (model (cfg/build "(x:=input();y:=input(); if x<y then x:=x+y else y:=x)"))

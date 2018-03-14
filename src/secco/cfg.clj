@@ -3,6 +3,8 @@
             [clojure.java.io :as io]
             [clojure.core.match :refer [match]]))
 
+(def node-count (atom 0))
+
 (def grm
   (insta/parser (io/resource "secco.grm")
                 :auto-whitespace :standard))
@@ -27,6 +29,7 @@
   [nam prog t_path f_path]
   (let [start (:instaparse.gll/start-line (meta prog))
         end (:instaparse.gll/end-line (meta prog))]
+    (swap! node-count inc)
     (->Node nam prog t_path f_path start end)))
 
 (defn parse-tree->cfg
@@ -64,6 +67,7 @@
 
 (defn build [program]
   (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))]
+    (reset! node-count 0)
     (if (insta/failure? ast)
-      (throw (Exception. "Invalid test program"))
-      tree)))
+      (println ast)
+      (parse-tree->cfg ast))))

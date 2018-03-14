@@ -14,12 +14,9 @@
 (defn -main
   "Main function"
   ([prog]
-   (try
-     (-> (slurp (file-path prog))
-         (cfg/build)
-         (ip/interpret))
-     (catch Exception ex
-       (println "File could not be read or was not a valid secco program"))))
+   (-> (slurp (file-path prog))
+       (cfg/build)
+       (ip/interpret)))
   ([prog opt]
    (let [file (slurp (file-path prog))]
      (cond (clojure.string/includes? opt "-cfg")
@@ -27,5 +24,4 @@
            (clojure.string/includes? opt "-ast")
            (insta/visualize (cfg/grm file))
            (clojure.string/includes? opt "-sym")
-           (do (sym/execute (cfg/build file))
-               (shutdown-agents))))))
+           (sym/execute (cfg/build file))))))
