@@ -4,7 +4,7 @@ while x < 1000 do
     if x > 500 then
       if x < 600 then 
         (error(); x := x + 1)
-      else x := x + 10
+      else (error(); x := x + 10)
     else x := x + 20
 else x;
 x
