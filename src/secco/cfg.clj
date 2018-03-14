@@ -69,5 +69,6 @@
   (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))]
     (reset! node-count 0)
     (if (insta/failure? ast)
-      (println ast)
+      (do (println ast)
+          (throw (Exception. "error parsing input")))
       (parse-tree->cfg ast))))
