@@ -21,9 +21,9 @@
                                                       sat?
                                                       (list 'get-model)))))
                 :out)
-        variables (map s/trim (re-seq #" \w\w\w " res))
+        vars (map read-string (re-seq #"(?<=define-fun\s)\w\w\w" res))
         values (re-seq #"\d+" res)]
-    (map vector variables values)))
+    (reduce conj {} (map vector vars [1 2]))))
 
 (defmacro const
   "Coverts s-exp `(const name type)` to SMT format"
@@ -46,4 +46,4 @@
 ;                          (list 'assert (list '> 'a '10))))
 
 ; (def test_model2 (conj [] (const 'b 'Int) (assert 'b > 10) (assert 'b < 5)))
-(check-sat [])
+; (check-sat [])
