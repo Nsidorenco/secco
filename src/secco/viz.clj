@@ -31,6 +31,8 @@
          [:OpExp] (let [[_ exp1 oper exp2] body]
                     (str (pretty exp1) (pretty oper) (pretty exp2)))
          [:ParenExp] (str "(" (pretty (second body)) ")")
+         [:UserInput] "input()"
+         [:Error] "Error"
          [_] body))
 
 (defn unfold [exp]
