@@ -23,7 +23,7 @@
                 :out)
         vars (map read-string (re-seq #"(?<=define-fun\s)\w\w\w" res))
         values (re-seq #"\d+" res)]
-    (reduce conj {} (map vector vars [1 2]))))
+    (reduce conj {} (map vector vars values))))
 
 (defmacro const
   "Coverts s-exp `(const name type)` to SMT format"

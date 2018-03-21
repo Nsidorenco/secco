@@ -43,7 +43,7 @@
                          varname (second varexp)
                          body (sym-exp bodyexp)]
                      (set! *venv* (conj *venv* {varname body}))
-                     (if (= (first bodyexp) :UserInput)
+                     (when (= (first bodyexp) :UserInput)
                        (z3/const body Int)))
       [_] "")))
 
@@ -66,7 +66,7 @@
                  (str "Reached error state on line: " (.start node)
                       "," (.end node)
                       " for expression: " (.exp node)
-                      "\n with solution: " (vec (z3/solve pc))
+                      "\n with solution: " (z3/solve pc)
                       " for: " *venv*))
            (model (cfg/get-t node) pc)))))))
 
