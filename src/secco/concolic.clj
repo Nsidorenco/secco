@@ -37,7 +37,7 @@
                 [:ParenExp] (concrete (second exp) env)
                 [:AssignExp] (if (not= (first (last exp)) :UserInput)
                                (let [[varexp bodyexp] (rest exp)
-                                     varname (second varexp)
+                                     varname (read-string (second varexp))
                                      body (first (concrete bodyexp env))]
                                  [body (conj env {varname body})])
                                [[] env])
@@ -82,7 +82,7 @@
     [:ParenExp] (symbolic (second exp) pc state path)
     [:AssignExp] (if (not= (first (last exp)) :UserInput)
                    (let [[varexp bodyexp] (rest exp)
-                         varname (second varexp)
+                         varname (read-string (second varexp))
                          body (first (symbolic bodyexp pc state path))]
                      [body pc (conj state {varname body})])
                    [[] pc state])
@@ -166,3 +166,4 @@
 
 ; (execute (cfg/build "(x := input(); while x < 1 do x := x+1; error())"))
 ; (execute (cfg/build "(x := input(); x := x + 1)"))
+(execute (cfg/build "(x := 5; x := x + 1)"))
