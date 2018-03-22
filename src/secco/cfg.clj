@@ -10,14 +10,19 @@
                 :auto-whitespace :standard))
 
 (defprotocol CFGNode
+  (get-edge [this boolean])
+  (mark-edge [this boolean])
   (get-t [this])
   (get-f [this])
   (set-t [this node])
   (set-f [this node])
   (print-path [this node]))
 
-(deftype Node [nam exp ^:volatile-mutable t ^:volatile-mutable f start end]
+(deftype Node [nam exp ^:volatile-mutable t ^:volatile-mutable f start end
+               ^:volatile-mutable flag-t ^:volatile-mutable flag-f ]
   CFGNode
+  (get-edge [this b] (if b flag-t flag-f))
+  (mark-edge [this b] (if b (set! flag-t true) (set! flag-f true)))
   (get-t [this] t)
   (get-f [this] f)
   (set-t [this node] (set! t node))
@@ -33,7 +38,7 @@
   (let [start (:instaparse.gll/start-line (meta prog))
         end (:instaparse.gll/end-line (meta prog))]
     (swap! node-count inc)
-    (->Node nam prog t_path f_path start end)))
+    (->Node nam prog t_path f_path start end false false)))
 
 (defn parse-tree->cfg
   ([prog] (parse-tree->cfg prog []))

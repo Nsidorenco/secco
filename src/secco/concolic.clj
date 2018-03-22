@@ -121,18 +121,24 @@
                new-state] evaluated
               path (:path (meta evaluated))]
           (if (= (first exp) :OpExp)
-            (do (traverse (transition node path) new-pc new-env new-state)
-                (let [negated-pc (conj pc (z3/not (last new-pc)))
-                      negated-env (conj env (z3/solve negated-pc))]
-                  (when (z3/check-sat negated-pc)
+            (do
+              (if (not (cfg/get-edge node path))
+                (do (cfg/mark-edge node path)
+                    (traverse (transition node path) new-pc new-env new-state))
+                (traverse (transition node path) pc new-env new-state))
+              (let [negated-pc (conj pc (z3/not (last new-pc)))
+                    negated-env (conj env (z3/solve negated-pc))]
+                (when (and (z3/check-sat negated-pc))
+                  (when-not (cfg/get-edge node (not path))
                     (println "env: " negated-env)
-                    (recur (transition node (not path))
-                           negated-pc negated-env new-state))))
-            (recur (cfg/get-t node) new-pc new-env new-state)))
-        (println "Reached error state on line: " (.start node)
-                 "," (.end node)
-                 " for expression: " (.exp node)
-                 " for: " env)))))
+                    (cfg/mark-edge node (not path))
+                    (traverse (transition node (not path))
+                               negated-pc negated-env new-state)))))
+                (recur (cfg/get-t node) new-pc new-env new-state)))
+          (println "Reached error state on line: " (.start node)
+                   "," (.end node)
+                   " for expression: " (.exp node)
+                   " for: " env)))))
 
 (defn findSym
   ([node] (findSym node [] #{}))
@@ -165,6 +171,6 @@
 
 ; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else 21 else 42)"))
 
-(execute (cfg/build "(x := input(); while x < 10 do x := x+1)"))
-; (execute (cfg/build "(x := input(); x := x + 1)"))
-; (execute (cfg/build "(x := 5; x := x + 1)"))
+ (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
+; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
+; (execute (cfg/build "x := 5"))
