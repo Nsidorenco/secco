@@ -123,7 +123,7 @@
           (if (= (first exp) :OpExp)
             (do (traverse (transition node path) new-pc new-env new-state)
                 (let [negated-pc (conj pc (z3/not (last new-pc)))
-                      negated-env (z3/solve negated-pc)
+                      negated-env (conj env (z3/solve negated-pc))
                       _ (println "neg pc: "negated-pc)
                       _ (println (z3/check-sat negated-pc))]
                   (when (z3/check-sat negated-pc)
@@ -164,4 +164,4 @@
         state (reduce conj {} (map #(vector % %) sym-vars))]
     (traverse node pc env state)))
 
-(execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else 21 else 42)"))
+(execute (cfg/build "(x := input(); if x=10 then x:=x+1 else 2)"))
