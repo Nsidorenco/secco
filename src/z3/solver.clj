@@ -13,7 +13,8 @@
       s/trim
       (#(if (= % "sat")
           true
-          false))))
+          (do (println %)
+              false)))))
 
 (defn solve
   [model]
@@ -21,7 +22,7 @@
                                                       sat?
                                                       (list 'get-model)))))
                 :out)
-        vars (map read-string (re-seq #"(?<=define-fun\s)\w\w\w" res))
+        vars (map read-string (re-seq #"(?<=define-fun\s)\w" res))
         values (re-seq #"\d+" res)]
     (reduce conj {} (map vector vars values))))
 

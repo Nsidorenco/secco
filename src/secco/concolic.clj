@@ -22,7 +22,7 @@
                 [:add] (arithmetic exp +)
                 [:sub] (arithmetic exp -)
                 [:mul] (arithmetic exp *)
-                [:VarExp] (let [varname (get env (second exp))]
+                [:VarExp] (let [varname (get env (read-string (second exp)))]
                             (assert (not= varname nil) "Variable not declared (concrete)")
                             [varname env])
                 [:OpExp] (let [[exp1 oper exp2] (rest exp)
@@ -34,10 +34,12 @@
                              (with-meta [[] env] {:path true})
                              (with-meta [[] env] {:path false})))
                 [:ParenExp] (concrete (second exp) env)
-                [:AssignExp] (let [[varexp body] (rest exp)
-                                   varname (second varexp)
-                                   body (first (concrete body env))]
-                               [body (conj env {varname 1})])
+                [:AssignExp] (if (not= (first (last exp)) :UserInput)
+                               (let [[varexp bodyexp] (rest exp)
+                                     varname (second varexp)
+                                     body (first (concrete bodyexp env))]
+                                 [body (conj env {varname body})])
+                               [[] env])
                 [_] [[] env])]
       (if (nil? (:path (meta res)))
         (with-meta res {:path true})
@@ -53,7 +55,7 @@
     [:INT] [(read-string (second exp)) pc state]
     [:OPER] [(read-string (second exp)) pc state]
     [:Error] ::Error
-    [:VarExp] (let [varname (get state (second exp))]
+    [:VarExp] (let [varname (get state (read-string (second exp)))]
                 (println "state: " state " varname: " varname)
                 (assert (not= varname nil) "Variable not declared (symbolic)")
                 [varname pc state])
@@ -121,12 +123,18 @@
           (if (= (first exp) :OpExp)
             (do (traverse (transition node path) new-pc new-env new-state)
                 (let [negated-pc (conj pc (z3/not (last new-pc)))
-                      negated-env (z3/solve negated-pc)]
+                      negated-env (z3/solve negated-pc)
+                      _ (println "neg pc: "negated-pc)
+                      _ (println (z3/check-sat negated-pc))]
                   (when (z3/check-sat negated-pc)
+                    (println "env: " negated-env)
                     (recur (transition node (not path))
                            negated-pc negated-env new-state))))
             (recur (cfg/get-t node) new-pc new-env new-state)))
-        (println "found error")))))
+        (println "Reached error state on line: " (.start node)
+                  "," (.end node)
+                  " for expression: " (.exp node)
+                  " for: " env)))))
 
 (defn findSym 
   ([node] (findSym node #{}))
@@ -137,16 +145,11 @@
                (= (first (last exp)) :UserInput))
         (recur (cfg/get-t node) (conj acc (-> exp 
                                               second 
-                                              second 
+                                              second
                                               read-string)))
         (do (findSym (cfg/get-t node) acc)
             (recur (cfg/get-f node) acc))))
     acc)))
-
-(defn define-symbolic [node]
-  (let [sym_vars (findSym node)]
-    (vec (map #(z3/const % Int) sym_vars))
-  ))
 
 (defn execute
   [node]
@@ -157,7 +160,8 @@
   (let [sym-vars (findSym node)
         pc (vec (map #(z3/const % Int) sym-vars))
         env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))
+        _(println "start-env" env)
         state (reduce conj {} (map #(vector % %) sym-vars))]
     (traverse node pc env state)))
 
-(execute (cfg/build "(x := input(); y := input(); t := 2; h := input(); if x>2 then error() else 2)"))
+(execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else 21 else 42)"))
