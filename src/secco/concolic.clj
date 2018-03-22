@@ -1,38 +1,47 @@
 (ns secco.concolic
   (:require [z3.solver :as z3]
+            [secco.cfg :as cfg]
             [clojure.core.match :refer [match]]))
+
+(defn- op-exp
+  [exp1 oper exp2]
+  (if (= "!=" (str oper))
+    (not (oper exp1 exp2))
+    (eval ((resolve oper) exp1 exp2))))
 
 (defn- concrete
   [exp env]
-  (let [arithmetic (fn [exp oper]
-                     (let [[_ exp1 exp2] exp]
-                       (interpret-expression exp1)
-                       (let [exp1 @res]
-                         (interpret-expression exp2)
-                         (let [exp2 @res]
-                           (reset! res (oper exp1 exp2))))))]
-    (match [(first exp)]
-      [:INT] [(read-string (second exp)) env]
-      [:OPER] [(read-string (second exp)) env]
-      [:add] (arithmetic exp +)
-      [:sub] (arithmetic exp -)
-      [:mul] (arithmetic exp *)
-      [:VarExp] (let [varname (get env (second exp))]
-                  (assert (not= varname nil) "Variable not declared")
-                  [varname env])
-      [:OpExp] (let [[exp1 oper exp2] (rest exp)]
-                 (let [exp1 (first (concrete exp1 env))
-                       exp2 (first (concrete exp2 env))
-                       oper (first (concrete oper env))]
-                   (if (= "!=" (str oper))
-                     (with-meta [[] env] {:path false})
-                     (with-meta [[] env] {:path true}))))
-      [:ParenExp] (recur (second exp) env)
-      [:AssignExp] (let [[varexp body] (rest exp)
-                         varname (second varexp)
-                         body (concrete body env)]
-                     [body (conj env {varname body})])
-      [_] [[] env])))
+  (letfn [(arithmetic [exp oper]
+            (let [[exp1 exp2] (rest exp)
+                  exp1 (first (concrete exp1 env))
+                  exp2 (first (concrete exp2 env))]
+              [(oper exp1 exp2) env]))]
+    (let [res (match [(first exp)]
+                [:INT] [(read-string (second exp)) env]
+                [:OPER] [(read-string (second exp)) env]
+                [:add] (arithmetic exp +)
+                [:sub] (arithmetic exp -)
+                [:mul] (arithmetic exp *)
+                [:VarExp] (let [varname (get env (second exp))]
+                            (assert (not= varname nil) "Variable not declared (concrete)")
+                            [varname env])
+                [:OpExp] (let [[exp1 oper exp2] (rest exp)
+                               exp1 (first (concrete exp1 env))
+                               exp2 (first (concrete exp2 env))
+                               oper (first (concrete oper env))
+                               res (op-exp exp1 oper exp2)]
+                           (if res
+                             (with-meta [[] env] {:path true})
+                             (with-meta [[] env] {:path false})))
+                [:ParenExp] (concrete (second exp) env)
+                [:AssignExp] (let [[varexp body] (rest exp)
+                                   varname (second varexp)
+                                   body (first (concrete body env))]
+                               [body (conj env {varname 1})])
+                [_] [[] env])]
+      (if (nil? (:path (meta res)))
+        (with-meta res {:path true})
+        res))))
 
 (defmacro arithmetic
   [sym exp1 exp2]
@@ -43,39 +52,46 @@
   (match [(first exp)]
     [:INT] [(read-string (second exp)) pc state]
     [:OPER] [(read-string (second exp)) pc state]
-    [:Error] (println "error")
+    [:Error] ::Error
     [:VarExp] (let [varname (get state (second exp))]
-                (assert (not= varname nil) "Variable not declared")
+                (assert (not= varname nil) "Variable not declared (symbolic)")
                 [varname pc state])
     [:OpExp] (let [[_ exp1 oper exp2] exp
-                   e1 (first (sym-exp exp1))
-                   op (first (sym-exp oper))
-                   e2 (first (sym-exp exp2))
+                   e1 (first (symbolic exp1 pc state path))
+                   op (first (symbolic oper pc state path))
+                   e2 (first (symbolic exp2 pc state path))
                    condition (z3/assert e1 op e2)]
                (if path
                  [condition (conj pc condition) state]
                  [condition (conj pc (z3/not condition)) state]))
-    [:add] (let [[_ exp1 exp2] exp]
-             [(arithmetic + (first (sym-exp exp1)) (first (sym-exp exp2))) pc state])
-    [:sub] (let [[_ exp1 exp2] exp]
-             [(arithmetic - (first (sym-exp exp1)) (first (sym-exp exp2))) pc state])
-    [:mul] (let [[_ exp1 exp2] exp]
-             [(arithmetic * (first (sym-exp exp1)) (first (sym-exp exp2))) pc state])
-    [:AssignExp] (let [[_ varexp bodyexp] exp]
-                   varname (second varexp)
-                   body (first (sym-exp bodyexp))
+    ; [:add] (let [[_ exp1 exp2] exp]
+    ;          [(arithmetic + (first (symbolic exp1)) (first (symbolic exp2))) pc state])
+    ; [:sub] (let [[_ exp1 exp2] exp]
+    ;          [(arithmetic - (first (symbolic exp1)) (first (symbolic exp2))) pc state])
+    ; [:mul] (let [[_ exp1 exp2] exp]
+    ;          [(arithmetic * (first (symbolic exp1)) (first (symbolic exp2))) pc state])
+    [:AssignExp] (let [[_ varexp bodyexp] exp
+                       varname (second varexp)
+                       body (first (symbolic bodyexp pc state path))]
                    [body pc (conj state {varname body})])
-    [_] ""))
+    [_] []))
 
 (defn- evaluate-node
-  [exp env pc state]
+  [exp pc env state]
   (let [res (concrete exp env)
         path (:path (meta res))
         new-env (last res)]
-    (if-let [s (vector? (symbolic exp pc state path))]
-      (let [[new-pc new-state] (rest s)]
-        (with-meta [new-pc new-env new-state] {:path path}))
-      ::Error)))
+    (let [s (symbolic exp pc state path)]
+      (if (vector? s)
+        (let [[new-pc new-state] (rest s)]
+          (with-meta [new-pc new-env new-state] {:path path}))
+        ::Error))))
+
+(defn- transition
+  [node path]
+  (if path
+    (cfg/get-t node)
+    (cfg/get-f node)))
 
 (defn- traverse
   [node pc env state]
@@ -83,19 +99,24 @@
   ; Symbolic should not branch non-deterministically 
   ; Recursive call first, then pc negation call
   (when (instance? secco.cfg.CFGNode node)
+    (println (.exp node))
     (let [exp (.exp node)
-          [path
-           new-pc
-           new-env
-           new-state] (evaluate exp pc env state)]
-      (if (= (first exp) :OpExp)
-        ; What branch do we jump to?
-        (do (traverse ??? new-pc new-env new-state)
-            (let [negated-pc (conj (pop new-pc) (z3/not (last new-pc)))
-                  negated-env (z3/solve negated-pc)]
-              (when (z3/check-sat negated-pc)
-                (recur ??? negated-pc negated-env new-state))))
-        (recur (cfg/get-t node) new-pc new-env new-state)))))
+          evaluated (evaluate-node exp pc env state)]
+      (if (vector? evaluated)
+        (let [[new-pc
+               new-env
+               new-state] evaluated
+              path (:path (meta evaluated))]
+          (if (= (first exp) :OpExp)
+          ; What branch do we jump to?
+            (do (traverse (transition node path) new-pc new-env new-state
+                          (let [negated-pc (conj pc (z3/not (last new-pc)))
+                                negated-env (z3/solve negated-pc)]
+                            (when (z3/check-sat negated-pc)
+                              (traverse (transition node (not path))
+                                        negated-pc negated-env new-state)))))
+            (recur (cfg/get-t node) new-pc new-env new-state)))
+        (println "found error")))))
 
 (defn execute
   [node]
@@ -107,3 +128,5 @@
         env (z3/solve pc)
         state {}]
     (traverse node pc state)))
+
+(traverse (cfg/build "(x := input(); if x>2 then error() else 2)") [] {} {})
