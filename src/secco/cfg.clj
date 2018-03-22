@@ -25,6 +25,9 @@
   (print-path [this node] (println node))
   (toString [_] (str "Node: <" nam ">, Exp: " exp)))
 
+(defn node? [maybe-node]
+  (satisfies? CFGNode maybe-node))
+
 (defn new-node
   [nam prog t_path f_path]
   (let [start (:instaparse.gll/start-line (meta prog))
