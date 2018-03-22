@@ -77,11 +77,13 @@
              [(arithmetic * (first (symbolic exp1 pc state path))
                           (first (symbolic exp2 pc state path)))
               pc state])
-    [:AssignExp] (let [[_ varexp bodyexp] exp
-                       varname (second varexp)
-                       body (first (symbolic bodyexp pc state path))
-                       _ (println "state is: " {varname body})]
-                   [body pc (conj state {varname body})])
+    [:ParenExp] (symbolic (second exp) pc state path)
+    [:AssignExp] (if (not= (first (last exp)) :UserInput)
+                   (let [[varexp bodyexp] (rest exp)
+                         varname (second varexp)
+                         body (first (symbolic bodyexp pc state path))]
+                     [body pc (conj state {varname body})])
+                   [[] pc state])
     [_] [[] pc state]))
 
 (defn- evaluate-node
