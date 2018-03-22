@@ -54,6 +54,7 @@
     [:OPER] [(read-string (second exp)) pc state]
     [:Error] ::Error
     [:VarExp] (let [varname (get state (second exp))]
+                (println "state: " state " varname: " varname)
                 (assert (not= varname nil) "Variable not declared (symbolic)")
                 [varname pc state])
     [:OpExp] (let [[_ exp1 oper exp2] exp
@@ -78,9 +79,10 @@
               pc state])
     [:AssignExp] (let [[_ varexp bodyexp] exp
                        varname (second varexp)
-                       body (first (symbolic bodyexp pc state path))]
+                       body (first (symbolic bodyexp pc state path))
+                       _ (println "state is: " {varname body})]
                    [body pc (conj state {varname body})])
-    [_] []))
+    [_] [[] pc state]))
 
 (defn- evaluate-node
   [exp pc env state]
@@ -101,6 +103,7 @@
 
 (defn- traverse
   [node pc env state]
+  {:pre [(map? state) (map? env) (vector? pc)]}
   ; Concrete execution should detect errors
   ; Symbolic should not branch non-deterministically 
   ; Recursive call first, then pc negation call
@@ -134,4 +137,4 @@
         state {}]
     (traverse node pc state)))
 
-(traverse (cfg/build "(x := input(); if x>2 then error() else 2)") [] {} {})
+(traverse (cfg/build "(x := 12; if x>2 then error() else 2)") [] {} {})
