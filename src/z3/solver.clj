@@ -23,7 +23,7 @@
                                                       (list 'get-model)))))
                 :out)
         vars (map read-string (re-seq #"(?<=define-fun\s)\w" res))
-        values (re-seq #"\d+" res)]
+        values (map read-string (re-seq #"\d+" res))]
     (reduce conj {} (map vector vars values))))
 
 (defmacro const
