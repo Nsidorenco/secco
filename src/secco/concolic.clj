@@ -64,12 +64,18 @@
                (if path
                  [condition (conj pc condition) state]
                  [condition (conj pc (z3/not condition)) state]))
-    ; [:add] (let [[_ exp1 exp2] exp]
-    ;          [(arithmetic + (first (symbolic exp1)) (first (symbolic exp2))) pc state])
-    ; [:sub] (let [[_ exp1 exp2] exp]
-    ;          [(arithmetic - (first (symbolic exp1)) (first (symbolic exp2))) pc state])
-    ; [:mul] (let [[_ exp1 exp2] exp]
-    ;          [(arithmetic * (first (symbolic exp1)) (first (symbolic exp2))) pc state])
+    [:add] (let [[_ exp1 exp2] exp]
+             [(arithmetic + (first (symbolic exp1 pc state path))
+                          (first (symbolic exp2 pc state path)))
+              pc state])
+    [:sub] (let [[_ exp1 exp2] exp]
+             [(arithmetic - (first (symbolic exp1 pc state path))
+                          (first (symbolic exp2 pc state path)))
+              pc state])
+    [:mul] (let [[_ exp1 exp2] exp]
+             [(arithmetic * (first (symbolic exp1 pc state path))
+                          (first (symbolic exp2 pc state path)))
+              pc state])
     [:AssignExp] (let [[_ varexp bodyexp] exp
                        varname (second varexp)
                        body (first (symbolic bodyexp pc state path))]
@@ -98,7 +104,7 @@
   ; Concrete execution should detect errors
   ; Symbolic should not branch non-deterministically 
   ; Recursive call first, then pc negation call
-  (when (instance? secco.cfg.CFGNode node)
+  (when (cfg/node? node)
     (println (.exp node))
     (let [exp (.exp node)
           evaluated (evaluate-node exp pc env state)]
@@ -108,13 +114,12 @@
                new-state] evaluated
               path (:path (meta evaluated))]
           (if (= (first exp) :OpExp)
-          ; What branch do we jump to?
-            (do (traverse (transition node path) new-pc new-env new-state
-                          (let [negated-pc (conj pc (z3/not (last new-pc)))
-                                negated-env (z3/solve negated-pc)]
-                            (when (z3/check-sat negated-pc)
-                              (traverse (transition node (not path))
-                                        negated-pc negated-env new-state)))))
+            (do (traverse (transition node path) new-pc new-env new-state)
+                (let [negated-pc (conj pc (z3/not (last new-pc)))
+                      negated-env (z3/solve negated-pc)]
+                  (when (z3/check-sat negated-pc)
+                    (recur (transition node (not path))
+                           negated-pc negated-env new-state))))
             (recur (cfg/get-t node) new-pc new-env new-state)))
         (println "found error")))))
 
