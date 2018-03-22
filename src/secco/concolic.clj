@@ -126,15 +126,36 @@
             (recur (cfg/get-t node) new-pc new-env new-state)))
         (println "found error")))))
 
+(defn findSym 
+  ([node] (findSym node #{}))
+  ([node acc]
+  (if (cfg/node? node)
+    (let [exp (.exp node)]
+      (if (and (= (first exp) :AssignExp)
+               (= (first (last exp)) :UserInput))
+        (recur (cfg/get-t node) (conj acc (-> exp 
+                                              second 
+                                              second 
+                                              read-string)))
+        (do (findSym (cfg/get-t node) acc)
+            (recur (cfg/get-f node) acc))))
+    acc)))
+
+(defn define-symbolic [node]
+  (let [sym_vars (findSym node)]
+    (vec (map #(z3/const % Int) sym_vars))
+  ))
+
 (defn execute
   [node]
   ; Find all symbolic values
   ; Add them z3
   ; solve z3 to get initial values
   ; update state
-  (let [pc (declare-symbolic)
-        env (z3/solve pc)
-        state {}]
-    (traverse node pc state)))
+  (let [sym-vars (findSym node)
+        pc (vec (map #(z3/const % Int) sym-vars))
+        env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))
+        state (reduce conj {} (map #(vector % %) sym-vars))]
+    (traverse node pc env state)))
 
-(traverse (cfg/build "(x := 12; if x>2 then error() else 2)") [] {} {})
+(execute (cfg/build "(x := input(); y := input(); t := 2; h := input(); if x>2 then error() else 2)"))
