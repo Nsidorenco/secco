@@ -135,18 +135,19 @@
                  " for: " env)))))
 
 (defn findSym
-  ([node] (findSym node #{}))
-  ([node acc]
+  ([node] (findSym node [] #{}))
+  ([node visited acc]
    (if (cfg/node? node)
      (let [exp (.exp node)]
        (if (and (= (first exp) :AssignExp)
                 (= (first (last exp)) :UserInput))
-         (recur (cfg/get-t node) (conj acc (-> exp
-                                               second
-                                               second
-                                               read-string)))
-         (do (findSym (cfg/get-t node) acc)
-             (recur (cfg/get-f node) acc))))
+         (recur (cfg/get-t node) (conj visited node) (conj acc (-> exp
+                                                                   second
+                                                                   second
+                                                                   read-string)))
+         (when-not (some (partial identical? node) visited)
+           (do (findSym (cfg/get-t node) (conj visited node) acc)
+               (recur (cfg/get-f node) (conj visited node) acc)))))
      acc)))
 
 (defn execute
@@ -164,6 +165,6 @@
 
 ; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else 21 else 42)"))
 
-; (execute (cfg/build "(x := input(); while x < 1 do x := x+1; error())"))
+(execute (cfg/build "(x := input(); while x < 10 do x := x+1)"))
 ; (execute (cfg/build "(x := input(); x := x + 1)"))
-(execute (cfg/build "(x := 5; x := x + 1)"))
+; (execute (cfg/build "(x := 5; x := x + 1)"))
