@@ -6,7 +6,7 @@
 (defn- op-exp
   [exp1 oper exp2]
   (if (= "!=" (str oper))
-    (not (oper exp1 exp2))
+    (not (= exp1 exp2))
     (eval ((resolve oper) exp1 exp2))))
 
 (defn- concrete
@@ -22,9 +22,11 @@
                 [:add] (arithmetic exp +)
                 [:sub] (arithmetic exp -)
                 [:mul] (arithmetic exp *)
+                [:UserInput] (rand-int 1000)
                 [:VarExp] (let [value (get env (read-string (second exp)))]
                             (assert (not= value nil)
-                                    "Variable not declared (concrete)")
+                                    (str (second exp)
+                                         " Variable not declared (concrete)"))
                             [value env])
                 [:OpExp] (let [[exp1 oper exp2] (rest exp)
                                exp1 (first (concrete exp1 env))
@@ -35,12 +37,10 @@
                              (with-meta [[] env] {:path true})
                              (with-meta [[] env] {:path false})))
                 [:ParenExp] (concrete (second exp) env)
-                [:AssignExp] (if (not= (first (last exp)) :UserInput)
-                               (let [[varexp bodyexp] (rest exp)
-                                     varname (read-string (second varexp))
-                                     body (first (concrete bodyexp env))]
-                                 [body (conj env {varname body})])
-                               [[] env])
+                [:AssignExp] (let [[varexp bodyexp] (rest exp)
+                                   varname (read-string (second varexp))
+                                   body (first (concrete bodyexp env))]
+                               [body (conj env {varname body})])
                 [_] [[] env])]
       (if (nil? (:path (meta res)))
         (with-meta res {:path true})
@@ -108,18 +108,15 @@
 (defn- traverse
   [node pc env state]
   {:pre [(map? state) (map? env) (vector? pc)]}
-  ; Concrete execution should detect errors
-  ; Symbolic should not branch non-deterministically 
-  ; Recursive call first, then pc negation call
   (when (cfg/node? node)
-    (println (.exp node))
     (let [exp (.exp node)
           evaluated (evaluate-node exp pc env state)]
       (if (vector? evaluated)
         (let [[new-pc
                new-env
                new-state] evaluated
-              path (:path (meta evaluated))]
+              path (:path (meta evaluated))
+              _ (println new-state)]
           (if (= (first exp) :OpExp)
             (do
               (if (not (cfg/get-edge node path))
@@ -130,23 +127,22 @@
                     negated-env (conj env (z3/solve negated-pc))]
                 (when (and (z3/check-sat negated-pc))
                   (when-not (cfg/get-edge node (not path))
-                    (println "env: " negated-env)
                     (cfg/mark-edge node (not path))
-                    (traverse (transition node (not path))
-                               negated-pc negated-env new-state)))))
-                (recur (cfg/get-t node) new-pc new-env new-state)))
-          (println "Reached error state on line: " (.start node)
-                   "," (.end node)
-                   " for expression: " (.exp node)
-                   " for: " env)))))
+                    (recur (transition node (not path))
+                           negated-pc negated-env new-state)))))
+            (recur (cfg/get-t node) new-pc new-env new-state)))
+        (println "Reached error state on line: " (.start node)
+                 "," (.end node)
+                 " for expression: " (.exp node)
+                 " for: " env
+                 " and state: " state)))))
 
 (defn findSym
   ([node] (findSym node [] #{}))
   ([node visited acc]
    (if (cfg/node? node)
      (let [exp (.exp node)]
-       (if (and (= (first exp) :AssignExp)
-                (= (first (last exp)) :UserInput))
+       (if (= (first exp) :AssignExp)
          (recur (cfg/get-t node) (conj visited node) (conj acc (-> exp
                                                                    second
                                                                    second
@@ -171,6 +167,7 @@
 
 ; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else 21 else 42)"))
 
- (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
+; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
+; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
