@@ -1,6 +1,7 @@
 (ns secco.concolic
   (:require [z3.solver :as z3]
             [secco.cfg :as cfg]
+            [secco.util :as util]
             [clojure.core.match :refer [match]]))
 
 (defn- op-exp
@@ -112,45 +113,33 @@
     (let [exp (.exp node)
           evaluated (evaluate-node exp pc env state)]
       (if (vector? evaluated)
-        (let [[new-pc
-               new-env
-               new-state] evaluated
-              path (:path (meta evaluated))
-              _ (println new-state)]
-          (if (= (first exp) :OpExp)
-            (do
-              (if (not (cfg/get-edge node path))
-                (do (cfg/mark-edge node path)
-                    (traverse (transition node path) new-pc new-env new-state))
-                (traverse (transition node path) pc new-env new-state))
-              (let [negated-pc (conj pc (z3/not (last new-pc)))
-                    negated-env (conj env (z3/solve negated-pc))]
-                (when (and (z3/check-sat negated-pc))
-                  (when-not (cfg/get-edge node (not path))
-                    (cfg/mark-edge node (not path))
-                    (recur (transition node (not path))
-                           negated-pc negated-env new-state)))))
-            (recur (cfg/get-t node) new-pc new-env new-state)))
+        (let [path (:path (meta evaluated))]
+          (dfs path node [pc env state] evaluated))
         (println "Reached error state on line: " (.start node)
                  "," (.end node)
                  " for expression: " (.exp node)
                  " for: " env
                  " and state: " state)))))
 
-(defn findSym
-  ([node] (findSym node [] #{}))
-  ([node visited acc]
-   (if (cfg/node? node)
-     (let [exp (.exp node)]
-       (if (= (first exp) :AssignExp)
-         (recur (cfg/get-t node) (conj visited node) (conj acc (-> exp
-                                                                   second
-                                                                   second
-                                                                   read-string)))
-         (when-not (some (partial identical? node) visited)
-           (do (findSym (cfg/get-t node) (conj visited node) acc)
-               (recur (cfg/get-f node) (conj visited node) acc)))))
-     acc)))
+(defn- dfs
+  [path node old-args new-args]
+  (let [[pc env state] old-args
+        [new-pc new-env new-state] new-args
+        exp (.exp node)]
+    (if (= (first exp) :OpExp)
+      (do
+        (if (not (cfg/get-edge node path))
+          (do (cfg/mark-edge node path)
+              (traverse (transition node path) new-pc new-env new-state))
+          (traverse (transition node path) pc new-env new-state))
+        (let [negated-pc (conj pc (z3/not (last new-pc)))
+              negated-env (conj env (z3/solve negated-pc))]
+          (when (and (z3/check-sat negated-pc))
+            (when-not (cfg/get-edge node (not path))
+              (cfg/mark-edge node (not path))
+              (traverse (transition node (not path))
+                        negated-pc negated-env new-state)))))
+      (traverse (cfg/get-t node) new-pc new-env new-state))))
 
 (defn execute
   [node]
@@ -158,14 +147,14 @@
   ; Add them z3
   ; solve z3 to get initial values
   ; update state
-  (let [sym-vars (findSym node)
+  (let [sym-vars (util/findSym node)
         pc (vec (map #(z3/const % Int) sym-vars))
         env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))
         _ (println "start-env" env)
         state (reduce conj {} (map #(vector % %) sym-vars))]
-    (traverse node pc env state)))
+    (trampoline traverse node pc env state)))
 
-; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else 21 else 42)"))
+; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else error() else error())"))
 
 ; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
 ; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))

@@ -6,8 +6,8 @@
 (defn- op-exp
   [exp1 oper exp2]
   (if (= "!=" (str oper))
-    (not (oper exp1 exp2))
-    (eval ((resolve oper) exp1 exp2))))
+    (not= exp1 exp2)
+    ((resolve oper) exp1 exp2)))
 
 (defn- expression
   [exp env]
@@ -19,10 +19,11 @@
     (match [(first exp)]
       [:INT] [(read-string (second exp)) env]
       [:OPER] [(read-string (second exp)) env]
-      [:add] [(arithmetic exp +) env]
-      [:sub] [(arithmetic exp -) env]
-      [:mul] [(arithmetic exp *) env]
+      [:add] (arithmetic exp +)
+      [:sub] (arithmetic exp -)
+      [:mul] (arithmetic exp *)
       [:UserInput] (do (println "Enter input: ")
+                       (flush)
                        [(read-string (read-line)) env])
       [:Error] (throw (Exception. "Error state reached"))
       [:VarExp] (let [varname (get env (second exp))]
@@ -54,3 +55,4 @@
 
 ; (interpret (cfg/build "x := input()"))
 ; (interpret (cfg/build "(x := input(); if x > 2 then 2 else 4)"))
+; (interpret (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))

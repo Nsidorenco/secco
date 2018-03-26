@@ -1,4 +1,5 @@
-(ns secco.util)
+(ns secco.util
+  (:require [secco.cfg :as cfg]))
 
 (def alphabet
   (map char (range 97 123)))
@@ -20,3 +21,18 @@
   (-> (swap! a #(with-meta (subvec % 1) {:head (% 0)}))
       (meta)
       :head))
+
+(defn findSym
+  ([node] (findSym node [] #{}))
+  ([node visited acc]
+   (if (cfg/node? node)
+     (let [exp (.exp node)]
+       (if (= (first exp) :AssignExp)
+         (recur (cfg/get-t node) (conj visited node) (conj acc (-> exp
+                                                                   second
+                                                                   second
+                                                                   read-string)))
+         (when-not (some (partial identical? node) visited)
+           (findSym (cfg/get-t node) (conj visited node) acc)
+           (recur (cfg/get-f node) (conj visited node) acc))))
+     acc)))
