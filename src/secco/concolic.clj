@@ -23,7 +23,7 @@
                 [:add] (arithmetic exp +)
                 [:sub] (arithmetic exp -)
                 [:mul] (arithmetic exp *)
-                [:UserInput] (rand-int 1000)
+                [:UserInput] [(rand-int 1000) env]
                 [:VarExp] (let [value (get env (read-string (second exp)))]
                             (assert (not= value nil)
                                     (str (second exp)
@@ -111,10 +111,10 @@
   {:pre [(map? state) (map? env) (vector? pc)]}
   (when (cfg/node? node)
     (let [exp (.exp node)
-          evaluated (evaluate-node exp pc env state)]
+          evaluated (evaluate-node exp pc env state)
+          path (:path (meta evaluated))]
       (if (vector? evaluated)
-        (let [path (:path (meta evaluated))]
-          (dfs path node [pc env state] evaluated))
+        (dfs path node [pc env state] evaluated)
         (println "Reached error state on line: " (.start node)
                  "," (.end node)
                  " for expression: " (.exp node)
@@ -152,9 +152,9 @@
         env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))
         _ (println "start-env" env)
         state (reduce conj {} (map #(vector % %) sym-vars))]
-    (trampoline traverse node pc env state)))
+    (traverse node pc env state)))
 
-; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else error() else error())"))
+(execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else error() else error())"))
 
 ; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
 ; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
