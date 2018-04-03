@@ -4,6 +4,8 @@
             [secco.util :as util]
             [clojure.core.match :refer [match]]))
 
+(def inputs (atom {}))
+
 (defn- op-exp
   [exp1 oper exp2]
   (if (= "!=" (str oper))
@@ -23,6 +25,7 @@
                 [:add] (arithmetic exp +)
                 [:sub] (arithmetic exp -)
                 [:mul] (arithmetic exp *)
+                [:Error] [::Error env]
                 [:UserInput] [(rand-int 1000) env]
                 [:VarExp] (let [value (get env (read-string (second exp)))]
                             (assert (not= value nil)
@@ -56,7 +59,6 @@
   (match [(first exp)]
     [:INT] [(read-string (second exp)) pc state]
     [:OPER] [(read-string (second exp)) pc state]
-    [:Error] ::Error
     [:VarExp] (let [varname (get state (read-string (second exp)))]
                 (assert (not= varname nil) "Variable not declared (symbolic)")
                 [varname pc state])
@@ -94,11 +96,11 @@
   (let [res (concrete exp env)
         path (:path (meta res))
         new-env (last res)]
-    (let [s (symbolic exp pc state path)]
-      (if (vector? s)
+    (if (isa? ::Error (first res))
+      ::Error
+      (let [s (symbolic exp pc state path)]
         (let [[new-pc new-state] (rest s)]
-          (with-meta [new-pc new-env new-state] {:path path}))
-        ::Error))))
+          (with-meta [new-pc new-env new-state] {:path path}))))))
 
 (defn- transition
   [node path]
@@ -111,15 +113,13 @@
   {:pre [(map? state) (map? env) (vector? pc)]}
   (when (cfg/node? node)
     (let [exp (.exp node)
-          evaluated (evaluate-node exp pc env state)
-          path (:path (meta evaluated))]
-      (if (vector? evaluated)
-        (dfs path node [pc env state] evaluated)
+          evaluated (evaluate-node exp pc env state)]
+      (if (isa? ::Error evaluated)
         (println "Reached error state on line: " (.start node)
                  "," (.end node)
                  " for expression: " (.exp node)
-                 " for: " env
-                 " and state: " state)))))
+                 " for: " @inputs)
+        (dfs (:path (meta evaluated)) node [pc env state] evaluated)))))
 
 (defn- dfs
   [path node old-args new-args]
@@ -131,9 +131,11 @@
         (if (not (cfg/get-edge node path))
           (do (cfg/mark-edge node path)
               (traverse (transition node path) new-pc new-env new-state))
-          (traverse (transition node path) pc new-env new-state))
+          (traverse (transition node path) pc new-env state))
         (let [negated-pc (conj pc (z3/not (last new-pc)))
-              negated-env (conj env (z3/solve negated-pc))]
+              new-inputs (z3/solve negated-pc)
+              _ (swap! inputs conj new-inputs)
+              negated-env (conj env new-inputs)]
           (when (and (z3/check-sat negated-pc))
             (when-not (cfg/get-edge node (not path))
               (cfg/mark-edge node (not path))
@@ -150,13 +152,15 @@
   (let [sym-vars (util/findSym node)
         pc (vec (map #(z3/const % Int) sym-vars))
         env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))
+        _ (reset! inputs env)
         _ (println "start-env" env)
         state (reduce conj {} (map #(vector % %) sym-vars))]
     (traverse node pc env state)))
 
-(execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else error() else error())"))
+; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else error() else error())"))
 
 ; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
-; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
+;; TODO: This throws false positives
+(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))

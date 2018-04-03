@@ -27,7 +27,7 @@
   ([node visited acc]
    (if (cfg/node? node)
      (let [exp (.exp node)]
-       (if (= (first exp) :AssignExp)
+       (if (and (= (first exp) :AssignExp) (= (first (last exp)) :UserInput))
          (recur (cfg/get-t node) (conj visited node) (conj acc (-> exp
                                                                    second
                                                                    second

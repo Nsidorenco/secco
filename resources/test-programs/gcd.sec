@@ -1,7 +1,8 @@
 % gcd(a,b) %
 (
-    a := 22;
-    b := 7;
+    a := input();
+    b := input();
+    if a > b then max := a else max := b;
     while b != 0 do
         (
             c := b;
@@ -18,5 +19,5 @@
             b := i; 
             a := c
         );
-    a+b
+    if max < a+b then error() else a+b
 )
