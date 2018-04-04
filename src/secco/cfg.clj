@@ -19,7 +19,7 @@
   (print-path [this node]))
 
 (deftype Node [nam exp ^:volatile-mutable t ^:volatile-mutable f start end
-               ^:volatile-mutable flag-t ^:volatile-mutable flag-f ]
+               ^:volatile-mutable flag-t ^:volatile-mutable flag-f]
   CFGNode
   (get-edge [this b] (if b flag-t flag-f))
   (mark-edge [this b] (if b (set! flag-t true) (set! flag-f true)))

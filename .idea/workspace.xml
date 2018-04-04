@@ -1,0 +1,915 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="63fa6027-5728-4417-9482-9c79827310db" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/resources/test-programs/gcd.sec" afterPath="$PROJECT_DIR$/resources/test-programs/gcd.sec" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/secco/cfg.clj" afterPath="$PROJECT_DIR$/src/secco/cfg.clj" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/secco/concolic.clj" afterPath="$PROJECT_DIR$/src/secco/concolic.clj" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/secco/viz.clj" afterPath="$PROJECT_DIR$/src/secco/viz.clj" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/z3/solver.clj" afterPath="$PROJECT_DIR$/src/z3/solver.clj" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="375">
+      <file leaf-file-name="concolic.clj" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/secco/concolic.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="419">
+              <caret line="138" column="47" lean-forward="false" selection-start-line="138" selection-start-column="47" selection-end-line="138" selection-end-column="47" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="solver.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/z3/solver.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="315">
+              <caret line="15" column="10" lean-forward="false" selection-start-line="15" selection-start-column="10" selection-end-line="15" selection-end-column="10" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="symbolic.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/secco/symbolic.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="63">
+              <caret line="3" column="33" lean-forward="true" selection-start-line="3" selection-start-column="33" selection-end-line="3" selection-end-column="33" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="cfg.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/secco/cfg.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1214">
+              <caret line="82" column="0" lean-forward="true" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="viz.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/secco/viz.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="714">
+              <caret line="118" column="46" lean-forward="false" selection-start-line="118" selection-start-column="46" selection-end-line="118" selection-end-column="46" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="secco.grm" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/resources/secco.grm">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="395">
+              <caret line="34" column="12" lean-forward="false" selection-start-line="34" selection-start-column="12" selection-end-line="34" selection-end-column="12" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="core.clj" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/secco/core.clj">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="0">
+              <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>dfs</find>
+    </findStrings>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="GradleLocalSettings">
+    <option name="externalProjectsViewState">
+      <projects_view />
+    </option>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$PROJECT_DIR$/src/secco/viz.clj" />
+        <option value="$PROJECT_DIR$/src/secco/cfg.clj" />
+        <option value="$PROJECT_DIR$/resources/secco.grm" />
+        <option value="$PROJECT_DIR$/src/secco/concolic.clj" />
+        <option value="$PROJECT_DIR$/src/z3/solver.clj" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-9" />
+    <option name="y" value="-9" />
+    <option name="width" value="1938" />
+    <option name="height" value="1048" />
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
+      <pane id="Scratches" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="secco" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="secco" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="secco" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="secco" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="z3" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="secco" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="secco" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="secco" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="secco" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="secco" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="resources" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="aspect.path.notification.shown" value="true" />
+    <property name="settings.editor.selected.configurable" value="editor.preferences.smartKeys" />
+  </component>
+  <component name="ReplState" timestamp="1522855118629">{:repl-history {:ide [], :local [{:command &quot;(ns secco.concolic\n  (:require [z3.solver :as z3]\n            [secco.cfg :as cfg]\n            [clojure.core.match :refer [match]]))&quot;, :offset 131, :ns &quot;secco.core&quot;} {:command &quot;(defn- op-exp\n  [exp1 oper exp2]\n  (if (= \&quot;!=\&quot; (str oper))\n    (not (oper exp1 exp2))\n    (eval ((resolve oper) exp1 exp2))))&quot;, :offset 125, :ns &quot;secco.concolic&quot;} {:command &quot;(defn- concrete\n  [exp env]\n  (letfn [(arithmetic [exp oper]\n            (let [[exp1 exp2] (rest exp)\n                  exp1 (first (concrete exp1 env))\n                  exp2 (first (concrete exp2 env))]\n              [(oper exp1 exp2) env]))]\n    (let [res (match [(first exp)]\n                [:INT] [(read-string (second exp)) env]\n                [:OPER] [(read-string (second exp)) env]\n                [:add] (arithmetic exp +)\n                [:sub] (arithmetic exp -)\n                [:mul] (arithmetic exp *)\n                [:VarExp] (let [value (get env (read-string (second exp)))]\n                            (assert (not= value nil)\n                                    \&quot;Variable not declared (concrete)\&quot;)\n                            [value env])\n                [:OpExp] (let [[exp1 oper exp2] (rest exp)\n                               exp1 (first (concrete exp1 env))\n                               exp2 (first (concrete exp2 env))\n                               oper (first (concrete oper env))\n                               res (op-exp exp1 oper exp2)]\n                           (if res\n                             (with-meta [[] env] {:path true})\n                             (with-meta [[] env] {:path false})))\n                [:ParenExp] (concrete (second exp) env)\n                [:AssignExp] (if (not= (first (last exp)) :UserInput)\n                               (let [[varexp bodyexp] (rest exp)\n                                     varname (read-string (second varexp))\n                                     body (first (concrete bodyexp env))]\n                                 [body (conj env {varname body})])\n                               [[] env])\n                [_] [[] env])]\n      (if (nil? (:path (meta res)))\n        (with-meta res {:path true})\n        res))))&quot;, :offset 1803, :ns &quot;secco.concolic&quot;} {:command &quot;(defmacro arithmetic\n  [sym exp1 exp2]\n  `(list (symbol '~sym) ~exp1 ~exp2))&quot;, :offset 76, :ns &quot;secco.concolic&quot;} {:command &quot;(defn- symbolic\n  [exp pc state path]\n  (match [(first exp)]\n    [:INT] [(read-string (second exp)) pc state]\n    [:OPER] [(read-string (second exp)) pc state]\n    [:Error] ::Error\n    [:VarExp] (let [varname (get state (read-string (second exp)))]\n                (assert (not= varname nil) \&quot;Variable not declared (symbolic)\&quot;)\n                [varname pc state])\n    [:OpExp] (let [[_ exp1 oper exp2] exp\n                   e1 (first (symbolic exp1 pc state path))\n                   op (first (symbolic oper pc state path))\n                   e2 (first (symbolic exp2 pc state path))\n                   condition (z3/assert e1 op e2)]\n               (if path\n                 [condition (conj pc condition) state]\n                 [condition (conj pc (z3/not condition)) state]))\n    [:add] (let [[_ exp1 exp2] exp]\n             [(arithmetic + (first (symbolic exp1 pc state path))\n                          (first (symbolic exp2 pc state path)))\n              pc state])\n    [:sub] (let [[_ exp1 exp2] exp]\n             [(arithmetic - (first (symbolic exp1 pc state path))\n                          (first (symbolic exp2 pc state path)))\n              pc state])\n    [:mul] (let [[_ exp1 exp2] exp]\n             [(arithmetic * (first (symbolic exp1 pc state path))\n                          (first (symbolic exp2 pc state path)))\n              pc state])\n    [:ParenExp] (symbolic (second exp) pc state path)\n    [:AssignExp] (if (not= (first (last exp)) :UserInput)\n                   (let [[varexp bodyexp] (rest exp)\n                         varname (read-string (second varexp))\n                         body (first (symbolic bodyexp pc state path))]\n                     [body pc (conj state {varname body})])\n                   [[] pc state])\n    [_] [[] pc state]))&quot;, :offset 1775, :ns &quot;secco.concolic&quot;} {:command &quot;(defn- evaluate-node\n  [exp pc env state]\n  (let [res (concrete exp env)\n        path (:path (meta res))\n        new-env (last res)]\n    (let [s (symbolic exp pc state path)]\n      (if (vector? s)\n        (let [[new-pc new-state] (rest s)]\n          (with-meta [new-pc new-env new-state] {:path path}))\n        ::Error))))&quot;, :offset 322, :ns &quot;secco.concolic&quot;} {:command &quot;(defn- transition\n  [node path]\n  (if path\n    (cfg/get-t node)\n    (cfg/get-f node)))&quot;, :offset 86, :ns &quot;secco.concolic&quot;} {:command &quot;(defn- traverse\n  [node pc env state]\n  {:pre [(map? state) (map? env) (vector? pc)]}\n  ; Concrete execution should detect errors\n  ; Symbolic should not branch non-deterministically \n  ; Recursive call first, then pc negation call\n  (when (cfg/node? node)\n    (println (.exp node))\n    (let [exp (.exp node)\n          evaluated (evaluate-node exp pc env state)]\n      (if (vector? evaluated)\n        (let [[new-pc\n               new-env\n               new-state] evaluated\n              path (:path (meta evaluated))]\n          (if (= (first exp) :OpExp)\n            (do (traverse (transition node path) new-pc new-env new-state)\n                (let [negated-pc (conj pc (z3/not (last new-pc)))\n                      negated-env (conj env (z3/solve negated-pc))]\n                  (when (z3/check-sat negated-pc)\n                    (println \&quot;env: \&quot; negated-env)\n                    (recur (transition node (not path))\n                           negated-pc negated-env new-state))))\n            (recur (cfg/get-t node) new-pc new-env new-state)))\n        (println \&quot;Reached error state on line: \&quot; (.start node)\n                 \&quot;,\&quot; (.end node)\n                 \&quot; for expression: \&quot; (.exp node)\n                 \&quot; for: \&quot; env)))))&quot;, :offset 1228, :ns &quot;secco.concolic&quot;} {:command &quot;(defn findSym\n  ([node] (findSym node #{}))\n  ([node acc]\n   (if (cfg/node? node)\n     (let [exp (.exp node)]\n       (if (and (= (first exp) :AssignExp)\n                (= (first (last exp)) :UserInput))\n         (recur (cfg/get-t node) (conj acc (-&gt; exp\n                                               second\n                                               second\n                                               read-string)))\n         (do (findSym (cfg/get-t node) acc)\n             (recur (cfg/get-f node) acc))))\n     acc)))&quot;, :offset 525, :ns &quot;secco.concolic&quot;} {:command &quot;(defn execute\n  [node]\n  ; Find all symbolic values\n  ; Add them z3\n  ; solve z3 to get initial values\n  ; update state\n  (let [sym-vars (findSym node)\n        pc (vec (map #(z3/const % Int) sym-vars))\n        env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))\n        _ (println \&quot;start-env\&quot; env)\n        state (reduce conj {} (map #(vector % %) sym-vars))]\n    (traverse node pc env state)))&quot;, :offset 405, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); if x&gt;500 then error() else 1)\&quot;))&quot;, :offset 68, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := 5; if x&gt;500 then error() else 1)\&quot;))&quot;, :offset 62, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := 501; if x&gt;500 then error() else 1)\&quot;))&quot;, :offset 64, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := 10; while x&gt;0 do x:=x-1)\&quot;))&quot;, :offset 54, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); x := x+2; if x=12 then error() else 1)\&quot;))&quot;, :offset 77, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); while x &lt; 10 do x := x+1)\&quot;))&quot;, :offset 64, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); while x &lt; 100 do x := x+1)\&quot;))&quot;, :offset 65, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); y := 0; while x &lt; 10 do (x := x+1; y := y+1); if y&gt;5 then 20 else 40)\&quot;))&quot;, :offset 108, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := 5; x := x + 1)\&quot;))&quot;, :offset 44, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := 5\&quot;))&quot;, :offset 31, :ns &quot;secco.concolic&quot;} {:command &quot;*e*e*e&quot;, :offset 6, :ns &quot;secco.core&quot;} {:command &quot;(execute (cfg/build \&quot;x := 5\&quot;))&quot;, :offset 30, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); if x&gt;500 then if x&lt;750 then error() else 21 else 42)\&quot;))&quot;, :offset 91, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); x := x + 1)\&quot;))&quot;, :offset 50, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); while x&lt;10 do x := x + 1)\&quot;))&quot;, :offset 64, :ns &quot;secco.concolic&quot;} {:command &quot;(defn- traverse\n  [node pc env state]\n  {:pre [(map? state) (map? env) (vector? pc)]}\n  ; Concrete execution should detect errors\n  ; Symbolic should not branch non-deterministically \n  ; Recursive call first, then pc negation call\n  (when (cfg/node? node)\n    (println (.exp node))\n    (let [exp (.exp node)\n          evaluated (evaluate-node exp pc env state)]\n      (if (vector? evaluated)\n        (let [[new-pc\n               new-env\n               new-state] evaluated\n              path (:path (meta evaluated))]\n          (if (= (first exp) :OpExp)\n            (do\n              (if (not (cfg/get-edge node path))\n                (do (cfg/mark-edge node path)\n                    (traverse (transition node path) new-pc new-env new-state))\n                (traverse (transition node path) pc new-env new-state))\n              (let [negated-pc (conj pc (z3/not (last new-pc)))\n                    negated-env (conj env (z3/solve negated-pc))]\n                (when (and (z3/check-sat negated-pc))\n                  (when-not (cfg/get-edge node (not path))\n                    (println \&quot;env: \&quot; negated-env)\n                    (cfg/mark-edge node (not path))\n                    (traverse (transition node (not path))\n                               negated-pc negated-env new-state)))))\n                (recur (cfg/get-t node) new-pc new-env new-state)))\n          (println \&quot;Reached error state on line: \&quot; (.start node)\n                   \&quot;,\&quot; (.end node)\n                   \&quot; for expression: \&quot; (.exp node)\n                   \&quot; for: \&quot; env)))))&quot;, :offset 1547, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); y := 0; while x &lt; 10 do (x := x+1; y := y+1); if x&gt;5 then error() else 40)\&quot;))&quot;, :offset 113, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); y := 0; while x &lt; 10 do (x := x+1; y := y+1); if (x-10)&gt;5 then error() else 40)\&quot;))&quot;, :offset 118, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); y := x; while x &lt; 10 do (x := x+1; y := y+1); if y&gt;5 then error() else 40)\&quot;))&quot;, :offset 113, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); y := 0; while x &lt; 10 do (x := x+1; y := y+1); if y&gt;5 then error() else 40)\&quot;))&quot;, :offset 113, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); y := input(); while x &lt; 10 do (x := x+1; y := y+1); if y&gt;5 then error() else 40)\&quot;))&quot;, :offset 119, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build \&quot;(x := input(); y := x+0; while x &lt; 10 do (x := x+1; y := y+1); if y&gt;5 then error() else 40)\&quot;))&quot;, :offset 115, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env new-state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              negated-env (conj env (z3/solve negated-pc))]\n          (when (and (z3/check-sat negated-pc))\n            (when-not (cfg/get-edge node (not path))\n              (cfg/mark-edge node (not path))\n              (traverse (transition node (not path))\n                        negated-pc negated-env new-state)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 848, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build (slurp (clojure.java.io/resource \&quot;test-programs/gcd.sec\&quot;))))&quot;, :offset 80, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  (print \&quot;dfs-search\&quot;)\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)\n              negated-env (conj env new-inputs)]\n          (when (and (z3/check-sat negated-pc))\n            (when-not (cfg/get-edge node (not path))\n              (cfg/mark-edge node (not path))\n              (traverse (transition node (not path))\n                        negated-pc negated-env new-state)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 950, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  (println \&quot;dfs-search\&quot;)\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)\n              negated-env (conj env new-inputs)]\n          (when (and (z3/check-sat negated-pc))\n            (when-not (cfg/get-edge node (not path))\n              (cfg/mark-edge node (not path))\n              (traverse (transition node (not path))\n                        negated-pc negated-env new-state)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 952, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)\n        _ (println \&quot;dfs-search\&quot;)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)\n              negated-env (conj env new-inputs)]\n          (when (and (z3/check-sat negated-pc))\n            (when-not (cfg/get-edge node (not path))\n              (cfg/mark-edge node (not path))\n              (traverse (transition node (not path))\n                        negated-pc negated-env new-state)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 960, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)\n              negated-env (conj env new-inputs)]\n          (when (and (z3/check-sat negated-pc))\n            (when-not (cfg/get-edge node (not path))\n              (cfg/mark-edge node (not path))\n              (traverse (transition node (not path))\n                        negated-pc negated-env new-state)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 927, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (\&quot;new inputs: \&quot; new-inputs)\n              _ (swap! inputs conj new-inputs)\n              negated-env (conj env new-inputs)]\n          (when (and (z3/check-sat negated-pc))\n            (when-not (cfg/get-edge node (not path))\n              (cfg/mark-edge node (not path))\n              (traverse (transition node (not path))\n                        negated-pc negated-env new-state)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 971, :ns &quot;secco.concolic&quot;} {:command &quot;(execute (cfg/build (slurp (clojure.java.io/resource \&quot;test-programs/simplerTest.sec\&quot;))))&quot;, :offset 88, :ns &quot;secco.concolic&quot;} {:command &quot;(defn execute\n  [node]\n  ; Find all symbolic values\n  ; Add them z3\n  ; solve z3 to get initial values\n  ; update state\n  (let [sym-vars (util/findSym node)\n        pc (vec (map #(z3/const % Int) sym-vars))\n        env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))\n        _ (reset! inputs env)\n        _ (println \&quot;start-env\&quot; env)\n        state (reduce conj {} (map #(vector % %) sym-vars))]\n    (binding [*root* node]\n      (traverse node pc env state))))&quot;, :offset 470, :ns &quot;secco.concolic&quot;} {:command &quot;*e*e&quot;, :offset 4, :ns &quot;secco.core&quot;} {:command &quot;'eduction&quot;, :offset 9, :ns &quot;secco.core&quot;} {:command &quot;*e&quot;, :offset 2, :ns &quot;secco.core&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)\n              negated-env (conj env new-inputs)]\n          (when (z3/check-sat negated-pc)\n            (when-not (cfg/get-edge node (not path))\n              (traverse *root* negated-pc negated-env new-state)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 829, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)\n              negated-env (conj env new-inputs)]\n          (when (z3/check-sat negated-pc)\n            (when-not (cfg/get-edge node (not path))\n              (println \&quot;here\&quot;)\n              (traverse *root* negated-pc negated-env new-state)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 860, :ns &quot;secco.concolic&quot;} {:command &quot;(defn execute\n  [node]\n  ; Find all symbolic values\n  ; Add them z3\n  ; solve z3 to get initial values\n  ; update state\n  (let [sym-vars (util/findSym node)\n        pc (vec (map #(z3/const % Int) sym-vars))\n        env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))\n        _ (reset! inputs env)\n        _ (println \&quot;start-env\&quot; env)\n        state (reduce conj {} (map #(vector % %) sym-vars))]\n    (binding [*root* node]\n      (traverse node pc env state)))\n\n (execute (cfg/build \&quot;(x := input(); if x&gt;500 then if x&lt;750 then error() else error() else error())\&quot;)))&quot;, :offset 574, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)\n              negated-env (conj env new-inputs)]\n          (when (z3/check-sat negated-pc)\n            (when-not (cfg/get-edge node (not path))\n              (println \&quot;here\&quot;)\n              (traverse *root* [] negated-env new-state)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 852, :ns &quot;secco.concolic&quot;} {:command &quot;              negated-env (conj env new-inputs)&quot;, :offset 47, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)]\n          (when (z3/check-sat negated-pc)\n            (when-not (cfg/get-edge node (not path))\n              (println exp)\n              (traverse *root* *root-pc* (conj *root-env* new-inputs) *root-state*)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 828, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (if (= (first exp) :OpExp)\n      (do\n        (if (not (cfg/get-edge node path))\n          (do (cfg/mark-edge node path)\n              (traverse (transition node path) new-pc new-env new-state))\n          (traverse (transition node path) pc new-env state))\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)]\n          (when (z3/check-sat negated-pc)\n            (println \&quot;before\&quot;)\n            (when-not (cfg/get-edge node (not path))\n              (println \&quot;here\&quot;)\n              (println exp)\n              (traverse *root* *root-pc* (conj *root-env* new-inputs) *root-state*)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 890, :ns &quot;secco.concolic&quot;} {:command &quot;(defn dfs\n  [path node old-args new-args]\n  (let [[pc env state] old-args\n        [new-pc new-env new-state] new-args\n        exp (.exp node)]\n    (println node)\n    (cfg/mark-edge node path)\n    (if (= (first exp) :OpExp)\n      (do\n        (traverse (transition node path) new-pc new-env new-state)\n        (let [negated-pc (conj pc (z3/not (last new-pc)))\n              new-inputs (z3/solve negated-pc)\n              _ (swap! inputs conj new-inputs)]\n              ;_ (println \&quot;test shabazz\&quot; (cfg/get-edge node (not path)))]\n          (when (z3/check-sat negated-pc)\n            ;(println \&quot;before\&quot;)\n            (when-not (cfg/get-edge node (not path))\n              (cfg/mark-edge node (not path))\n              ;(println \&quot;here\&quot;)\n              ;(println exp)\n              (traverse *root* *root-pc* (conj *root-env* new-inputs) *root-state*)))))\n      (traverse (cfg/get-t node) new-pc new-env new-state))))&quot;, :offset 910, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp)&quot;, :offset 8, :ns &quot;secco.core&quot;} {:command &quot;(defn- op-exp\n  [exp1 oper exp2]\n  (println ((resolve oper) exp1 exp2))\n  (if (= \&quot;!=\&quot; (str oper))\n    (not (= exp1 exp2))\n    (eval ((resolve oper) exp1 exp2))))&quot;, :offset 161, :ns &quot;secco.concolic&quot;} {:command &quot;op-exp&quot;, :offset 6, :ns &quot;secco.core&quot;} {:command &quot;(ns secco.concolic)&quot;, :offset 19, :ns &quot;secco.core&quot;} {:command &quot;(op-exp)\n  &quot;, :offset 11, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp \&quot;&lt;\&quot; 1 2)&quot;, :offset 16, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp \&quot;&lt;\&quot; \&quot;1\&quot; \&quot;2\&quot;)\n        &quot;, :offset 29, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp \&quot;1\&quot; (symbol &lt;) \&quot;2\&quot;)\n        &quot;, :offset 27, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp \&quot;1\&quot; &lt; \&quot;2\&quot;)\n        &quot;, :offset 18, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp \&quot;1\&quot; '&lt; \&quot;2\&quot;)\n        &quot;, :offset 19, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp 1 '&lt; 2)\n        &quot;, :offset 15, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp 1 '&lt; 1)\n        \n        &quot;, :offset 24, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp 799 '&lt; 500)\n        \n        &quot;, :offset 19, :ns &quot;secco.concolic&quot;} {:command &quot;(defn- op-exp\n  [exp1 oper exp2]\n  (println \&quot;oper test\&quot; (= \&quot;!=\&quot; (str oper)))\n  (if (= \&quot;!=\&quot; (str oper))\n    (not (= exp1 exp2))\n    (eval ((resolve oper) exp1 exp2))))&quot;, :offset 166, :ns &quot;secco.concolic&quot;} {:command &quot;(op-exp 799 '&gt; 500)\n        \n        &quot;, :offset 19, :ns &quot;secco.concolic&quot;}], :remote []}}</component>
+  <component name="RunDashboard">
+    <option name="ruleStates">
+      <list>
+        <RuleState>
+          <option name="name" value="ConfigurationTypeDashboardGroupingRule" />
+        </RuleState>
+        <RuleState>
+          <option name="name" value="StatusDashboardGroupingRule" />
+        </RuleState>
+      </list>
+    </option>
+  </component>
+  <component name="RunManager" selected="Clojure REPL.Repl">
+    <configuration default="false" name="secco.core" type="ClojureScriptRunConfiguration" factoryName="Clojure Script" temporary="true">
+      <module name="secco" />
+      <setting name="path" value="" />
+      <setting name="namespace" value="secco.core" />
+      <setting name="useLein" value="false" />
+      <setting name="profiles" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workDir" value="$PROJECT_DIR$" />
+      <method />
+    </configuration>
+    <configuration default="false" name="secco.concolic" type="ClojureScriptRunConfiguration" factoryName="Clojure Script" temporary="true">
+      <module name="secco" />
+      <setting name="path" value="$PROJECT_DIR$/src/secco/concolic.clj" />
+      <setting name="namespace" value="" />
+      <setting name="useLein" value="false" />
+      <setting name="profiles" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workDir" value="$PROJECT_DIR$/src/secco" />
+      <method />
+    </configuration>
+    <configuration default="true" type="#org.jetbrains.idea.devkit.run.PluginConfigurationType" factoryName="Plugin">
+      <module name="" />
+      <option name="VM_PARAMETERS" value="-Xmx512m -Xms256m -XX:MaxPermSize=250m -ea" />
+      <option name="PROGRAM_PARAMETERS" />
+      <predefined_log_file id="idea.log" enabled="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidRunConfigurationType" factoryName="Android App">
+      <module name="" />
+      <option name="DEPLOY" value="true" />
+      <option name="ARTIFACT_NAME" value="" />
+      <option name="PM_INSTALL_OPTIONS" value="" />
+      <option name="ACTIVITY_EXTRA_FLAGS" value="" />
+      <option name="MODE" value="default_activity" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <option name="DEEP_LINK" value="" />
+      <option name="ACTIVITY_CLASS" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
+      <module name="" />
+      <option name="TESTING_TYPE" value="0" />
+      <option name="INSTRUMENTATION_RUNNER_CLASS" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="CLASS_NAME" value="" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="EXTRA_OPTIONS" value="" />
+      <option name="TARGET_SELECTION_MODE" value="SHOW_DIALOG" />
+      <option name="PREFERRED_AVD" value="" />
+      <option name="CLEAR_LOGCAT" value="false" />
+      <option name="SHOW_LOGCAT_AUTOMATICALLY" value="false" />
+      <option name="SKIP_NOOP_APK_INSTALLATIONS" value="true" />
+      <option name="FORCE_STOP_RUNNING_APP" value="true" />
+      <option name="DEBUGGER_TYPE" value="Java" />
+      <option name="USE_LAST_SELECTED_DEVICE" value="false" />
+      <option name="PREFERRED_AVD" value="" />
+      <Java />
+      <Profilers>
+        <option name="ENABLE_ADVANCED_PROFILING" value="true" />
+        <option name="GAPID_ENABLED" value="false" />
+        <option name="GAPID_DISABLE_PCS" value="false" />
+        <option name="SUPPORT_LIB_ENABLED" value="true" />
+        <option name="INSTRUMENTATION_ENABLED" value="true" />
+      </Profilers>
+      <method />
+    </configuration>
+    <configuration default="true" type="Applet" factoryName="Applet">
+      <option name="HTML_USED" value="false" />
+      <option name="WIDTH" value="400" />
+      <option name="HEIGHT" value="300" />
+      <option name="POLICY_FILE" value="$APPLICATION_HOME_DIR$/bin/appletviewer.policy" />
+      <module />
+      <method />
+    </configuration>
+    <configuration default="true" type="Application" factoryName="Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="ArquillianJUnit" factoryName="" nameIsGenerated="true">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="ArquillianTestNG" factoryName="">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="arquillianRunConfiguration">
+        <value>
+          <option name="containerStateName" value="" />
+        </value>
+      </option>
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="ClojureREPL" factoryName="Local">
+      <setting name="replType" value="1" />
+      <module name="" />
+      <setting name="jvmArgs" value="" />
+      <setting name="parameters" value="" />
+      <setting name="workingDir" value="" />
+      <setting name="profiles" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="ClojureScriptRunConfiguration" factoryName="Clojure Script">
+      <module name="" />
+      <setting name="path" value="" />
+      <setting name="namespace" value="" />
+      <setting name="useLein" value="false" />
+      <setting name="profiles" value="" />
+      <setting name="vmparams" value="" />
+      <setting name="params" value="" />
+      <setting name="workDir" value="" />
+      <method />
+    </configuration>
+    <configuration default="true" type="Cold Fusion runner description" factoryName="Cold Fusion" custom_browser="" web_path="">
+      <method />
+    </configuration>
+    <configuration default="true" type="CucumberJavaRunConfigurationType" factoryName="Cucumber java">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="myFilePath" />
+      <option name="GLUE" />
+      <option name="myNameFilter" />
+      <option name="myGeneratedName" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="FlashRunConfigurationType" factoryName="Flash App">
+      <option name="BCName" value="" />
+      <option name="IOSSimulatorSdkPath" value="" />
+      <option name="adlOptions" value="" />
+      <option name="airProgramParameters" value="" />
+      <option name="appDescriptorForEmulator" value="Android" />
+      <option name="debugTransport" value="USB" />
+      <option name="debuggerSdkRaw" value="BC SDK" />
+      <option name="emulator" value="NexusOne" />
+      <option name="emulatorAdlOptions" value="" />
+      <option name="fastPackaging" value="true" />
+      <option name="fullScreenHeight" value="0" />
+      <option name="fullScreenWidth" value="0" />
+      <option name="launchUrl" value="false" />
+      <option name="launcherParameters">
+        <LauncherParameters>
+          <option name="browser" value="a7bb68e0-33c0-4d6f-a81a-aac1fdb870c8" />
+          <option name="launcherType" value="OSDefault" />
+          <option name="newPlayerInstance" value="false" />
+          <option name="playerPath" value="FlashPlayerDebugger.exe" />
+        </LauncherParameters>
+      </option>
+      <option name="mobileRunTarget" value="Emulator" />
+      <option name="moduleName" value="" />
+      <option name="overriddenMainClass" value="" />
+      <option name="overriddenOutputFileName" value="" />
+      <option name="overrideMainClass" value="false" />
+      <option name="runTrusted" value="true" />
+      <option name="screenDpi" value="0" />
+      <option name="screenHeight" value="0" />
+      <option name="screenWidth" value="0" />
+      <option name="url" value="http://" />
+      <option name="usbDebugPort" value="7936" />
+      <method />
+    </configuration>
+    <configuration default="true" type="FlexUnitRunConfigurationType" factoryName="FlexUnit" appDescriptorForEmulator="Android" class_name="" emulatorAdlOptions="" method_name="" package_name="" scope="Class">
+      <option name="BCName" value="" />
+      <option name="launcherParameters">
+        <LauncherParameters>
+          <option name="browser" value="a7bb68e0-33c0-4d6f-a81a-aac1fdb870c8" />
+          <option name="launcherType" value="OSDefault" />
+          <option name="newPlayerInstance" value="false" />
+          <option name="playerPath" value="FlashPlayerDebugger.exe" />
+        </LauncherParameters>
+      </option>
+      <option name="moduleName" value="" />
+      <option name="trusted" value="true" />
+      <method />
+    </configuration>
+    <configuration default="true" type="GradleRunConfiguration" factoryName="Gradle">
+      <ExternalSystemSettings>
+        <option name="executionName" />
+        <option name="externalProjectPath" />
+        <option name="externalSystemIdString" value="GRADLE" />
+        <option name="scriptParameters" />
+        <option name="taskDescriptions">
+          <list />
+        </option>
+        <option name="taskNames">
+          <list />
+        </option>
+        <option name="vmOptions" />
+      </ExternalSystemSettings>
+      <method />
+    </configuration>
+    <configuration default="true" type="GrailsRunConfigurationType" factoryName="Grails">
+      <setting name="vmparams" value="" />
+      <setting name="cmdLine" value="run-app" />
+      <setting name="passParentEnv" value="true" />
+      <setting name="launchBrowser" value="true" />
+      <setting name="launchBrowserUrl" value="" />
+      <setting name="depsClasspath" value="false" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JUnit" factoryName="JUnit">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="TEST_OBJECT" value="class" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <envs />
+      <patterns />
+      <method />
+    </configuration>
+    <configuration default="true" type="JarApplication" factoryName="JAR Application">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Java Scratch" factoryName="Java Scratch">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="SCRATCH_FILE_ID" value="0" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="ENABLE_SWING_INSPECTOR" value="false" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerJest" factoryName="Jest">
+      <node-interpreter value="project" />
+      <working-dir value="" />
+      <envs />
+      <scope-kind value="ALL" />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerProtractor" factoryName="Protractor">
+      <config-file value="" />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="JetRunConfigurationType" factoryName="Kotlin">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="VM_PARAMETERS" />
+      <option name="PROGRAM_PARAMETERS" />
+      <option name="WORKING_DIRECTORY" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <module name="secco" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="KotlinStandaloneScriptRunConfigurationType" factoryName="Kotlin script">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <option name="filePath" />
+      <option name="vmParameters" />
+      <option name="alternativeJrePath" />
+      <option name="programParameters" />
+      <option name="passParentEnvs" value="true" />
+      <option name="workingDirectory" />
+      <option name="isAlternativeJrePathEnabled" value="false" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="Remote" factoryName="Remote">
+      <option name="USE_SOCKET_TRANSPORT" value="true" />
+      <option name="SERVER_MODE" value="false" />
+      <option name="SHMEM_ADDRESS" value="javadebug" />
+      <option name="HOST" value="localhost" />
+      <option name="PORT" value="5005" />
+      <method />
+    </configuration>
+    <configuration default="true" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="TestNG" factoryName="TestNG">
+      <extension name="coverage" enabled="false" merge="false" sample_coverage="true" runner="idea" />
+      <module name="" />
+      <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="false" />
+      <option name="ALTERNATIVE_JRE_PATH" />
+      <option name="SUITE_NAME" />
+      <option name="PACKAGE_NAME" />
+      <option name="MAIN_CLASS_NAME" />
+      <option name="METHOD_NAME" />
+      <option name="GROUP_NAME" />
+      <option name="TEST_OBJECT" value="CLASS" />
+      <option name="VM_PARAMETERS" value="-ea" />
+      <option name="PARAMETERS" />
+      <option name="WORKING_DIRECTORY" value="$MODULE_DIR$" />
+      <option name="OUTPUT_DIRECTORY" />
+      <option name="ANNOTATION_TYPE" />
+      <option name="ENV_VARIABLES" />
+      <option name="PASS_PARENT_ENVS" value="true" />
+      <option name="TEST_SEARCH_SCOPE">
+        <value defaultName="singleModule" />
+      </option>
+      <option name="USE_DEFAULT_REPORTERS" value="false" />
+      <option name="PROPERTIES_FILE" />
+      <envs />
+      <properties />
+      <listeners />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.npm" factoryName="npm">
+      <command value="run" />
+      <scripts />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="osgi.bnd.run" factoryName="Run Launcher">
+      <method />
+    </configuration>
+    <configuration default="true" type="osgi.bnd.run" factoryName="Test Launcher (JUnit)">
+      <method />
+    </configuration>
+    <configuration default="false" name="Repl" type="ClojureREPL" factoryName="Local">
+      <setting name="replType" value="1" />
+      <module name="secco" />
+      <setting name="jvmArgs" value="" />
+      <setting name="parameters" value="" />
+      <setting name="workingDir" value="$PROJECT_DIR$" />
+      <setting name="profiles" value="" />
+      <method />
+    </configuration>
+    <list size="3">
+      <item index="0" class="java.lang.String" itemvalue="Clojure REPL.Repl" />
+      <item index="1" class="java.lang.String" itemvalue="Clojure Application.secco.core" />
+      <item index="2" class="java.lang.String" itemvalue="Clojure Application.secco.concolic" />
+    </list>
+    <recent_temporary>
+      <list size="2">
+        <item index="0" class="java.lang.String" itemvalue="Clojure Application.secco.concolic" />
+        <item index="1" class="java.lang.String" itemvalue="Clojure Application.secco.core" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="63fa6027-5728-4417-9482-9c79827310db" name="Default" comment="" />
+      <created>1521729449794</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1521729449794</updated>
+      <workItem from="1521729455031" duration="9180000" />
+      <workItem from="1521798034955" duration="840000" />
+      <workItem from="1522764911276" duration="4851000" />
+      <workItem from="1522844514045" duration="10584000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="25455000" />
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-9" y="-9" width="1938" height="1048" extended-state="6" />
+    <layout>
+      <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Nl-Palette" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
+      <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="REPL" active="true" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.44791666" sideWeight="0.5" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32930845" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Leiningen" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Properties" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.14375" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.051591657" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="processedProjectFiles" value="true" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="4" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+  <component name="antWorkspaceConfiguration">
+    <option name="IS_AUTOSCROLL_TO_SOURCE" value="false" />
+    <option name="FILTER_TARGETS" value="false" />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$PROJECT_DIR$/src/secco/concolic.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/symbolic.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/cfg.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="483">
+          <caret line="23" column="39" lean-forward="false" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/secco.grm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="609">
+          <caret line="29" column="29" lean-forward="false" selection-start-line="29" selection-start-column="26" selection-end-line="29" selection-end-column="29" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/concolic.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/cfg.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="483">
+          <caret line="23" column="39" lean-forward="false" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/secco.grm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/concolic.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/cfg.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="483">
+          <caret line="23" column="39" lean-forward="true" selection-start-line="23" selection-start-column="39" selection-end-line="23" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/secco.grm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/core.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/symbolic.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="63">
+          <caret line="3" column="33" lean-forward="true" selection-start-line="3" selection-start-column="33" selection-end-line="3" selection-end-column="33" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/viz.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="714">
+          <caret line="118" column="46" lean-forward="false" selection-start-line="118" selection-start-column="46" selection-end-line="118" selection-end-column="46" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/cfg.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1214">
+          <caret line="82" column="0" lean-forward="true" selection-start-line="82" selection-start-column="0" selection-end-line="82" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/resources/secco.grm">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="395">
+          <caret line="34" column="12" lean-forward="false" selection-start-line="34" selection-start-column="12" selection-end-line="34" selection-end-column="12" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/z3/solver.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="15" column="10" lean-forward="false" selection-start-line="15" selection-start-column="10" selection-end-line="15" selection-end-column="10" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/secco/concolic.clj">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="419">
+          <caret line="138" column="47" lean-forward="false" selection-start-line="138" selection-start-column="47" selection-end-line="138" selection-end-column="47" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+</project>

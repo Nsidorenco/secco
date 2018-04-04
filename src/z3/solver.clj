@@ -13,8 +13,7 @@
       s/trim
       (#(if (= % "sat")
           true
-          (do (println %)
-              false)))))
+          false))))
 
 (defn solve
   [model]

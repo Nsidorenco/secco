@@ -1,0 +1,13 @@
+%  
+(
+    a := input();
+    b := input();
+    c := 10;
+    while a > b do(
+        c := c-1;
+        b := b+1
+    );
+    c
+)%
+
+b:=2;c:=2;b+c

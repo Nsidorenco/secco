@@ -50,8 +50,8 @@
   ([node counter mark]
    (if (instance? secco.cfg.CFGNode node)
      (let [
-           getsym (nth util/symbols counter)
-          ]
+           getsym (nth util/symbols counter)]
+
        (match [(.nam node)]
               ["root"] (let [ex (read-string (.nam node))
                              tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
@@ -65,14 +65,14 @@
                                      (build-tree (cfg/get-t node) (+ counter 1) (conj mark {node getsym})))
                              fnode (if (not (contains? mark node)) 
                                      (build-tree (cfg/get-f node) (+ counter 256) (conj mark {node getsym}))
-                                     :end)
-                             ]
-                              (if (not(contains? mark node))
-                                    (let [] (swap! labels conj {getsym ex})
-                                      (swap! edges conj {getsym {tnode "true" fnode "false"}})
-                                      (swap! graph conj {getsym [tnode fnode]})
-                                      getsym)
-                                    (get mark node)))
+                                     :end)]
+
+                            (if (not(contains? mark node))
+                                (let [] (swap! labels conj {getsym ex})
+                                  (swap! edges conj {getsym {tnode "true" fnode "false"}})
+                                  (swap! graph conj {getsym [tnode fnode]})
+                                  getsym)
+                                (get mark node)))
               ["arith"] (let [type (first (.exp node))]
                             (let [
                                   oper (str (match [type]
@@ -81,20 +81,20 @@
                                               [:mul] "*"))
                                   [_ exp1 exp2] (.exp node)
                                   ex (str (unfold exp1) oper (unfold exp2))
-                                  tnode (build-tree (cfg/get-t node) (+ counter 1) mark)
-                                ]
+                                  tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
+
                              (swap! labels conj {getsym ex})
                              (swap! graph conj {getsym [tnode]}))
-                             getsym)
+                            getsym)
               ["int"]  (let [
-                             ex (second (.exp node))
-                             ]
+                             ex (second (.exp node))]
+
                          (swap! labels conj {getsym ex})
                          (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]}) 
                          getsym)
               ["varexp"] (let [
-                               ex (second (.exp node))
-                               ]
+                               ex (second (.exp node))]
+
                            (swap! labels conj {getsym ex})
                            (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
                            getsym)
@@ -116,7 +116,7 @@
 ;(println @graph)
 ;(println @labels)
 ;(println @edges)
-;(visualize (graphic (cfg/build "x:=42")))
+(visualize (graphic (cfg/build "x:=42;a:=2;x+a")))
 ;(visualize (graphic (cfg/build "(x:=(2+3);x)")))
 ;(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 ;(visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
