@@ -29,8 +29,6 @@
                 [:add] (arithmetic exp +)
                 [:sub] (arithmetic exp -)
                 [:mul] (arithmetic exp *)
-                [:Error] [::Error env]
-                [:UserInput] [[] env]
                 [:VarExp] (let [value (get env (read-string (second exp)))]
                             (assert (not= value nil)
                                     (str (second exp)
@@ -65,6 +63,7 @@
   (match [(first exp)]
     [:INT] [(read-string (second exp)) pc state]
     [:OPER] [(read-string (second exp)) pc state]
+    [:Error] [::Error pc state]
     [:VarExp] (let [varname (get state (read-string (second exp)))]
                 (assert (not= varname nil) "Variable not declared (symbolic)")
                 [varname pc state])
@@ -100,13 +99,10 @@
 (defn- evaluate-node
   [exp pc env state]
   (let [res (concrete exp env)
-        path (:path (meta res))
-        new-env (last res)]
-    (if (isa? ::Error (first res))
-      ::Error
-      (let [s (symbolic exp pc state path)
-            [new-pc new-state] (rest s)]
-        (with-meta [new-pc new-env new-state] {:path path})))))
+        new-env (last res)
+        path (-> res meta :path)
+        s (symbolic exp pc state path)]
+    (with-meta (conj s new-env) {:path path})))
 
 (defn- transition
   [node path]
@@ -115,36 +111,32 @@
     (cfg/get-f node)))
 
 (defn- traverse
-  [node pc env state strategy]
+  [node pc state env strategy]
   {:pre [(map? state) (map? env) (vector? pc)]}
   (when (cfg/node? node)
     (let [exp (.exp node)
           evaluated (evaluate-node exp pc env state)]
-      (if (isa? ::Error evaluated)
+      (if (isa? (first evaluated) ::Error)
         (println "Reached error state on line: " (.start node)
                  "," (.end node)
-                 " for expression: " (.exp node)
+                 " for expression: " exp
                  " for: " @inputs)
-        (strategy (:path (meta evaluated)) node [pc env state] evaluated)))))
+        (strategy (-> evaluated meta :path) node [pc state env] (rest evaluated))))))
 
 (defn dfs
   [path node old-args new-args]
-  (let [[pc env state] old-args
-        [new-pc new-env new-state] new-args
-        exp (.exp node)]
+  (let [[pc state env] old-args
+        [new-pc new-state new-env] new-args]
     (cfg/mark-edge node path)
-    (if (= (first exp) :OpExp)
-      (do
-        (traverse (transition node path) new-pc new-env new-state dfs)
-        (let [negated-pc (conj pc (z3/not (last new-pc)))
-              new-inputs (z3/solve negated-pc)
-              new-env (conj *root-env* new-inputs)]
+    (if (= (-> node .exp first) :OpExp)
+      (let [negated-pc (conj pc (z3/not (last new-pc)))
+            new-inputs (conj *root-env* (z3/solve negated-pc))]
+        (traverse (transition node path) new-pc new-state new-env dfs)
+        (when (and (z3/check-sat negated-pc)
+                   (not (cfg/get-edge node (not path))))
           (swap! inputs conj new-inputs)
-          (when (z3/check-sat negated-pc)
-            (when-not (cfg/get-edge node (not path))
-              (cfg/mark-edge node (not path))
-              (traverse *root* *root-pc* new-env *root-state* dfs)))))
-      (traverse (cfg/get-t node) new-pc new-env new-state dfs))))
+          (traverse *root* *root-pc* *root-state* new-inputs dfs)))
+      (traverse (cfg/get-t node) new-pc new-state new-env dfs))))
 
 (defn execute
   [node]
@@ -154,14 +146,14 @@
   ; update state
   (let [sym-vars (util/findSym node)
         pc (vec (map #(z3/const % Int) sym-vars))
-        env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))
-        state (reduce conj {} (map #(vector % %) sym-vars))]
+        state (reduce conj {} (map #(vector % %) sym-vars))
+        env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))]
     (reset! inputs env)
     (binding [*root* node
-              *root-env* env
+              *root-pc* pc
               *root-state* state
-              *root-pc* pc]
-      (traverse node pc env state dfs))
+              *root-env* env]
+      (traverse node pc state env dfs))
     (println "it is a-okay, my dudes")))
 
 ; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else error() else error())"))
