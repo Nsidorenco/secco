@@ -13,7 +13,7 @@
 (defn- op-exp
   [exp1 oper exp2]
   (if (= "!=" (str oper))
-    (not (= exp1 exp2))
+    (not= exp1 exp2)
     (eval ((resolve oper) exp1 exp2))))
 
 (defn- concrete
@@ -104,9 +104,9 @@
         new-env (last res)]
     (if (isa? ::Error (first res))
       ::Error
-      (let [s (symbolic exp pc state path)]
-        (let [[new-pc new-state] (rest s)]
-          (with-meta [new-pc new-env new-state] {:path path}))))))
+      (let [s (symbolic exp pc state path)
+            [new-pc new-state] (rest s)]
+        (with-meta [new-pc new-env new-state] {:path path})))))
 
 (defn- transition
   [node path]
@@ -115,7 +115,7 @@
     (cfg/get-f node)))
 
 (defn- traverse
-  [node pc env state]
+  [node pc env state strategy]
   {:pre [(map? state) (map? env) (vector? pc)]}
   (when (cfg/node? node)
     (let [exp (.exp node)
@@ -125,7 +125,7 @@
                  "," (.end node)
                  " for expression: " (.exp node)
                  " for: " @inputs)
-        (dfs (:path (meta evaluated)) node [pc env state] evaluated)))))
+        (strategy (:path (meta evaluated)) node [pc env state] evaluated)))))
 
 (defn dfs
   [path node old-args new-args]
@@ -135,20 +135,16 @@
     (cfg/mark-edge node path)
     (if (= (first exp) :OpExp)
       (do
-        (traverse (transition node path) new-pc new-env new-state)
+        (traverse (transition node path) new-pc new-env new-state dfs)
         (let [negated-pc (conj pc (z3/not (last new-pc)))
               new-inputs (z3/solve negated-pc)
-              _ (swap! inputs conj new-inputs)
               new-env (conj *root-env* new-inputs)]
-              ;_ (println "test shabazz" (cfg/get-edge node (not path)))]
+          (swap! inputs conj new-inputs)
           (when (z3/check-sat negated-pc)
-            ;(println "before")
             (when-not (cfg/get-edge node (not path))
               (cfg/mark-edge node (not path))
-              ;(println "here")
-              ;(println exp)
-              (traverse *root* *root-pc* new-env *root-state*)))))
-      (traverse (cfg/get-t node) new-pc new-env new-state))))
+              (traverse *root* *root-pc* new-env *root-state* dfs)))))
+      (traverse (cfg/get-t node) new-pc new-env new-state dfs))))
 
 (defn execute
   [node]
@@ -165,13 +161,12 @@
               *root-env* env
               *root-state* state
               *root-pc* pc]
-      (traverse node pc env state))
+      (traverse node pc env state dfs))
     (println "it is a-okay, my dudes")))
 
-;(execute (cfg/build "x := input(); if x>500 then if x<750 then error() else error() else error()"))
+; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else error() else error())"))
 
 ; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
-;; TODO: This throws false positives
-(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
+; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
