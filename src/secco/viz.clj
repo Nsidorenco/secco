@@ -55,7 +55,7 @@
        (match [(.nam node)]
               ["root"] (let [ex (read-string (.nam node))
                              tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
-                         (swap! labels conj {getsym "start"})
+                         (swap! labels conj {getsym "s_0"})
                          (swap! graph conj {getsym [tnode]})
                          getsym)
               ["oper"] (let [
@@ -92,6 +92,11 @@
                          (swap! labels conj {getsym ex})
                          (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]}) 
                          getsym)
+              ["error()"]  (let []
+
+                         (swap! labels conj {getsym "error()"})
+                         (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]}) 
+                         getsym)
               ["varexp"] (let [
                                ex (second (.exp node))]
 
@@ -108,7 +113,7 @@
 
 (defn graphic [node]
   (reset! graph {:end []})
-  (reset! labels {:end "end"})
+  (reset! labels {:end "s_n"})
   (reset! edges {:end {}})
   (build-tree node)
   @graph)
@@ -116,7 +121,7 @@
 ;(println @graph)
 ;(println @labels)
 ;(println @edges)
-(visualize (graphic (cfg/build "x:=42;a:=2;x+a")))
+;(visualize (graphic (cfg/build "x:=42;a:=2;x+a")))
 ;(visualize (graphic (cfg/build "(x:=(2+3);x)")))
 ;(visualize (graphic (cfg/build "(x := 0;y := 1; if x < y then if y < 2 then 0 else 1 else x)")))
 ;(visualize (graphic (cfg/build "while x < 10 do x := x + 1")))
