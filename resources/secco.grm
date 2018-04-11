@@ -8,7 +8,6 @@ root = exp
       | SeqExp
       | WhileExp
       | INT
-      | ArrayExp
       | add-sub
       | Comment
       | UserInput
