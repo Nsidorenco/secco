@@ -8,6 +8,7 @@ root = exp
       | SeqExp
       | WhileExp
       | INT
+      | ArrayExp
       | add-sub
       | Comment
       | UserInput
@@ -32,10 +33,10 @@ AssignExp = VarExp <':='> exp
 ParenExp = <'('> OptParenExp <')'>
 <OptParenExp> = exp | eps
 
-SeqExp = <'('> exp <';'> exp OptExp <')'>
+SeqExp = exp <';'> exp OptExp
 <OptExp> = <';'> exp OptExp | eps (* broken *)
 
-WhileExp = <'while'> test <'do'> body
+WhileExp = <'while'> test <'do'> body <'end'>
 <test> = exp
 <body> = exp
 
