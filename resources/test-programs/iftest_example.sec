@@ -1,4 +1,4 @@
-(x:=input();
+x:=input();
 if x > 10 then
     if 2*x = 30 then
         1 
@@ -6,4 +6,4 @@ if x > 10 then
         0 
 else
     0
-)
+
