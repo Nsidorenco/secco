@@ -57,4 +57,4 @@
 ; (interpret (cfg/build "(x := input(); if x > 2 then 2 else 4)"))
 ; (interpret (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
 
-(interpret (cfg/build "x := input(); while x < 10 do x := x+1 end; x"))
+;(interpret (cfg/build "x := input(); while x < 10 do x := x+1 end; x"))
