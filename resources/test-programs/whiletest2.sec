@@ -1,11 +1,15 @@
-(x := input();
+x := input();
 if x > 0 then
-while x < 1000 do
-    if x > 500 then
-      if x < 600 then 
-        (error(); x := x + 1)
-      else (error(); x := x + 10)
-    else x := x + 20
+    while x < 1000 do
+        if x > 500 then
+            if x < 600 then 
+                error(); 
+                x := x + 1
+            else 
+                error(); 
+                x := x + 10
+        else 
+            x := x + 20
+    end
 else x;
 x
-) 

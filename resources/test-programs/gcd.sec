@@ -1,23 +1,26 @@
 % gcd(a,b) %
-(
-    a := input();
-    b := input();
-    if a > b then max := a else max := b;
-    while b != 0 do
-        (
-            c := b;
+a := input();
+b := input();
 
-            i := a;
-            while i > 0 do
-                i := i - b;
+if a > b then max := a else max := b;
 
-            if i < 0 then
-                i := i + b
-            else
-                i;
+while b != 0 do
+    c := b;
 
-            b := i; 
-            a := c
-        );
-    if max < a+b then error() else a+b
-)
+    % modulus %
+    i := a;
+    while i > 0 do
+        i := i - b
+    end;
+
+    if i < 0 then
+        i := i + b
+    else
+        i;
+
+    b := i; 
+    a := c
+end;
+
+% checking if the algorithm is correct %
+if max < a+b then error() else a+b
