@@ -4,6 +4,7 @@
             [instaparse.core :as insta]
             [clojure.java.io :as io]
             [secco.viz :as viz]
+            [secco.concolic :as conc]
             [secco.symbolic :as sym])
   (:gen-class))
 
@@ -24,4 +25,6 @@
            (clojure.string/includes? opt "-ast")
            (insta/visualize (cfg/grm file))
            (clojure.string/includes? opt "-sym")
-           (sym/execute (cfg/build file))))))
+           (sym/execute (cfg/build file))
+           (clojure.string/includes? opt "-conc")
+           (conc/execute (cfg/build file))))))
