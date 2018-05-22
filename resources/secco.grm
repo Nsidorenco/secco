@@ -12,6 +12,7 @@ root = exp
       | Comment
       | UserInput
       | Error
+      | Array
 
 OpExp = exp OPER exp
 
@@ -22,12 +23,18 @@ sub = add-sub <'-'> mul-term
 mul = mul-term <'*'> term
 <term> = VarExp | INT | <'('> add-sub <')'>
 
-VarExp = ID
+VarExp = SimpleVar
+       | ArrayVar
+
+SimpleVar = ID
+ArrayVar = ID <'['> INT <']'>
 <ID> = #'[a-zA-Z]+[a-zA-Z0-9_]*'
 
 IFEXP = <'if'> exp <'then'> exp <'else'> exp
 
 AssignExp = VarExp <':='> exp
+
+Array = <'array('> INT <')'>
 
 ParenExp = <'('> OptParenExp <')'>
 <OptParenExp> = exp | eps
