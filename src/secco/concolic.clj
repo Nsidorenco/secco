@@ -113,30 +113,33 @@
 (defn- traverse
   [node pc state env strategy]
   {:pre [(map? state) (map? env) (vector? pc)]}
-  (when (cfg/node? node)
+  (if (cfg/node? node)
     (let [exp (.exp node)
-          evaluated (evaluate-node exp pc env state)]
-      (if (isa? (first evaluated) ::Error)
+          [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
+          path (-> evaluated meta :path)]
+      (cfg/mark-edge node path)
+      (when (isa? err ::Error)
         (println "Reached error state on line: " (.start node)
                  "," (.end node)
                  " for expression: " exp
-                 " for: " @inputs)
-        (strategy (-> evaluated meta :path) node [pc state env] (rest evaluated))))))
-
-(defn dfs
-  [path node old-args new-args]
-  (let [[pc state env] old-args
-        [new-pc new-state new-env] new-args]
-    (cfg/mark-edge node path)
-    (if (= (-> node .exp first) :OpExp)
-      (let [negated-pc (conj pc (z3/not (last new-pc)))
-            new-inputs (conj *root-env* (z3/solve negated-pc))]
-        (traverse (transition node path) new-pc new-state new-env dfs)
-        (when (and (z3/check-sat negated-pc)
-                   (not (cfg/get-edge node (not path))))
-          (swap! inputs conj new-inputs)
-          (traverse *root* *root-pc* *root-state* new-inputs dfs)))
-      (traverse (cfg/get-t node) new-pc new-state new-env dfs))))
+                 " for: " @inputs))
+      (if (= (first exp) :OpExp)
+       (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
+                (not (cfg/get-edge node (not path)))
+                (not (.contains strategy (conj pc (z3/not (last new-pc))))))
+          (recur (transition node path)
+                 new-pc new-state new-env
+                 (conj strategy (conj pc (z3/not (last new-pc)))))
+          (recur (transition node path)
+                 new-pc new-state new-env
+                 strategy))
+       (recur (transition node path)
+              new-pc new-state new-env
+              strategy)))
+    (when-let [new-pc (peek strategy)]
+      (let [new-inputs (conj *root-env* (z3/solve new-pc))]
+        (swap! inputs conj new-inputs)
+        (recur *root* *root-pc* *root-state* new-inputs (pop strategy))))))
 
 (defn execute
   [node]
@@ -153,10 +156,10 @@
               *root-pc* pc
               *root-state* state
               *root-env* env]
-      (traverse node pc state env dfs))
+      (traverse node pc state env (clojure.lang.PersistentQueue/EMPTY)))
     (println "it is a-okay, my dudes")))
 
-; (execute (cfg/build "(x := input(); if x>500 then if x<750 then error() else error() else error())"))
+(execute (cfg/build "x := input(); if x>500 then if x<750 then error() else error() else error()"))
 
 ; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
 ; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
