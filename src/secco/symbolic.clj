@@ -5,13 +5,13 @@
             [clojure.core.match :refer [match]]))
 
 ; define mutable variables
-(def ^:dynamic *venv* {})
-(def sym (atom (vec util/literals)))
-(def nodes-visited (atom 0))
-(def active-threads (atom 0))
+(defonce ^:dynamic *venv* {})
+(defonce sym (atom (vec util/literals)))
+(defonce nodes-visited (atom 0))
+(defonce active-threads (atom 0))
 
 ; define an channel responsible for passing error states
-(def error-queue (java.util.concurrent.LinkedBlockingQueue.))
+(defonce error-queue (java.util.concurrent.LinkedBlockingQueue.))
 
 (defmacro arithmetic
   [sym exp1 exp2]
@@ -25,9 +25,15 @@
       [:OPER] (read-string (second exp))
       [:UserInput] getsym
       [:Error] ::Error
-      [:VarExp] (let [varname (get *venv* (second exp))]
-                  (assert (not= varname nil) "Variable not declared")
-                  varname)
+      [:VarExp] (match [(first (second exp))]
+                       [:SimpleVar] (let [value (get *venv* (second (second exp)))]
+                                      (assert (not= value nil) "Variable not declared")
+                                      value)
+                       [:ArrayVar] (let [arr (get *venv* (second (second exp)))
+                                         array-index (read-string (second (last (second exp))))]
+                                     (nth arr array-index)))
+      [:Array] (let [arraysize (read-string (second (second exp)))]
+                 (vec (repeat arraysize nil)))
       [:OpExp] (let [[_ exp1 oper exp2] exp
                      e1 (sym-exp exp1)
                      op (sym-exp oper)
@@ -40,11 +46,18 @@
       [:mul] (let [[_ exp1 exp2] exp]
                (arithmetic * (sym-exp exp1) (sym-exp exp2)))
       [:AssignExp] (let [[_ varexp bodyexp] exp
-                         varname (second varexp)
+                         varname (second (last varexp))
                          body (sym-exp bodyexp)]
-                     (set! *venv* (conj *venv* {varname body}))
-                     (when (= (first bodyexp) :UserInput)
-                       (z3/const body Int)))
+                     (if (= (first (last varexp)) :ArrayVar)
+                       (let [arr (get *venv* varname)
+                             array-index (read-string (second (last (second varexp))))]
+                          (set! *venv* (conj *venv* {varname (assoc arr array-index body)}))
+                          (assoc arr array-index body))
+                       (do (set! *venv* (conj *venv* {varname body}))
+                           (when (= (first bodyexp) :UserInput)
+                             (z3/const body Int)))))
+
+
       [_] "")))
 
 (defn model
@@ -81,6 +94,7 @@
     (println "Coverage was:" (* (/ @nodes-visited @cfg/node-count) 100) "%"))
   (shutdown-agents))
 
+;(execute (cfg/build "a:=array(4); a[2]:=3; if a[2] = 1 then error() else error()"))
 ; (model (cfg/build "(a := 1 + 1; if a > 1 then 2 else 3)"))
 ; (z3/check-sat (conj [] (z3/const x Int)))
 ; (execute (cfg/build "(x:= input();if x < 0 then error() else error())"))

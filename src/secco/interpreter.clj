@@ -63,7 +63,7 @@
          (recur (cfg/get-t node) env)))
      (-> env meta :res))))
 
-;(println (interpret (cfg/build "x := array(4); x[1] := 2; x[2] := 1; x[2]+x[1]")))
+;(println (interpret (cfg/build "x := array(4); x[1] := 2; if x[1] = 2 then error() else 2")))
 ;(println (interpret (cfg/build "x := 3; x")))
 ; (interpret (cfg/build "(x := input(); if x > 2 then 2 else 4)"))
 ; (interpret (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))

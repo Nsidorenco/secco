@@ -31,6 +31,7 @@
          (recur (cfg/get-t node) (conj visited node) (conj acc (-> exp
                                                                    second
                                                                    second
+                                                                   second
                                                                    read-string)))
          (when-not (some (partial identical? node) visited)
            (findSym (cfg/get-t node) (conj visited node) acc)
