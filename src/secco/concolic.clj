@@ -55,7 +55,7 @@
                                    (let [arr (get env varname)
                                          array-index (read-string (second (last (second varexp))))]
                                      [body (conj env {varname (assoc arr array-index body)})])
-                                   [body (conj env {varname body})]))
+                                   [body (conj env {(read-string varname) body})]))
                                [[] env])
                 [_] [[] env])]
       (if (nil? (:path (meta res)))
@@ -133,7 +133,6 @@
   {:pre [(map? state) (map? env) (vector? pc)]}
   (if (cfg/node? node)
     (let [exp (.exp node)
-          _ (println env)
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
           path (-> evaluated meta :path)]
       (cfg/mark-edge node path)
@@ -182,6 +181,7 @@
 ;(execute (cfg/build "x := input(); x"))
 ;(execute (cfg/build "x := array(4)"))
 ;(execute (cfg/build "a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1"))
+;(execute (cfg/build "(x:=input(); x:=x+2; x)"))
 ;(execute (cfg/build "x:=input(); if x>500 then if x<750 then error() else error() else error()"))
 ; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
 ; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
