@@ -118,7 +118,15 @@
                                array-index (read-string (second (last (second varexp))))]
                            [(assoc arr array-index body) pc (conj state {varname (assoc arr array-index body)})])
                          [body pc (conj state {varname body})]))
-                     [[] pc state])
+                     (if (= (first (second (second exp))) :ArrayVar)
+                       (do
+                         (let [index (last (last (second (second exp))))
+                               arrayName (second (second (second exp)))
+                               indexName (str arrayName index)
+                               indexValue (get state indexName)
+                               arr (get state (read-string arrayName))]
+                           [(assoc arr (read-string index) indexValue) pc (conj state {(read-string arrayName) (assoc arr (read-string index) indexValue)})]))
+                       [[] pc state]))
     [_] [[] pc state]))
 
 (defn- evaluate-node
@@ -188,7 +196,7 @@
 ;(execute (cfg/build ""))
 ;(execute (cfg/build "x := input(); x"))
 ;(execute (cfg/build "x := array(4)"))
-;(execute (cfg/build "(a:=array(4); a[2]:=input())"))
+(execute (cfg/build "(a:=array(4); a[2]:=input())"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=3; if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(x:=input(); x:=x+2; x)"))
