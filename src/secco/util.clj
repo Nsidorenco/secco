@@ -32,7 +32,8 @@
                                                                    second
                                                                    second
                                                                    second
-                                                                   read-string)))
+                                                                   read-string
+                                                                   (str (second (last (second (second exp))))))))
          (when-not (some (partial identical? node) visited)
            (findSym (cfg/get-t node) (conj visited node) acc)
            (recur (cfg/get-f node) (conj visited node) acc))))

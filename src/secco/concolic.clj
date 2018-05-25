@@ -56,7 +56,14 @@
                                          array-index (read-string (second (last (second varexp))))]
                                      [body (conj env {(read-string varname) (assoc arr array-index body)})])
                                    [body (conj env {(read-string varname) body})]))
-                               [[] env])
+                               (if (= (first (second (second exp))) :ArrayVar)
+                                 (let [index (last (last (second (second exp))))
+                                       arrayName (second (second (second exp)))
+                                       indexName (str arrayName index)
+                                       indexValue (get env indexName)
+                                       arr (get env (read-string arrayName))]
+                                     [indexValue (conj env {(read-string arrayName) (assoc arr (read-string index) indexValue)})])
+                                 ([[] env])))
                 [_] [[] env])]
       (if (nil? (:path (meta res)))
         (with-meta res {:path true})
@@ -136,6 +143,7 @@
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
           path (-> evaluated meta :path)]
       (cfg/mark-edge node path)
+      (println "state: " new-state ", env: " new-env ", pc: " new-pc)
       (when (isa? err ::Error)
         (println "Reached error state on line: " (.start node)
                  "," (.end node)
@@ -180,7 +188,7 @@
 ;(execute (cfg/build ""))
 ;(execute (cfg/build "x := input(); x"))
 ;(execute (cfg/build "x := array(4)"))
-;(execute (cfg/build "(a:=array(4); a[2]:=4)"))
+;(execute (cfg/build "(a:=array(4); a[2]:=input())"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=3; if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(x:=input(); x:=x+2; x)"))

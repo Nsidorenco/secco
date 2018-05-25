@@ -49,7 +49,7 @@
                        (let [arr (get env varname)
                              array-index (read-string (second (last (second varexp))))]
                          [body (conj env {varname (assoc arr array-index body)})])
-                       [body (conj env {varname body})]))
+                       [body (conj env {(read-string varname) body})]))
       [_] [0 env])))
 
 (defn interpret
@@ -64,7 +64,7 @@
      (-> env meta :res))))
 
 ;(println (interpret (cfg/build "x := array(4); x[1] := 2; if x[1] = 2 then error() else 2")))
-;(println (interpret (cfg/build "x := 3; x")))
-; (interpret (cfg/build "(x := input(); if x > 2 then 2 else 4)"))
+(println (interpret (cfg/build "x := 3; x := 2+x; x")))
+;(interpret (cfg/build "(x := input(); if x > 2 then 2 else 4)"))
 ; (interpret (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
 ;(interpret (cfg/build "x := input(); while x < 10 do x := x+1 end; x"))

@@ -80,3 +80,5 @@
       (do (println ast)
           (throw (Exception. "error parsing input")))
       (parse-tree->cfg ast))))
+
+(println (grm "(x := 3; x := 2+x; x)"))

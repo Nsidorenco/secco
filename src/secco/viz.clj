@@ -92,11 +92,11 @@
                          (swap! labels conj {getsym ex})
                          (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]}) 
                          getsym)
-              ["error()"]  (let []
+              ["error()"]  (let [])
 
                          (swap! labels conj {getsym "error()"})
-                         (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]}) 
-                         getsym)
+                         (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
+                         getsym
               ["varexp"] (let [
                                ex (second (.exp node))]
 
