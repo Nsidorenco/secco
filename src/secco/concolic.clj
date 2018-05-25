@@ -33,7 +33,7 @@
                                  [:SimpleVar] (let [value (get env (read-string (second (second exp))))]
                                                 (assert (not= value nil) "Variable not declared")
                                                 [value env])
-                                 [:ArrayVar] (let [arr (get env (second (second exp)))
+                                 [:ArrayVar] (let [arr (get env (read-string (second (second exp))))
                                                    array-index (read-string (second (last (second exp))))]
                                                [(nth arr array-index) env]))
                 [:OpExp] (let [[exp1 oper exp2] (rest exp)
@@ -60,9 +60,9 @@
                                  (let [index (last (last (second (second exp))))
                                        arrayName (second (second (second exp)))
                                        indexName (str arrayName index)
-                                       indexValue (get env indexName)
+                                       indexValue (get env (read-string indexName))
                                        arr (get env (read-string arrayName))]
-                                     [indexValue (conj env {(read-string arrayName) (assoc arr (read-string index) indexValue)})])
+                                     [indexValue (dissoc (conj env {(read-string arrayName) (assoc arr (read-string index) indexValue)}) (read-string indexName))])
                                  [[] env]))
                 [_] [[] env])]
       (if (nil? (:path (meta res)))
@@ -122,9 +122,9 @@
                        (let [index (last (last (second (second exp))))
                              arrayName (second (second (second exp)))
                              indexName (str arrayName index)
-                             indexValue (get state indexName)
+                             indexValue (get state (read-string indexName))
                              arr (get state (read-string arrayName))]
-                         [(assoc arr (read-string index) indexValue) pc (conj state {(read-string arrayName) (assoc arr (read-string index) indexValue)})])
+                         [(assoc arr (read-string index) indexValue) pc (dissoc (conj state {(read-string arrayName) (assoc arr (read-string index) indexValue)}) (read-string indexName))])
                        [[] pc state]))
     [_] [[] pc state]))
 
@@ -195,8 +195,8 @@
 ;(execute (cfg/build ""))
 ;(execute (cfg/build "x := input(); x"))
 ;(execute (cfg/build "x := array(4)"))
-;(execute (cfg/build "(x:=2; y:=input(); a:=array(4); a[3]:=y+x)"))
-;(execute (cfg/build "(a:=array(4); a[2]:=input(); a[3]:=2+3)"))
+;(execute (cfg/build "(a:=array(4); a[2]:=2; if a[2]<10 then error() else 1)"))
+(execute (cfg/build "(a:=array(4); a[2]:=input(); a[3]:=2+3)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=3; if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(x:=input(); x:=x+2; x)"))
