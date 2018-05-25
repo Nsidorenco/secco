@@ -61,6 +61,7 @@
        [:INT] (new-node "int" prog path path)
        [:VarExp] (new-node "varexp" prog path path)
        [:AssignExp] (new-node "assignexp" prog path path)
+       [:Array] (new-node "arrayexp" prog path path)
        [:IFEXP] (let [[guard tru fal] exps
                       gnode (parse-tree->cfg guard)
                       tnode (parse-tree->cfg tru path)

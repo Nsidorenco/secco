@@ -34,8 +34,10 @@
                                                 (assert (not= value nil) "Variable not declared")
                                                 [value env])
                                  [:ArrayVar] (let [arr (get env (read-string (second (second exp))))
-                                                   array-index (read-string (second (last (second exp))))]
-                                               [(nth arr array-index) env]))
+                                                   array-index (read-string (second (last (second exp))))
+                                                   val (get env (str arr array-index))]
+                                               (assert (not= val nil) "Variable not declared")
+                                               [val env]))
                 [:OpExp] (let [[exp1 oper exp2] (rest exp)
                                exp1 (first (concrete exp1 env))
                                exp2 (first (concrete exp2 env))
@@ -45,25 +47,28 @@
                              (with-meta [[] env] {:path true})
                              (with-meta [[] env] {:path false})))
                 [:ParenExp] (concrete (second exp) env)
-                [:Array] (let [arraysize (read-string (second (second exp)))]
-                           [(vec (repeat arraysize nil)) (vec (repeat arraysize nil))])
+                [:Array] (let [uid (gensym)
+                               arraysize (read-string (second (second exp)))
+                               array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
+                           [uid (conj env (reduce (fn [acc e] (conj acc {e 0})) {} array))])
                 [:AssignExp] (if (not= (first (last exp)) :UserInput)
                                (let [[varexp body] (rest exp)
                                      varname (second (second varexp))
-                                     body (first (concrete body env))]
+                                     [body env'] (concrete body env)]
                                  (if (= (first (second varexp)) :ArrayVar)
-                                   (let [arr (get env (read-string varname))
-                                         array-index (read-string (second (last (second varexp))))]
-                                     [body (conj env {(read-string varname) (assoc arr array-index body)})])
-                                   [body (conj env {(read-string varname) body})]))
+                                   (let [idx (read-string (second (last (second (second exp)))))
+                                         uid (get env' (read-string varname))]
+                                     [body (conj env env' {(str uid idx) body})])
+                                   [body (conj env env' {(read-string varname) body})]))
                                (if (= (first (second (second exp))) :ArrayVar)
-                                 (let [index (last (last (second (second exp))))
-                                       arrayName (second (second (second exp)))
-                                       indexName (str arrayName index)
-                                       indexValue (get env (read-string indexName))
-                                       arr (get env (read-string arrayName))]
-                                     [indexValue (dissoc (conj env {(read-string arrayName) (assoc arr (read-string index) indexValue)}) (read-string indexName))])
+                                 (let [idx (read-string (second (last (second (second exp)))))
+                                       varname (second (second (second exp)))
+                                       uid (get env (read-string varname))
+                                       value (get env (read-string (str varname idx)))
+                                       _ (println ":::" value uid (str uid idx))]
+                                   [value (conj env {(str uid idx) (str varname idx)})])
                                  [[] env]))
+
                 [_] [[] env])]
       (if (nil? (:path (meta res)))
         (with-meta res {:path true})
@@ -83,7 +88,7 @@
                      [:SimpleVar] (let [value (get state (read-string (second (second exp))))]
                                     (assert (not= value nil) "Variable not declared")
                                     [value pc state])
-                     [:ArrayVar] (let [arr (get state (second (second exp)))
+                     [:ArrayVar] (let [arr (get state (read-string (second (second exp))))
                                        array-index (read-string (second (last (second exp))))]
                                    [(nth arr array-index) pc state]))
     [:OpExp] (let [[_ exp1 oper exp2] exp
@@ -171,6 +176,7 @@
               strategy)))
     (when-let [new-pc (peek strategy)]
       (let [new-inputs (conj *root-env* (z3/solve new-pc))]
+        (println "new-inputs: " new-inputs)
         (swap! inputs conj new-inputs)
         (recur *root* *root-pc* *root-state* new-inputs (pop strategy))))))
 
@@ -194,11 +200,11 @@
 
 ;(execute (cfg/build ""))
 ;(execute (cfg/build "x := input(); x"))
-;(execute (cfg/build "x := array(4)"))
+;(execute (cfg/build "(b := array(4); b[2]:=3+4)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=2; if a[2]<10 then error() else 1)"))
-(execute (cfg/build "(a:=array(4); a[2]:=input(); a[3]:=2+3)"))
+;(execute (cfg/build "(a:=array(4); a[2]:=input(); a[3]:=2+3)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1)"))
-;(execute (cfg/build "(a:=array(4); a[2]:=3; if a[2] = 1 then error() else 1)"))
+;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else error())"))
 ;(execute (cfg/build "(x:=input(); x:=x+2; x)"))
 ;(execute (cfg/build "x:=input(); if x>500 then if x<750 then error() else error() else error()"))
 ; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
