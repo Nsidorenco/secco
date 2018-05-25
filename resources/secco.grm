@@ -1,11 +1,11 @@
 root = exp
 
-<exp> = ParenExp 
+<exp> = ParenExp
+      | SeqExp
       | OpExp
       | VarExp
       | IFEXP
       | AssignExp
-      | SeqExp
       | WhileExp
       | INT
       | add-sub
@@ -13,6 +13,9 @@ root = exp
       | UserInput
       | Error
       | Array
+
+SeqExp = <'('> exp <';'> exp OptExp <')'>
+<OptExp> = <';'> exp OptExp | eps (* broken *)
 
 OpExp = exp OPER exp
 
@@ -38,9 +41,6 @@ Array = <'array('> INT <')'>
 
 ParenExp = <'('> OptParenExp <')'>
 <OptParenExp> = exp | eps
-
-SeqExp = exp <';'> exp OptExp
-<OptExp> = <';'> exp OptExp | eps (* broken *)
 
 WhileExp = <'while'> test <'do'> body <'end'>
 <test> = exp
