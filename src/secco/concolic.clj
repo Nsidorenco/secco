@@ -52,9 +52,9 @@
                                      varname (second (second varexp))
                                      body (first (concrete body env))]
                                  (if (= (first (second varexp)) :ArrayVar)
-                                   (let [arr (get env varname)
+                                   (let [arr (get env (read-string varname))
                                          array-index (read-string (second (last (second varexp))))]
-                                     [body (conj env {varname (assoc arr array-index body)})])
+                                     [body (conj env {(read-string varname) (assoc arr array-index body)})])
                                    [body (conj env {(read-string varname) body})]))
                                [[] env])
                 [_] [[] env])]
@@ -180,7 +180,9 @@
 ;(execute (cfg/build ""))
 ;(execute (cfg/build "x := input(); x"))
 ;(execute (cfg/build "x := array(4)"))
-;(execute (cfg/build "a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1"))
+;(execute (cfg/build "(a:=array(4); a[2]:=4)"))
+;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1)"))
+;(execute (cfg/build "(a:=array(4); a[2]:=3; if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(x:=input(); x:=x+2; x)"))
 ;(execute (cfg/build "x:=input(); if x>500 then if x<750 then error() else error() else error()"))
 ; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
