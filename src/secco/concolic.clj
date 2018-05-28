@@ -35,9 +35,9 @@
                                                      [value env])
                                       [:ArrayVar] (let [arr (get env (read-string (second (second exp))))
                                                         array-index (read-string (second (last (second exp))))
-                                                        val (get env (str arr array-index))]
-                                                    (assert (not= val nil) "Variable not declared")
-                                                    [val env]))
+                                                        value (get env (str arr array-index))]
+                                                    (assert (not= value nil) "Variable not declared")
+                                                    [value env]))
                      [:OpExp] (let [[exp1 oper exp2] (rest exp)
                                     exp1 (first (concrete exp1 env))
                                     exp2 (first (concrete exp2 env))
@@ -124,11 +124,11 @@
                         (if (not= (first (last exp)) :UserInput)
                           (if (= (first (last varexp)) :ArrayVar)
                             (let [idx (read-string (second (last (second (second exp)))))]
-                              [body pc (conj state {(str uid idx) body})])
+                              [body pc (conj state {(read-string (str uid idx)) body})])
                             [body pc (conj state {varname body})])
                           (if (= (first (second (second exp))) :ArrayVar)
                             (let [idx (read-string (second (last (second (second exp)))))]
-                              [body pc (conj state {(str uid idx) (str varname idx)})])
+                              [body pc (conj state {(str uid idx) (read-string (str varname idx))})])
                             [[] pc state])))
          [_] [[] pc state]))
 
@@ -152,9 +152,9 @@
   (if (cfg/node? node)
     (let [exp (.exp node)
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
-          path (-> evaluated meta :path)]
+          path (-> evaluated meta :path)
+          _ (println "pc: " pc ", state: " state ", env: " env)]
       (cfg/mark-edge node path)
-      (println "state: " new-state ", env: " new-env ", pc: " new-pc)
       (when (isa? err ::Error)
         (println "Reached error state on line: " (.start node)
                  "," (.end node)
@@ -164,9 +164,10 @@
         (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
                  (not (cfg/get-edge node (not path)))
                  (not (.contains strategy (conj pc (z3/not (last new-pc))))))
-          (recur (transition node path)
-                 new-pc new-state new-env
-                 (conj strategy (conj pc (z3/not (last new-pc)))))
+          (do
+            (recur (transition node path)
+                   new-pc new-state new-env
+                   (conj strategy (conj pc (z3/not (last new-pc))))))
           (recur (transition node path)
                  new-pc new-state new-env
                  strategy))
@@ -202,7 +203,7 @@
 ;(execute (cfg/build "(x:=array(4); x[2]:=input())"))
 ;(execute (cfg/build "(b := array(4); b[2]:=3+4)"))
 ;(execute (cfg/build "(a:=input(); if a<10 then error() else 1)"))
-;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2]<700 then error() else 1)"))
+;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2]>70 then error() else 1)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); a[3]:=2+3)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else error())"))
