@@ -70,7 +70,8 @@
   ([node pc]
    (when (and (z3/check-sat pc) (instance? secco.cfg.CFGNode node))
      (swap! nodes-visited inc)
-     (let [last_cond (sym-exp (.exp node))]
+     (let [last_cond (sym-exp (.exp node))
+           _ (println *venv*)]
        (if (instance? clojure.lang.PersistentList last_cond)
          (let [t_pc (conj pc last_cond)
                f_pc (conj pc (z3/not last_cond))]
@@ -99,6 +100,7 @@
     (println "Coverage was:" (* (/ @nodes-visited @cfg/node-count) 100) "%"))
   (shutdown-agents))
 
+(execute (cfg/build "x:=array(4)"))
 ;(execute (cfg/build "(x:=input(); a:=array(2); a[x]:=2; a[x])"))
 ;(execute (cfg/build "(x:=input(); a:=array(4); a[2]:=3; a[3]:=10)"))
 ;(execute (cfg/build "if 1 = 1 then error() else error()"))
