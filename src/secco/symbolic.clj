@@ -32,8 +32,11 @@
                        [:ArrayVar] (let [arr (get *venv* (second (second exp)))
                                          array-index (read-string (second (last (second exp))))]
                                      (nth arr array-index)))
-      [:Array] (let [arraysize (read-string (second (second exp)))]
-                 (vec (repeat arraysize nil)))
+      [:Array] (let [uid (gensym)
+                     arraysize (read-string (second (second exp)))
+                     array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
+                 (set! *venv* (conj *venv* (reduce (fn [acc e] (conj acc {e 0})) {} array)))
+                 uid)
       [:OpExp] (let [[_ exp1 oper exp2] exp
                      e1 (sym-exp exp1)
                      op (sym-exp oper)
@@ -49,15 +52,12 @@
                          varname (second (last varexp))
                          body (sym-exp bodyexp)]
                      (if (= (first (last varexp)) :ArrayVar)
-                       (let [arr (get *venv* varname)
-                             array-index (read-string (second (last (second varexp))))]
-                          (set! *venv* (conj *venv* {varname (assoc arr array-index body)}))
-                          (assoc arr array-index body))
+                       (let [idx (read-string (second (last (second (second exp)))))
+                             uid (get *venv* varname)]
+                         (set! *venv* (conj *venv* {(str uid idx) body})))
                        (do (set! *venv* (conj *venv* {varname body}))
                            (when (= (first bodyexp) :UserInput)
                              (z3/const body Int)))))
-
-
       [_] "")))
 
 (defn model
@@ -65,7 +65,8 @@
   ([node pc]
    (when (and (z3/check-sat pc) (instance? secco.cfg.CFGNode node))
      (swap! nodes-visited inc)
-     (let [last_cond (sym-exp (.exp node))]
+     (let [last_cond (sym-exp (.exp node))
+           _ (println *venv*)]
        (if (instance? clojure.lang.PersistentList last_cond)
          (let [t_pc (conj pc last_cond)
                f_pc (conj pc (z3/not last_cond))]
@@ -94,6 +95,7 @@
     (println "Coverage was:" (* (/ @nodes-visited @cfg/node-count) 100) "%"))
   (shutdown-agents))
 
+;(execute (cfg/build "(x:=input(); a:=array(4); a[2]:=3; a[3]:=10)"))
 ;(execute (cfg/build "a:=array(4); a[2]:=3; if a[2] = 1 then error() else error()"))
 ; (model (cfg/build "(a := 1 + 1; if a > 1 then 2 else 3)"))
 ; (z3/check-sat (conj [] (z3/const x Int)))
