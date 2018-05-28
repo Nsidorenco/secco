@@ -152,8 +152,7 @@
   (if (cfg/node? node)
     (let [exp (.exp node)
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
-          path (-> evaluated meta :path)
-          _ (println "pc: " pc ", state: " state ", env: " env)]
+          path (-> evaluated meta :path)]
       (cfg/mark-edge node path)
       (when (isa? err ::Error)
         (println "Reached error state on line: " (.start node)
@@ -164,8 +163,7 @@
         (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
                  (not (cfg/get-edge node (not path)))
                  (not (.contains strategy (conj pc (z3/not (last new-pc))))))
-          (do
-            (recur (transition node path)
+          (recur (transition node path
                    new-pc new-state new-env
                    (conj strategy (conj pc (z3/not (last new-pc))))))
           (recur (transition node path)
