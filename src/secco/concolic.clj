@@ -163,9 +163,9 @@
         (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
                  (not (cfg/get-edge node (not path)))
                  (not (.contains strategy (conj pc (z3/not (last new-pc))))))
-          (recur (transition node path
-                   new-pc new-state new-env
-                   (conj strategy (conj pc (z3/not (last new-pc))))))
+          (recur (transition node path)
+                 new-pc new-state new-env
+                 (conj strategy (conj pc (z3/not (last new-pc)))))
           (recur (transition node path)
                  new-pc new-state new-env
                  strategy))
