@@ -30,13 +30,11 @@
                      [:sub] (arithmetic exp -)
                      [:mul] (arithmetic exp *)
                      [:VarExp] (match [(first (second exp))]
-                                      [:SimpleVar] (let [value (get env (read-string (second (second exp))))]
-                                                     (assert (not= value nil) "Variable not declared")
+                                      [:SimpleVar] (let [value (get env (read-string (second (second (second exp)))))]
                                                      [value env])
                                       [:ArrayVar] (let [arr (get env (read-string (second (second exp))))
-                                                        array-index (read-string (second (last (second exp))))
+                                                        array-index (read-string (second (second (last (second exp)))))
                                                         value (get env (str arr array-index))]
-                                                    (assert (not= value nil) "Variable not declared")
                                                     [value env]))
                      [:OpExp] (let [[exp1 oper exp2] (rest exp)
                                     exp1 (first (concrete exp1 env))
@@ -87,13 +85,19 @@
          [:Error] [::Error pc state]
          [:VarExp] (match [(first (second exp))]
                           [:SimpleVar] (let [value (get state (read-string (second (second exp))))]
-                                         (assert (not= value nil) "Variable not declared")
-                                         [value pc state])
+                                         (if (= value nil)
+                                           [::Error pc state]
+                                           [value pc state]))
                           [:ArrayVar] (let [arr (get state (read-string (second (second exp))))
-                                            array-index (read-string (second (last (second exp))))
-                                            value (get state (read-string (str arr array-index)))]
-                                        (assert (not= value nil) "Variable not declared")
-                                        [value pc state]))
+                                            array-index (read-string (second (second (last (second exp)))))
+                                            value (get state (str arr array-index))
+                                            arr-size (loop [n 0]
+                                                       (if (= nil (get state (str arr n)))
+                                                         n
+                                                         (recur (inc n))))]
+                                        (if (= value nil)
+                                          [::Error pc state]
+                                          [value (conj pc (z3/assert array-index < arr-size)) state])))
          [:OpExp] (let [[_ exp1 oper exp2] exp
                         e1 (first (symbolic exp1 pc state path))
                         op (first (symbolic oper pc state path))
@@ -217,6 +221,7 @@
 ; (execute (cfg/build "x := 5"))
 ; (execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
 ;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/sort.sec"))))
+;(execute (cfg/build "(a:=array(4); a[2])"))
 ;(execute (cfg/build "(a:=array(4); x:=2; a[x]:=2)"))
 ;(execute (cfg/build "(x:=input(); a:=array(4); a[0]:=1; a[1]:=x; a[2]:=3)"))
 ;(execute (cfg/build "(a:=array(4); x:=3; a[2]:=1; a[x]:=5)"))
