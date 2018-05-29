@@ -29,8 +29,10 @@ mul = mul-term <'*'> term
 VarExp = SimpleVar
        | ArrayVar
 
+lvalue = VarExp | INT
+
 SimpleVar = ID
-ArrayVar = ID <'['> INT <']'>
+ArrayVar = ID <'['> lvalue <']'>
 <ID> = #'[a-zA-Z]+[a-zA-Z0-9_]*'
 
 IFEXP = <'if'> exp <'then'> exp <'else'> exp

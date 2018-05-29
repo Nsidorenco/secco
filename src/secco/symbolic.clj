@@ -54,7 +54,8 @@
                          varname (second (last varexp))
                          body (sym-exp bodyexp)]
                      (if (= (first (last varexp)) :ArrayVar)
-                       (let [idx (read-string (second (last (second (second exp)))))
+                       (let [l_value (second (last (second (second exp))))
+                             idx (sym-exp l_value)
                              uid (get *venv* varname)]
                          (do
                            (set! *venv* (conj *venv* {(str uid idx) body}))
@@ -70,8 +71,7 @@
   ([node pc]
    (when (and (z3/check-sat pc) (instance? secco.cfg.CFGNode node))
      (swap! nodes-visited inc)
-     (let [last_cond (sym-exp (.exp node))
-           _ (println *venv*)]
+     (let [last_cond (sym-exp (.exp node))]
        (if (instance? clojure.lang.PersistentList last_cond)
          (let [t_pc (conj pc last_cond)
                f_pc (conj pc (z3/not last_cond))]
@@ -100,7 +100,7 @@
     (println "Coverage was:" (* (/ @nodes-visited @cfg/node-count) 100) "%"))
   (shutdown-agents))
 
-(execute (cfg/build "x:=array(4)"))
+;(execute (cfg/build "x:=array(4)"))
 ;(execute (cfg/build "(x:=input(); a:=array(2); a[x]:=2; a[x])"))
 ;(execute (cfg/build "(x:=input(); a:=array(4); a[2]:=3; a[3]:=10)"))
 ;(execute (cfg/build "if 1 = 1 then error() else error()"))
@@ -117,3 +117,6 @@
 ; (model (cfg/build "(x:=input();y:=input(); if x<y then x:=x+y else y:=x)"))
 ; (model (cfg/build "(x:=input(); if x > 10 then error() else error())"))
 ; (model (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
+;(execute (cfg/build "(a:=array(4); a[2]:=1)"))
+;(execute (cfg/build "(a:=array(4); x:=3; a[2]:=1; a[x]:=5)"))
+;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x+3)"))

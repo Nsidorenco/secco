@@ -50,7 +50,8 @@
                          varname (second (second varexp))
                          [body env'] (expression body env)]
                         (if (= :ArrayVar (first (second (second exp))))
-                          (let [idx (read-string (second (last (second (second exp)))))
+                          (let [l_value (second (last (second (second exp))))
+                                idx (first (expression l_value env))
                                 uid (get env (read-string varname))]
                             [body (conj env env' {(str uid idx) body})])
                           [body (conj env env' {(read-string varname) body})]))
@@ -62,15 +63,18 @@
   ([node env]
    (if (cfg/node? node)
      (let [[res env] (expression (.exp node) env)
-           env (with-meta env {:res res})
-           _ (println env)]
+           env (with-meta env {:res res})]
        (if (false? res)
          (recur (cfg/get-f node) env)
          (recur (cfg/get-t node) env)))
      (-> env meta :res))))
 
-;(println (interpret (cfg/build "x := array(4); x[1] := 2; if x[1] = 2 then error() else 2")))
+;(println (interpret (cfg/build "(i:=5; a:=0; while i>0 do (a:=a+1; i:=i-1) end; a)")))
+;(println (interpret (cfg/build "(x := array(4); x[1] := 2; if x[1] = 2 then error() else 2)")))
 ;(println (interpret (cfg/build "(x:=array(4); x[3]:=input())")))
 ;(interpret (cfg/build "(x := input(); if x > 2 then 2 else 4)"))
-; (interpret (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
-;(interpret (cfg/build "x := input(); while x < 10 do x := x+1 end; x"))
+;(interpret (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
+;(interpret (cfg/build "(x := 3; while x < 10 do x := x+1 end; x)"))
+;(interpret (cfg/build "(a:=array(4); a[2]:=1)"))
+;(interpret (cfg/build "(a:=array(4); x:=3; a[2]:=1; a[x]:=5)"))
+;(interpret (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x+3)"))

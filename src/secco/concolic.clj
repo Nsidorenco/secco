@@ -56,12 +56,14 @@
                                           varname (second (second varexp))
                                           [body env'] (concrete body env)]
                                       (if (= (first (second varexp)) :ArrayVar)
-                                        (let [idx (read-string (second (last (second (second exp)))))
-                                              uid (get env' (read-string varname))]
+                                        (let [l_value (second (last (second (second exp))))
+                                              idx (first (concrete l_value env))
+                                              uid (get env (read-string varname))]
                                           [body (conj env env' {(str uid idx) body})])
                                         [body (conj env env' {(read-string varname) body})]))
                                     (if (= (first (second (second exp))) :ArrayVar)
-                                      (let [idx (read-string (second (last (second (second exp)))))
+                                      (let [l_value (second (last (second (second exp))))
+                                            idx (first (concrete l_value env))
                                             varname (second (second (second exp)))
                                             uid (get env (read-string varname))
                                             value (get env (read-string (str varname idx)))]
@@ -89,7 +91,7 @@
                                          [value pc state])
                           [:ArrayVar] (let [arr (get state (read-string (second (second exp))))
                                             array-index (read-string (second (last (second exp))))
-                                            value (get state (str arr array-index))]
+                                            value (get state (read-string (str arr array-index)))]
                                         (assert (not= value nil) "Variable not declared")
                                         [value pc state]))
          [:OpExp] (let [[_ exp1 oper exp2] exp
@@ -123,11 +125,13 @@
                             uid (get state varname)]
                         (if (not= (first (last exp)) :UserInput)
                           (if (= (first (last varexp)) :ArrayVar)
-                            (let [idx (read-string (second (last (second (second exp)))))]
-                              [body pc (conj state {(read-string (str uid idx)) body})])
+                            (let [l_value (second (last (second (second exp))))
+                                  idx (first (symbolic  l_value pc state path))]
+                              [body pc (conj state {(str uid idx) body})])
                             [body pc (conj state {varname body})])
                           (if (= (first (second (second exp))) :ArrayVar)
-                            (let [idx (read-string (second (last (second (second exp)))))]
+                            (let [l_value (second (last (second (second exp))))
+                                  idx (first (symbolic  l_value pc state path))]
                               [body pc (conj state {(str uid idx) (read-string (str varname idx))})])
                             [[] pc state])))
          [_] [[] pc state]))
@@ -206,8 +210,14 @@
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else error())"))
 ;(execute (cfg/build "(x:=input(); x:=x+2; x)"))
-;(execute (cfg/build "x:=input(); if x>500 then if x<750 then error() else error() else error()"))
-; (execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1); if y>5 then error() else 40)"))
-; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
+;(execute (cfg/build "(x:=input(); if x>500 then if x<750 then error() else error() else error())"))
+;(execute (cfg/build "(x := input(); y := 0; while x < 10 do (x := x+1; y := y+1) end; if y>5 then error() else 40)"))
+;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
+; (execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
+;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/sort.sec"))))
+;(execute (cfg/build "(a:=array(4); x:=2; a[x]:=2)"))
+;(execute (cfg/build "(x:=input(); a:=array(4); a[0]:=1; a[1]:=x; a[2]:=3)"))
+;(execute (cfg/build "(a:=array(4); x:=3; a[2]:=1; a[x]:=5)"))
+;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x+3)"))
