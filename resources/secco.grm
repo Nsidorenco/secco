@@ -11,8 +11,11 @@ root = exp
       | add-sub
       | Comment
       | UserInput
+      | Size
       | Error
       | Array
+
+Size = <'size('> exp <')'>
 
 SeqExp = <'('> exp <';'> exp OptExp <')'>
 <OptExp> = <';'> exp OptExp | eps (* broken *)
@@ -29,7 +32,7 @@ mul = mul-term <'*'> term
 VarExp = SimpleVar
        | ArrayVar
 
-lvalue = VarExp | INT
+lvalue = VarExp | INT | add-sub
 
 SimpleVar = ID
 ArrayVar = ID <'['> lvalue <']'>
