@@ -61,6 +61,7 @@
 (defn interpret
   ([node] (interpret node {}))
   ([node env]
+   (println env)
    (if (cfg/node? node)
      (let [[res env] (expression (.exp node) env)
            env (with-meta env {:res res})]

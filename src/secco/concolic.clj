@@ -30,10 +30,10 @@
                      [:sub] (arithmetic exp -)
                      [:mul] (arithmetic exp *)
                      [:VarExp] (match [(first (second exp))]
-                                      [:SimpleVar] (let [value (get env (read-string (second (second (second exp)))))]
+                                      [:SimpleVar] (let [value (get env (read-string (second (second exp))))]
                                                      [value env])
                                       [:ArrayVar] (let [arr (get env (read-string (second (second exp))))
-                                                        array-index (read-string (second (second (last (second exp)))))
+                                                        [array-index _] (concrete (second (last (second exp))) env)
                                                         value (get env (str arr array-index))]
                                                     [value env]))
                      [:OpExp] (let [[exp1 oper exp2] (rest exp)
@@ -45,6 +45,12 @@
                                   (with-meta [[] env] {:path true})
                                   (with-meta [[] env] {:path false})))
                      [:ParenExp] (concrete (second exp) env)
+                     [:Size] (let [arr (get env (read-string (second (second (second exp)))))
+                                   size (loop [n 0]
+                                          (if (= nil (get env (str arr n)))
+                                            n
+                                            (recur (inc n))))]
+                               [size env])
                      [:Array] (let [uid (gensym)
                                     arraysize (read-string (second (second exp)))
                                     array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
@@ -90,14 +96,8 @@
                                            [value pc state]))
                           [:ArrayVar] (let [arr (get state (read-string (second (second exp))))
                                             array-index (read-string (second (second (last (second exp)))))
-                                            value (get state (str arr array-index))
-                                            arr-size (loop [n 0]
-                                                       (if (= nil (get state (str arr n)))
-                                                         n
-                                                         (recur (inc n))))]
-                                        (if (= value nil)
-                                          [::Error pc state]
-                                          [value (conj pc (z3/assert array-index < arr-size)) state])))
+                                            value (get state (str arr array-index))]
+                                        [value pc state]))
          [:OpExp] (let [[_ exp1 oper exp2] exp
                         e1 (first (symbolic exp1 pc state path))
                         op (first (symbolic oper pc state path))
@@ -110,6 +110,12 @@
                         arraysize (read-string (second (second exp)))
                         array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
                     [uid pc (conj state (reduce (fn [acc e] (conj acc {e 0})) {} array))])
+         [:Size] (let [arr (get state (read-string (second (second (second exp)))))
+                       size (loop [n 0]
+                              (if (= nil (get state (str arr n)))
+                                n
+                                (recur (inc n))))]
+                    [size pc state])
          [:add] (let [[_ exp1 exp2] exp]
                   [(arithmetic + (first (symbolic exp1 pc state path))
                                (first (symbolic exp2 pc state path)))
@@ -204,6 +210,7 @@
       (traverse node pc state env (clojure.lang.PersistentQueue/EMPTY)))
     (println "it is a-okay, my dudes")))
 
+;(execute (cfg/build "(a:=array(4); a[2]:=input())"))
 ;(execute (cfg/build "(a:=3;b:=a)"))
 ;(execute (cfg/build "x := input(); x"))
 ;(execute (cfg/build "(x:=array(4); x[2]:=input())"))
@@ -219,10 +226,12 @@
 ;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
-; (execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
+;(execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
 ;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/sort.sec"))))
 ;(execute (cfg/build "(a:=array(4); a[2])"))
 ;(execute (cfg/build "(a:=array(4); x:=2; a[x]:=2)"))
 ;(execute (cfg/build "(x:=input(); a:=array(4); a[0]:=1; a[1]:=x; a[2]:=3)"))
 ;(execute (cfg/build "(a:=array(4); x:=3; a[2]:=1; a[x]:=5)"))
-;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x+3)"))
+;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x)"))
+;(execute (cfg/build "(a:=array(5); a[3]:=7; x:=input(); if a[x] > 3 then error() else 0)"))
+;(execute (cfg/build "(a:=array(24); size(a))"))
