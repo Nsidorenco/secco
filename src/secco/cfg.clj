@@ -42,9 +42,9 @@
 
 (defn findValue [exp]
   (match [(first exp)]
-         [:INT] (second exp)
-         [:SimpleVar] (second exp)
-         [:VarExp] (recur (second exp))))
+    [:INT] (second exp)
+    [:SimpleVar] (second exp)
+    [:VarExp] (recur (second exp))))
 
 (defn parse-tree->cfg
   ([prog] (parse-tree->cfg prog []))
@@ -66,30 +66,30 @@
                      gnode)
        [:INT] (new-node "int" prog path path)
        [:Size] (new-node "size" prog path path)
-       [:VarExp] (match [(first (first exps))]
-                     [:SimpleVar] (new-node "varexp" prog path path)
-                      [:ArrayVar] (let [index (findValue (second (last (first exps))))
-                                        name (second (first exps))
-                                        ast (grm (str "if " index " < size(" name ") then " name "[" index "] else error() "))]
-                                    (let [[guard tru fal] (rest (last ast))
-                                           gnode (parse-tree->cfg guard)
-                                          tnode (new-node "varexp" tru path path)
-                                          fnode (new-node "varexp" fal [] [])]
-                                      (set-t gnode tnode)
-                                      (set-f gnode fnode)
-                                      gnode)))
-        [:AssignExp] (match [(first (second (first exps)))]
-                           [:ArrayVar] (let [index (findValue (last (last (last (first exps)))))
-                                             name (second (second (first exps)))
-                                             ast (grm (str "if " index " < size(" name ") then " name "[" index "] else error() "))
-                                             [guard _ fal] (rest (last ast))
-                                             gnode (parse-tree->cfg guard)
-                                             tnode (new-node "assignexp" prog path path)
-                                             fnode (new-node "error" fal path path)]
-                                         (set-t gnode tnode)
-                                         (set-f gnode fnode)
-                                         gnode)
-                           [:SimpleVar] (new-node "assignexp" prog path path))
+       [:VarExp] (match [(ffirst exps)]
+                   [:SimpleVar] (new-node "varexp" prog path path)
+                   [:ArrayVar] (let [index (findValue (second (last (first exps))))
+                                     name (second (first exps))
+                                     ast (grm (str "if " index " < size(" name ") then " name "[" index "] else error() "))]
+                                 (let [[guard tru fal] (rest (last ast))
+                                       gnode (parse-tree->cfg guard)
+                                       tnode (new-node "varexp" tru path path)
+                                       fnode (new-node "varexp" fal [] [])]
+                                   (set-t gnode tnode)
+                                   (set-f gnode fnode)
+                                   gnode)))
+       [:AssignExp] (match [(first (second (first exps)))]
+                      [:ArrayVar] (let [index (findValue (last (last (last (first exps)))))
+                                        name (second (second (first exps)))
+                                        ast (grm (str "if " index " < size(" name ") then " name "[" index "] else error() "))
+                                        [guard _ fal] (rest (last ast))
+                                        gnode (parse-tree->cfg guard)
+                                        tnode (new-node "assignexp" prog path path)
+                                        fnode (new-node "error" fal path path)]
+                                    (set-t gnode tnode)
+                                    (set-f gnode fnode)
+                                    gnode)
+                      [:SimpleVar] (new-node "assignexp" prog path path))
 
        [:Array] (new-node "arrayexp" prog path path)
        [:IFEXP] (let [[guard tru fal] exps
@@ -104,14 +104,32 @@
                          (parse-tree->cfg (last exps) path)
                          (rest (reverse exps)))))))
 
+(defn transform-ast
+  [ast]
+  (insta/transform
+   {:VarExp (fn [param]
+              (let [[t id lvalue :as exp] param]
+                (if (= t :ArrayVar)
+                  [:IFEXP
+                   [:OpExp [:VarExp param]
+                    [:OPER "<"]
+                    [:Size [:VarExp [:SimpleVar id]]]]
+                   [:VarExp param]
+                   [:Error "error()"]]
+                  [:VarExp param])))}
+   ast))
+
 (defn build [program]
-  (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))]
+  (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))
+        ast (transform-ast ast)]
     (reset! node-count 0)
     (if (insta/failure? ast)
       (do (println ast)
           (throw (Exception. "error parsing input")))
       (parse-tree->cfg ast))))
 
+; (println (transform-ast (grm "a[x]")))
+; (println (grm "if a[x] < size(a) then a[x] else error()"))
 ;(println (grm "(x := 3; x := 2+x; x)"))
 ;(println (grm "(a:=array(4); x:=input(); a[2]:=x; if a[2] = 7 then error() else 1)"))
 ;(println (get-f (get-t (get-t (build "(a:=array(4); a[0])")))))
