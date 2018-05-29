@@ -42,13 +42,12 @@
 (defn unfold [exp]
   (match [(first exp)]
     [:add] (let [[_ exp1 exp2] exp]
-              (str (unfold exp1) "+" (unfold exp2)))
+              (str (pretty (unfold exp1)) "+" (pretty (unfold exp2))))
     [:sub] (let [[_ exp1 exp2] exp]
-              (str (unfold exp1) "-" (unfold exp2)))
+              (str (pretty (unfold exp1)) "-" (pretty (unfold exp2))))
     [:mul] (let [[_ exp1 exp2] exp]
-              (str (unfold exp1) "*" (unfold exp2)))
-    [:Size] exp
-    :else (second exp)))
+              (str (pretty (unfold exp1)) "*" (pretty (unfold exp2))))
+    :else exp))
 
 (defn build-tree 
   ([node] (build-tree node 0 {}))
@@ -106,7 +105,7 @@
                          (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
                          getsym)
               [:Size]  (let [[_ arr] (.exp node)]
-                         (swap! labels conj {getsym (str "size(" arr ")")})
+                         (swap! labels conj {getsym (str "size(" (pretty arr) ")")})
                          (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
                          getsym)
               [:VarExp] (let [
