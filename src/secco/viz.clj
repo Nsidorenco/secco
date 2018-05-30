@@ -36,7 +36,7 @@
          [:Array] (str "array(" (pretty (second body)) ")")
          [:UserInput] "input()"
          [:Size] (str "size(" (pretty (second body)) ")")
-         [:Error] "Error"
+         [:Error] "error()"
          [_] body))
 
 (defn unfold [exp]
