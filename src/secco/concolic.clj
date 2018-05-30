@@ -10,6 +10,7 @@
 (def ^:dynamic *root-state* [])
 (def ^:dynamic *root-pc* [])
 (def reset (atom :none))
+(def array-loop (atom []))
 
 (defn- op-exp
   [exp1 oper exp2]
@@ -118,13 +119,21 @@
                                 (do (println "Out of bounds for array " arr-name)
                                     (reset! reset :halt)
                                     [[] pc state])
+                                (do 
+                                  (doseq [i (range size)]
+                                    (let [
+                                          ;_ (println state array-index i)
+                                          new-pc (conj pc (z3/assert array-index (read-string "=") i))]
+                                      (when (and (z3/check-sat new-pc)
+                                                 (not (.contains pc (last new-pc))))
+                                        (swap! array-loop conj new-pc))))
                                 (if (.contains pc new-pc)
-                                  [var-name pc state]
-                                  [var-name (conj pc new-pc) state]))))
+                                  [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index)))) pc state]
+                                  [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index)))) (conj pc new-pc) state])))))
     [:OpExp] (let [[_ exp1 oper exp2] exp
-                   [e1 pc1 _] (symbolic exp1 pc state path)
-                   op (first (symbolic oper pc state path))
-                   [e2 pc2 _] (symbolic exp2 pc1 state path)
+                   [e1 pc1 _] (symbolic exp1 env pc state path)
+                   op (first (symbolic oper env pc state path))
+                   [e2 pc2 _] (symbolic exp2 env pc1 state path)
                    condition (z3/assert e1 op e2)]
                (if path
                  [condition (conj pc2 condition) state]
@@ -185,13 +194,20 @@
 (defn- traverse
   [node pc state env strategy]
   {:pre [(map? state) (map? env) (vector? pc)]}
-  ;(println "%%%" pc state strategy env)
-  ;(println "€€€" @reset)
+  (reset! array-loop [])
+  ;(println "%%%" pc)
+  ;(println "€#%#%" strategy)
   (if (cfg/node? node)
     (let [exp (.exp node)
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
-          path (-> evaluated meta :path)]
+          path (-> evaluated meta :path)
+          strategy (if-not (or (cfg/get-edge node path) 
+                               (cfg/get-edge node (not path)))
+                    (reduce conj strategy @array-loop)
+                    strategy)]
       (cfg/mark-edge node path)
+      ;(println "€€€" @array-loop)
+      ;(println (z3/check-sat (conj pc (z3/not (last new-pc)))))
       (case @reset
         :reset (let [new-inputs (conj *root-env* (z3/solve new-pc))]
                  (reset! reset :none)
