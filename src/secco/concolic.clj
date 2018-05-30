@@ -95,7 +95,7 @@
   `(list (symbol '~sym) ~exp1 ~exp2))
 
 (defn- symbolic
-  [exp pc state path]
+  [exp env pc state path]
   (match [(first exp)]
     [:INT] [(read-string (second exp)) pc state]
     [:OPER] [(read-string (second exp)) pc state]
@@ -107,7 +107,7 @@
                                  [value pc state]))
                 [:ArrayVar] (let [arr-name (read-string (second (second exp)))
                                   uid (get state arr-name)
-                                  array-index (first (symbolic (second (last (second exp))) pc state path))
+                                  array-index (first (symbolic (second (last (second exp))) env pc state path))
                                   size (loop [n 0]
                                          (if (nil? (get state (str uid n)))
                                            n
@@ -149,31 +149,31 @@
                            (recur (inc n))))]
               [size pc state])
     [:add] (let [[_ exp1 exp2] exp]
-             [(arithmetic + (first (symbolic exp1 pc state path))
-                          (first (symbolic exp2 pc state path)))
+             [(arithmetic + (first (symbolic exp1 env pc state path))
+                          (first (symbolic exp2 env pc state path)))
               pc state])
     [:sub] (let [[_ exp1 exp2] exp]
-             [(arithmetic - (first (symbolic exp1 pc state path))
-                          (first (symbolic exp2 pc state path)))
+             [(arithmetic - (first (symbolic exp1 env pc state path))
+                          (first (symbolic exp2 env pc state path)))
               pc state])
     [:mul] (let [[_ exp1 exp2] exp]
-             [(arithmetic * (first (symbolic exp1 pc state path))
-                          (first (symbolic exp2 pc state path)))
+             [(arithmetic * (first (symbolic exp1 env pc state path))
+                          (first (symbolic exp2 env pc state path)))
               pc state])
-    [:ParenExp] (symbolic (second exp) pc state path)
+    [:ParenExp] (symbolic (second exp) env pc state path)
     [:AssignExp] (let [[varexp bodyexp] (rest exp)
                        varname (read-string (second (second varexp)))
-                       [body pc state] (symbolic bodyexp pc state path)
+                       [body pc state] (symbolic bodyexp env pc state path)
                        uid (get state varname)]
                    (if (not= (first (last exp)) :UserInput)
                      (if (= (first (last varexp)) :ArrayVar)
                        (let [l_value (second (last (second (second exp))))
-                             idx (first (symbolic  l_value pc state path))]
+                             idx (first (symbolic  l_value env pc state path))]
                          [body pc (conj state {(str uid idx) body})])
                        [body pc (conj state {varname body})])
                      (if (= (first (second (second exp))) :ArrayVar)
                        (let [l_value (second (last (second (second exp))))
-                             idx (first (symbolic  l_value pc state path))]
+                             idx (first (symbolic  l_value env pc state path))]
                          [body pc (conj state {(str uid idx) (read-string (str varname idx))})])
                        [[] pc state])))
     [_] [[] pc state]))
@@ -182,7 +182,7 @@
   [exp pc env state]
   (let [[res new-env :as xyz] (concrete exp env)
         path (-> xyz meta :path)
-        s (symbolic exp pc state path)]
+        s (symbolic exp env pc state path)]
       (with-meta (conj s new-env) {:path path})))
 
 (defn- transition
