@@ -85,7 +85,7 @@
                                         [guard _ fal] (rest (last ast))
                                         gnode (parse-tree->cfg guard)
                                         tnode (new-node "assignexp" prog path path)
-                                        fnode (new-node "error" fal path path)]
+                                        fnode (new-node "error()" fal path path)]
                                     (set-t gnode tnode)
                                     (set-f gnode fnode)
                                     gnode)
