@@ -75,24 +75,7 @@
        [:INT] (new-node "int" prog path path)
        [:Size] (new-node "size" prog path path)
        [:VarExp] (new-node "varexp" prog path path)
-       [:AssignExp] (let [[lvalue value] exps]
-                      (if (= :IFEXP (first lvalue))
-                        (let [[_ op t f] lvalue
-                              gnode (parse-tree->cfg op path)
-                              tnode (parse-tree->cfg [:AssignExp t value] path)
-                              fnode (parse-tree->cfg f path)]
-                          (set-t gnode tnode)
-                          (set-f gnode fnode)
-                          gnode)
-                        (if (= :IFEXP (first value))
-                          (let [[_ op t f] value
-                                gnode (parse-tree->cfg op path)
-                                tnode (parse-tree->cfg [:AssignExp lvalue t] path)
-                                fnode (parse-tree->cfg f path)]
-                            (set-t gnode tnode)
-                            (set-f gnode fnode)
-                            gnode)
-                          (new-node "assignexp" prog path path))))
+       [:AssignExp] (new-node "assignexp" prog path path)
        [:Array] (new-node "arrayexp" prog path path)
        [:IFEXP] (let [[guard tru fal] exps
                       gnode (parse-tree->cfg guard)
@@ -106,27 +89,10 @@
                          (parse-tree->cfg (last exps) path)
                          (rest (reverse exps)))))))
 
-(defn transform-ast
-  [ast]
-  (insta/transform
-   {:VarExp (fn [param]
-              (let [[t id lvalue :as exp] param]
-                (if (= t :ArrayVar)
-                  [:IFEXP
-                   [:OpExp
-                    (find-value lvalue)
-                    [:OPER "<"]
-                    [:Size [:VarExp [:SimpleVar id]]]]
-                   [:VarExp param]
-                   [:Error "error()"]]
-                  [:VarExp param])))}
-   ast))
-
 (defn build [program]
   (let [ast (->> program
                  grm
-                 (insta/add-line-and-column-info-to-metadata program)
-                 transform-ast)]
+                 (insta/add-line-and-column-info-to-metadata program))]
     (reset! node-count 0)
     (if (insta/failure? ast)
       (do (println ast)
@@ -134,7 +100,7 @@
       (parse-tree->cfg ast))))
 
 ; (next-node 2 (build "a[x]:=input()"))
-(next-node 1 (build "x:=a[x]"))
+; (next-node 1 (build "x:=a[x]"))
 ; (println (grm "if a[x] < size(a) then a[x] else error()"))
 ;(println (grm "(x := 3; x := 2+x; x)"))
 ;(println (grm "(a:=array(4); x:=input(); a[2]:=x; if a[2] = 7 then error() else 1)"))
