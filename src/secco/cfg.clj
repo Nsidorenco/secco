@@ -75,7 +75,24 @@
        [:INT] (new-node "int" prog path path)
        [:Size] (new-node "size" prog path path)
        [:VarExp] (new-node "varexp" prog path path)
-       [:AssignExp] (new-node "assignexp" prog path path)
+       [:AssignExp] (let [[lvalue value] exps]
+                      (if (= :IFEXP (first lvalue))
+                        (let [[_ op t f] lvalue
+                              gnode (parse-tree->cfg op path)
+                              tnode (parse-tree->cfg [:AssignExp t value] path)
+                              fnode (parse-tree->cfg f path)]
+                          (set-t gnode tnode)
+                          (set-f gnode fnode)
+                          gnode)
+                        (if (= :IFEXP (first value))
+                          (let [[_ op t f] value
+                                gnode (parse-tree->cfg op path)
+                                tnode (parse-tree->cfg [:AssignExp lvalue t] path)
+                                fnode (parse-tree->cfg f path)]
+                            (set-t gnode tnode)
+                            (set-f gnode fnode)
+                            gnode)
+                          (new-node "assignexp" prog path path))))
        [:Array] (new-node "arrayexp" prog path path)
        [:IFEXP] (let [[guard tru fal] exps
                       gnode (parse-tree->cfg guard)
@@ -116,7 +133,8 @@
           (throw (Exception. "error parsing input")))
       (parse-tree->cfg ast))))
 
-; (next-node 2 (build "(a:=array(6); a[x]:=input())"))
+; (next-node 2 (build "a[x]:=input()"))
+(next-node 1 (build "x:=a[x]"))
 ; (println (grm "if a[x] < size(a) then a[x] else error()"))
 ;(println (grm "(x := 3; x := 2+x; x)"))
 ;(println (grm "(a:=array(4); x:=input(); a[2]:=x; if a[2] = 7 then error() else 1)"))
