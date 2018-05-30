@@ -9,6 +9,7 @@
 (def ^:dynamic *root-env* [])
 (def ^:dynamic *root-state* [])
 (def ^:dynamic *root-pc* [])
+(def reset (atom false))
 
 (defn- op-exp
   [exp1 oper exp2]
@@ -24,57 +25,66 @@
                   exp2 (first (concrete exp2 env))]
               [(oper exp1 exp2) env]))]
     (let [res (match [(first exp)]
-                     [:INT] [(read-string (second exp)) env]
-                     [:OPER] [(read-string (second exp)) env]
-                     [:add] (arithmetic exp +)
-                     [:sub] (arithmetic exp -)
-                     [:mul] (arithmetic exp *)
-                     [:VarExp] (match [(first (second exp))]
-                                      [:SimpleVar] (let [value (get env (read-string (second (second exp))))]
-                                                     [value env])
-                                      [:ArrayVar] (let [arr (get env (read-string (second (second exp))))
-                                                        [array-index _] (concrete (second (last (second exp))) env)
-                                                        value (get env (str arr array-index))]
-                                                    [value env]))
-                     [:OpExp] (let [[exp1 oper exp2] (rest exp)
-                                    exp1 (first (concrete exp1 env))
-                                    exp2 (first (concrete exp2 env))
-                                    oper (first (concrete oper env))
-                                    res (op-exp exp1 oper exp2)]
-                                (if res
-                                  (with-meta [[] env] {:path true})
-                                  (with-meta [[] env] {:path false})))
-                     [:ParenExp] (concrete (second exp) env)
-                     [:Size] (let [arr (get env (read-string (second (second (second exp)))))
-                                   size (loop [n 0]
-                                          (if (= nil (get env (str arr n)))
-                                            n
-                                            (recur (inc n))))]
-                               [size env])
-                     [:Array] (let [uid (gensym)
-                                    arraysize (read-string (second (second exp)))
-                                    array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
-                                [uid (conj env (reduce (fn [acc e] (conj acc {e 0})) {} array))])
-                     [:AssignExp] (if (not= (first (last exp)) :UserInput)
-                                    (let [[varexp body] (rest exp)
-                                          varname (second (second varexp))
-                                          [body env'] (concrete body env)]
-                                      (if (= (first (second varexp)) :ArrayVar)
-                                        (let [l_value (second (last (second (second exp))))
-                                              idx (first (concrete l_value env))
-                                              uid (get env (read-string varname))]
-                                          [body (conj env env' {(str uid idx) body})])
-                                        [body (conj env env' {(read-string varname) body})]))
-                                    (if (= (first (second (second exp))) :ArrayVar)
-                                      (let [l_value (second (last (second (second exp))))
-                                            idx (first (concrete l_value env))
-                                            varname (second (second (second exp)))
-                                            uid (get env (read-string varname))
-                                            value (get env (read-string (str varname idx)))]
-                                        [value (conj env {(str uid idx) value})])
-                                      [[] env]))
+                [:INT] [(read-string (second exp)) env]
+                [:OPER] [(read-string (second exp)) env]
+                [:add] (arithmetic exp +)
+                [:sub] (arithmetic exp -)
+                [:mul] (arithmetic exp *)
+                [:VarExp] (match [(first (second exp))]
+                            [:SimpleVar] (let [value (get env (read-string (second (second exp))))]
+                                           [value env])
+                            [:ArrayVar] (let [arr (get env (read-string (second (second exp))))
+                                              [array-index _] (concrete (second (last (second exp))) env)
+                                              value (get env (str arr array-index))
+                                              size (loop [n 0]
+                                                     (if (nil? (get env (str arr n)))
+                                                       n
+                                                       (recur (inc n))))]
+                                          (if (< array-index size)
+                                            [value env]
+                                            (do
+                                              (println "you fucked it up")
+                                              (reset! reset true)
+                                              [0 env]))))
+                [:OpExp] (let [[exp1 oper exp2] (rest exp)
+                               exp1 (first (concrete exp1 env))
+                               exp2 (first (concrete exp2 env))
+                               oper (first (concrete oper env))
+                               res (op-exp exp1 oper exp2)]
+                           (if res
+                             (with-meta [[] env] {:path true})
+                             (with-meta [[] env] {:path false})))
+                [:ParenExp] (concrete (second exp) env)
+                [:Size] (let [arr (get env (read-string (second (second (second exp)))))
+                              size (loop [n 0]
+                                     (if (= nil (get env (str arr n)))
+                                       n
+                                       (recur (inc n))))]
+                          [size env])
+                [:Array] (let [uid (gensym)
+                               arraysize (read-string (second (second exp)))
+                               array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
+                           [uid (conj env (reduce (fn [acc e] (conj acc {e 0})) {} array))])
+                [:AssignExp] (if (not= (first (last exp)) :UserInput)
+                               (let [[varexp body] (rest exp)
+                                     varname (second (second varexp))
+                                     [body env'] (concrete body env)]
+                                 (if (= (first (second varexp)) :ArrayVar)
+                                   (let [l_value (second (last (second (second exp))))
+                                         idx (first (concrete l_value env))
+                                         uid (get env (read-string varname))]
+                                     [body (conj env env' {(str uid idx) body})])
+                                   [body (conj env env' {(read-string varname) body})]))
+                               (if (= (first (second (second exp))) :ArrayVar)
+                                 (let [l_value (second (last (second (second exp))))
+                                       idx (first (concrete l_value env))
+                                       varname (second (second (second exp)))
+                                       uid (get env (read-string varname))
+                                       value (get env (read-string (str varname idx)))]
+                                   [value (conj env {(str uid idx) value})])
+                                 [[] env]))
 
-                     [_] [[] env])]
+                [_] [[] env])]
       (if (nil? (:path (meta res)))
         (with-meta res {:path true})
         res))))
@@ -86,73 +96,80 @@
 (defn- symbolic
   [exp pc state path]
   (match [(first exp)]
-         [:INT] [(read-string (second exp)) pc state]
-         [:OPER] [(read-string (second exp)) pc state]
-         [:Error] [::Error pc state]
-         [:VarExp] (match [(first (second exp))]
-                          [:SimpleVar] (let [value (get state (read-string (second (second exp))))]
-                                         (if (= value nil)
-                                           [::Error pc state]
-                                           [value pc state]))
-                          [:ArrayVar] (let [arr (get state (read-string (second (second exp))))
-                                            array-index (read-string (second (second (last (second exp)))))
-                                            value (get state (str arr array-index))]
-                                        [value pc state]))
-         [:OpExp] (let [[_ exp1 oper exp2] exp
-                        e1 (first (symbolic exp1 pc state path))
-                        op (first (symbolic oper pc state path))
-                        e2 (first (symbolic exp2 pc state path))
-                        condition (z3/assert e1 op e2)]
-                    (if path
-                      [condition (conj pc condition) state]
-                      [condition (conj pc (z3/not condition)) state]))
-         [:Array] (let [uid (gensym)
-                        arraysize (read-string (second (second exp)))
-                        array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
-                    [uid pc (conj state (reduce (fn [acc e] (conj acc {e 0})) {} array))])
-         [:Size] (let [arr (get state (read-string (second (second (second exp)))))
-                       size (loop [n 0]
-                              (if (= nil (get state (str arr n)))
-                                n
-                                (recur (inc n))))]
-                    [size pc state])
-         [:add] (let [[_ exp1 exp2] exp]
-                  [(arithmetic + (first (symbolic exp1 pc state path))
-                               (first (symbolic exp2 pc state path)))
-                   pc state])
-         [:sub] (let [[_ exp1 exp2] exp]
-                  [(arithmetic - (first (symbolic exp1 pc state path))
-                               (first (symbolic exp2 pc state path)))
-                   pc state])
-         [:mul] (let [[_ exp1 exp2] exp]
-                  [(arithmetic * (first (symbolic exp1 pc state path))
-                               (first (symbolic exp2 pc state path)))
-                   pc state])
-         [:ParenExp] (symbolic (second exp) pc state path)
-         [:AssignExp] (let [[varexp bodyexp] (rest exp)
-                            varname (read-string (second (second varexp)))
-                            [body pc state] (symbolic bodyexp pc state path)
-                            uid (get state varname)]
-                        (if (not= (first (last exp)) :UserInput)
-                          (if (= (first (last varexp)) :ArrayVar)
-                            (let [l_value (second (last (second (second exp))))
-                                  idx (first (symbolic  l_value pc state path))]
-                              [body pc (conj state {(str uid idx) body})])
-                            [body pc (conj state {varname body})])
-                          (if (= (first (second (second exp))) :ArrayVar)
-                            (let [l_value (second (last (second (second exp))))
-                                  idx (first (symbolic  l_value pc state path))]
-                              [body pc (conj state {(str uid idx) (read-string (str varname idx))})])
-                            [[] pc state])))
-         [_] [[] pc state]))
+    [:INT] [(read-string (second exp)) pc state]
+    [:OPER] [(read-string (second exp)) pc state]
+    [:Error] [::Error pc state]
+    [:VarExp] (match [(first (second exp))]
+                [:SimpleVar] (let [value (get state (read-string (second (second exp))))]
+                               (if (nil? value)
+                                 [::Error pc state]
+                                 [value pc state]))
+                [:ArrayVar] (let [arr (get state (read-string (second (second exp))))
+                                  array-index (first (symbolic (second (last (second exp))) pc state path))
+                                  size (loop [n 0]
+                                         (if (nil? (get state (str arr n)))
+                                           n
+                                           (recur (inc n))))]
+                              ; FIXME: Loops forever on concrete values
+                              [[] (conj pc (z3/assert array-index (read-string "<") size)) state]))
+    [:OpExp] (let [[_ exp1 oper exp2] exp
+                   e1 (first (symbolic exp1 pc state path))
+                   op (first (symbolic oper pc state path))
+                   e2 (first (symbolic exp2 pc state path))
+                   condition (z3/assert e1 op e2)]
+               (if path
+                 [condition (conj pc condition) state]
+                 [condition (conj pc (z3/not condition)) state]))
+    [:Array] (let [uid (gensym)
+                   arraysize (read-string (second (second exp)))
+                   array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
+               [uid pc (conj state (reduce (fn [acc e] (conj acc {e 0})) {} array))])
+    [:Size] (let [arr (get state (read-string (second (second (second exp)))))
+                  size (loop [n 0]
+                         (if (= nil (get state (str arr n)))
+                           n
+                           (recur (inc n))))]
+              [size pc state])
+    [:add] (let [[_ exp1 exp2] exp]
+             [(arithmetic + (first (symbolic exp1 pc state path))
+                          (first (symbolic exp2 pc state path)))
+              pc state])
+    [:sub] (let [[_ exp1 exp2] exp]
+             [(arithmetic - (first (symbolic exp1 pc state path))
+                          (first (symbolic exp2 pc state path)))
+              pc state])
+    [:mul] (let [[_ exp1 exp2] exp]
+             [(arithmetic * (first (symbolic exp1 pc state path))
+                          (first (symbolic exp2 pc state path)))
+              pc state])
+    [:ParenExp] (symbolic (second exp) pc state path)
+    [:AssignExp] (let [[varexp bodyexp] (rest exp)
+                       varname (read-string (second (second varexp)))
+                       [body pc state] (symbolic bodyexp pc state path)
+                       uid (get state varname)]
+                   (if (not= (first (last exp)) :UserInput)
+                     (if (= (first (last varexp)) :ArrayVar)
+                       (let [l_value (second (last (second (second exp))))
+                             idx (first (symbolic  l_value pc state path))]
+                         [body pc (conj state {(str uid idx) body})])
+                       [body pc (conj state {varname body})])
+                     (if (= (first (second (second exp))) :ArrayVar)
+                       (let [l_value (second (last (second (second exp))))
+                             idx (first (symbolic  l_value pc state path))]
+                         [body pc (conj state {(str uid idx) (read-string (str varname idx))})])
+                       [[] pc state])))
+    [_] [[] pc state]))
 
 (defn- evaluate-node
   [exp pc env state]
-  (let [res (concrete exp env)
-        new-env (last res)
+  (let [[res new-env] (concrete exp env)
         path (-> res meta :path)
         s (symbolic exp pc state path)]
-    (with-meta (conj s new-env) {:path path})))
+    (if @reset
+      (do
+        (reset! reset false)
+        (with-meta (conj (conj [:reset] (vec (rest s))) new-env) {:path path}))
+      (with-meta (conj s new-env) {:path path}))))
 
 (defn- transition
   [node path]
@@ -168,24 +185,29 @@
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
           path (-> evaluated meta :path)]
       (cfg/mark-edge node path)
-      (when (isa? err ::Error)
-        (println "Reached error state on line: " (.start node)
-                 "," (.end node)
-                 " for expression: " exp
-                 " for: " @inputs))
-      (if (= (first exp) :OpExp)
-        (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
-                 (not (cfg/get-edge node (not path)))
-                 (not (.contains strategy (conj pc (z3/not (last new-pc))))))
-          (recur (transition node path)
-                 new-pc new-state new-env
-                 (conj strategy (conj pc (z3/not (last new-pc)))))
-          (recur (transition node path)
-                 new-pc new-state new-env
-                 strategy))
-        (recur (transition node path)
-               new-pc new-state new-env
-               strategy)))
+      (if (isa? :reset err)
+        (let [new-inputs (conj *root-env* (z3/solve new-pc))]
+          (println "new-inputs: " new-inputs)
+          (swap! inputs conj new-inputs)
+          (recur *root* *root-pc* *root-state* new-inputs strategy))
+        (do (when (isa? err ::Error)
+              (println "Reached error state on line: " (.start node)
+                       "," (.end node)
+                       " for expression: " exp
+                       " for: " @inputs))
+            (if (= (first exp) :OpExp)
+              (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
+                       (not (cfg/get-edge node (not path)))
+                       (not (.contains strategy (conj pc (z3/not (last new-pc))))))
+                (recur (transition node path)
+                       new-pc new-state new-env
+                       (conj strategy (conj pc (z3/not (last new-pc)))))
+                (recur (transition node path)
+                       new-pc new-state new-env
+                       strategy))
+              (recur (transition node path)
+                     new-pc new-state new-env
+                     strategy)))))
     (when-let [new-pc (peek strategy)]
       (let [new-inputs (conj *root-env* (z3/solve new-pc))]
         (println "new-inputs: " new-inputs)
@@ -211,6 +233,7 @@
     (println "it is a-okay, my dudes")))
 
 ;(execute (cfg/build "(a:=array(4); a[2]:=input())"))
+(execute (cfg/build "(a:= array(5); x := input(); a[x])"))
 ;(execute (cfg/build "(a:=3;b:=a)"))
 ;(execute (cfg/build "x := input(); x"))
 ;(execute (cfg/build "(x:=array(4); x[2]:=input())"))
