@@ -19,7 +19,7 @@
 
 (defn pretty [body]
   (match [(first body)]
-         [:VarExp] (second body)
+         [:VarExp] (pretty (second body))
          [:INT] (second body)
          [:OPER] (second body)
          [:add] (let [[_ exp1 exp2] body]
@@ -31,19 +31,23 @@
          [:OpExp] (let [[_ exp1 oper exp2] body]
                     (str (pretty exp1) (pretty oper) (pretty exp2)))
          [:ParenExp] (str "(" (pretty (second body)) ")")
+         [:SimpleVar] (second body)
+         [:ArrayVar] (str (second body) "[" (pretty (second (last body))) "]")
+         [:Array] (str "array(" (pretty (second body)) ")")
          [:UserInput] "input()"
-         [:Error] "Error"
+         [:Size] (str "size(" (pretty (second body)) ")")
+         [:Error] "error()"
          [_] body))
 
 (defn unfold [exp]
   (match [(first exp)]
     [:add] (let [[_ exp1 exp2] exp]
-              (str (unfold exp1) "+" (unfold exp2)))
+              (str (pretty (unfold exp1)) "+" (pretty (unfold exp2))))
     [:sub] (let [[_ exp1 exp2] exp]
-              (str (unfold exp1) "-" (unfold exp2)))
+              (str (pretty (unfold exp1)) "-" (pretty (unfold exp2))))
     [:mul] (let [[_ exp1 exp2] exp]
-              (str (unfold exp1) "*" (unfold exp2)))
-    :else (second exp)))
+              (str (pretty (unfold exp1)) "*" (pretty (unfold exp2))))
+    :else exp))
 
 (defn build-tree 
   ([node] (build-tree node 0 {}))
@@ -51,16 +55,15 @@
    (if (instance? secco.cfg.CFGNode node)
      (let [
            getsym (nth util/symbols counter)]
-
-       (match [(.nam node)]
-              ["root"] (let [ex (read-string (.nam node))
+       (match [(first (.exp node))]
+              [nil] (let [ex (read-string (.nam node))
                              tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
                          (swap! labels conj {getsym "s_0"})
                          (swap! graph conj {getsym [tnode]})
                          getsym)
-              ["oper"] (let [
+              [:OpExp] (let [
                              [_ exp1 oper exp2] (.exp node)
-                             ex (str (unfold exp1) (second oper) (unfold exp2))
+                             ex (str (pretty (unfold exp1)) " " (second oper) " " (pretty (unfold exp2)))
                              tnode (when (not (contains? mark node)) 
                                      (build-tree (cfg/get-t node) (+ counter 1) (conj mark {node getsym})))
                              fnode (if (not (contains? mark node)) 
@@ -73,38 +76,46 @@
                                   (swap! graph conj {getsym [tnode fnode]})
                                   getsym)
                                 (get mark node)))
-              ["arith"] (let [type (first (.exp node))]
-                            (let [
-                                  oper (str (match [type]
-                                              [:add] "+"
-                                              [:sub] "-"
-                                              [:mul] "*"))
-                                  [_ exp1 exp2] (.exp node)
-                                  ex (str (unfold exp1) oper (unfold exp2))
-                                  tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
-
-                             (swap! labels conj {getsym ex})
-                             (swap! graph conj {getsym [tnode]}))
-                            getsym)
-              ["int"]  (let [
+              [:add] (let [[_ exp1 exp2] (.exp node) 
+                           ex (str (pretty (unfold exp1)) "+" (pretty (unfold exp2)))
+                           tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
+                       (swap! labels conj {getsym ex})
+                       (swap! graph conj {getsym [tnode]})
+                       getsym)
+              [:sub] (let [[_ exp1 exp2] (.exp node) 
+                           ex (str (pretty (unfold exp1)) "-" (pretty (unfold exp2)))
+                           tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
+                       (swap! labels conj {getsym ex})
+                       (swap! graph conj {getsym [tnode]})
+                       getsym)
+              [:mul] (let [[_ exp1 exp2] (.exp node) 
+                           ex (str (pretty (unfold exp1)) "*" (pretty (unfold exp2)))
+                           tnode (build-tree (cfg/get-t node) (+ counter 1) mark)]
+                       (swap! labels conj {getsym ex})
+                       (swap! graph conj {getsym [tnode]})
+                       getsym)
+              [:INT]  (let [
                              ex (second (.exp node))]
 
                          (swap! labels conj {getsym ex})
                          (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]}) 
                          getsym)
-              ["error()"]  (let []
-
+              [:Error]  (let []
                          (swap! labels conj {getsym "error()"})
-                         (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]}) 
+                         (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
                          getsym)
-              ["varexp"] (let [
-                               ex (second (.exp node))]
+              [:Size]  (let [[_ arr] (.exp node)]
+                         (swap! labels conj {getsym (str "size(" (pretty arr) ")")})
+                         (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
+                         getsym)
+              [:VarExp] (let [
+                               ex (pretty (second (.exp node)))]
 
                            (swap! labels conj {getsym ex})
                            (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
                            getsym)
-              ["assignexp"] (let [[_ varexp body] (.exp node)
-                                  ex (str (second varexp) ":=" (pretty body))
+              [:AssignExp] (let [[_ varexp body] (.exp node)
+                                  ex (str (pretty varexp) ":=" (pretty body))
                                   og (.exp node)]
                               (swap! labels conj {getsym ex})
                               (swap! graph conj {getsym [(build-tree (cfg/get-t node) (+ counter 1) mark)]})
