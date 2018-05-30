@@ -104,26 +104,31 @@
                                (if (nil? value)
                                  (do (reset! reset :error) [::Error pc state])
                                  [value pc state]))
-                [:ArrayVar] (let [arr (get state (read-string (second (second exp))))
+                [:ArrayVar] (let [arr-name (read-string (second (second exp)))
+                                  uid (get state arr-name)
                                   array-index (first (symbolic (second (last (second exp))) pc state path))
                                   size (loop [n 0]
-                                         (if (nil? (get state (str arr n)))
+                                         (if (nil? (get state (str uid n)))
                                            n
-                                           (recur (inc n))))]
+                                           (recur (inc n))))
+                                  new-pc (z3/assert array-index (read-string "<") size)
+                                  var-name (read-string (str arr-name array-index))]
                               (if (and (number? array-index)
                                        (not (< array-index size)))
-                                (do (println "Out of bounds for array " arr)
+                                (do (println "Out of bounds for array " arr-name)
                                     (reset! reset :halt)
                                     [[] pc state])
-                                [[] (conj pc (z3/assert array-index (read-string "<") size)) state])))
+                                (if (.contains pc new-pc)
+                                  [var-name pc state]
+                                  [var-name (conj pc new-pc) state]))))
     [:OpExp] (let [[_ exp1 oper exp2] exp
-                   e1 (first (symbolic exp1 pc state path))
+                   [e1 pc1 _] (symbolic exp1 pc state path)
                    op (first (symbolic oper pc state path))
-                   e2 (first (symbolic exp2 pc state path))
+                   [e2 pc2 _] (symbolic exp2 pc1 state path)
                    condition (z3/assert e1 op e2)]
                (if path
-                 [condition (conj pc condition) state]
-                 [condition (conj pc (z3/not condition)) state]))
+                 [condition (conj pc2 condition) state]
+                 [condition (conj pc2 (z3/not condition)) state]))
     [:Array] (let [uid (gensym)
                    arraysize (read-string (second (second exp)))
                    array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
@@ -166,8 +171,8 @@
 
 (defn- evaluate-node
   [exp pc env state]
-  (let [[res new-env] (concrete exp env)
-        path (-> res meta :path)
+  (let [[res new-env :as xyz] (concrete exp env)
+        path (-> xyz meta :path)
         s (symbolic exp pc state path)]
       (with-meta (conj s new-env) {:path path})))
 
@@ -180,6 +185,8 @@
 (defn- traverse
   [node pc state env strategy]
   {:pre [(map? state) (map? env) (vector? pc)]}
+  ;(println "%%%" pc state strategy env)
+  ;(println "€€€" @reset)
   (if (cfg/node? node)
     (let [exp (.exp node)
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
@@ -194,26 +201,27 @@
         :halt (do 
                 (reset! reset :none)
                 (recur [] pc state env strategy))
-        :error (do 
-                 (reset! reset :none)
-                 (println "Reached error state on line: " (.start node)
-                          "," (.end node)
-                          " for expression: " exp
-                          " for: " @inputs) 
-                 (recur [] pc state env strategy))
-        :none  (if (= (first exp) :OpExp)
-                 (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
-                          (not (cfg/get-edge node (not path)))
-                          (not (.contains strategy (conj pc (z3/not (last new-pc))))))
-                   (recur (transition node path)
-                          new-pc new-state new-env
-                          (conj strategy (conj pc (z3/not (last new-pc)))))
-                   (recur (transition node path)
-                          new-pc new-state new-env
-                          strategy))
-                 (recur (transition node path)
-                        new-pc new-state new-env
-                        strategy))))
+        (do
+          (when (isa? @reset :error) 
+            (reset! reset :none)
+            (println "Reached error state on line: " (.start node)
+                     "," (.end node)
+                     " for expression: " exp
+                     " for: " @inputs) 
+            (traverse [] pc state env strategy))
+          (if (= (first exp) :OpExp)
+            (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
+                     (not (cfg/get-edge node (not path)))
+                     (not (.contains strategy (conj pc (z3/not (last new-pc))))))
+              (recur (transition node path)
+                     new-pc new-state new-env
+                     (conj strategy (conj pc (z3/not (last new-pc)))))
+              (recur (transition node path)
+                     new-pc new-state new-env
+                     strategy))
+            (recur (transition node path)
+                   new-pc new-state new-env
+                   strategy)))))
     (when-let [new-pc (peek strategy)]
       (let [new-inputs (conj *root-env* (z3/solve new-pc))]
         (println "new-inputs: " new-inputs)
@@ -246,7 +254,7 @@
 ;(execute (cfg/build "(x:=array(4); x[2]:=input())"))
 ;(execute (cfg/build "(b := array(4); b[2]:=3+4)"))
 ;(execute (cfg/build "(a:=input(); if a<10 then error() else 1)"))
-;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2]>70 then error() else 1)"))
+;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2]>7000 then error() else 1)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); a[3]:=2+3)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else 1)"))
 ;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 1 then error() else error())"))
