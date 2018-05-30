@@ -18,13 +18,6 @@
   (set-f [this node])
   (print-path [this node]))
 
-(defn next
-  [n node]
-  (loop [node node itr 0]
-    (if (= itr n)
-      node
-      (recur (get-t node) (inc itr)))))
-
 (deftype Node [nam exp ^:volatile-mutable t ^:volatile-mutable f start end
                ^:volatile-mutable flag-t ^:volatile-mutable flag-f]
   CFGNode
@@ -37,6 +30,13 @@
   (print-path [this node] (println node))
   (toString [_] (str "Node: <" nam ">, Exp: " exp)))
 
+(defn next-node
+  [n node]
+  (loop [node node itr 0]
+    (if (= itr n)
+      node
+      (recur (get-t node) (inc itr)))))
+
 (defn node? [maybe-node]
   (satisfies? CFGNode maybe-node))
 
@@ -47,11 +47,12 @@
     (swap! node-count inc)
     (->Node nam prog t_path f_path start end false false)))
 
-(defn findValue [exp]
+(defn find-value [exp]
   (match [(first exp)]
-    [:INT] (second exp)
-    [:SimpleVar] (second exp)
-    [:VarExp] (recur (second exp))))
+    [:INT] [:INT (second exp)]
+    [:SimpleVar] [:VarExp [:SimpleVar (second exp)]]
+    [:VarExp] (recur (second exp))
+    [:lvalue] (recur (second exp))))
 
 (defn parse-tree->cfg
   ([prog] (parse-tree->cfg prog []))
@@ -73,31 +74,8 @@
                      gnode)
        [:INT] (new-node "int" prog path path)
        [:Size] (new-node "size" prog path path)
-       [:VarExp] (match [(ffirst exps)]
-                   [:SimpleVar] (new-node "varexp" prog path path)
-                   [:ArrayVar] (let [index (findValue (second (last (first exps))))
-                                     name (second (first exps))
-                                     ast (grm (str "if " index " < size(" name ") then " name "[" index "] else error() "))]
-                                 (let [[guard tru fal] (rest (last ast))
-                                       gnode (parse-tree->cfg guard)
-                                       tnode (new-node "varexp" tru path path)
-                                       fnode (new-node "varexp" fal [] [])]
-                                   (set-t gnode tnode)
-                                   (set-f gnode fnode)
-                                   gnode)))
-       [:AssignExp] (match [(first (second (first exps)))]
-                      [:ArrayVar] (let [index (findValue (last (last (last (first exps)))))
-                                        name (second (second (first exps)))
-                                        ast (grm (str "if " index " < size(" name ") then " name "[" index "] else error() "))
-                                        [guard _ fal] (rest (last ast))
-                                        gnode (parse-tree->cfg guard)
-                                        tnode (new-node "assignexp" prog path path)
-                                        fnode (new-node "error()" fal path path)]
-                                    (set-t gnode tnode)
-                                    (set-f gnode fnode)
-                                    gnode)
-                      [:SimpleVar] (new-node "assignexp" prog path path))
-
+       [:VarExp] (new-node "varexp" prog path path)
+       [:AssignExp] (new-node "assignexp" prog path path)
        [:Array] (new-node "arrayexp" prog path path)
        [:IFEXP] (let [[guard tru fal] exps
                       gnode (parse-tree->cfg guard)
@@ -118,7 +96,8 @@
               (let [[t id lvalue :as exp] param]
                 (if (= t :ArrayVar)
                   [:IFEXP
-                   [:OpExp [:VarExp param]
+                   [:OpExp
+                    (find-value lvalue)
                     [:OPER "<"]
                     [:Size [:VarExp [:SimpleVar id]]]]
                    [:VarExp param]
@@ -127,18 +106,22 @@
    ast))
 
 (defn build [program]
-  (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))
-        ast (transform-ast ast)]
+  (let [ast (->> program
+                 grm
+                 (insta/add-line-and-column-info-to-metadata program)
+                 transform-ast)]
     (reset! node-count 0)
     (if (insta/failure? ast)
       (do (println ast)
           (throw (Exception. "error parsing input")))
       (parse-tree->cfg ast))))
 
-; (println (transform-ast (grm "a[x]")))
+; (next-node 2 (build "(a:=array(6); a[x]:=input())"))
 ; (println (grm "if a[x] < size(a) then a[x] else error()"))
 ;(println (grm "(x := 3; x := 2+x; x)"))
 ;(println (grm "(a:=array(4); x:=input(); a[2]:=x; if a[2] = 7 then error() else 1)"))
 ;(println (get-f (get-t (get-t (build "(a:=array(4); a[0])")))))
 ;(println (next 2 (build "(a:=array(4); a[0])")))
 ;(clojure.pprint/pprint (grm "(a:=array(5); a[3]:=7; x:=input(); if a[x] > 3 then error() else 0)"))
+
+; (clojure.pprint/pprint (transform-ast (grm "(a:=array(5); a[3]:=7; x:=input(); if a[x] > 3 then error() else 0)")))
