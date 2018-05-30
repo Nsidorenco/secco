@@ -9,7 +9,7 @@
 (def ^:dynamic *root-env* [])
 (def ^:dynamic *root-state* [])
 (def ^:dynamic *root-pc* [])
-(def reset (atom false))
+(def reset (atom :none))
 
 (defn- op-exp
   [exp1 oper exp2]
@@ -43,8 +43,8 @@
                                           (if (< array-index size)
                                             [value env]
                                             (do
-                                              (println "you fucked it up")
-                                              (reset! reset true)
+                                              (println "Symbolic out of bounds")
+                                              (reset! reset :reset)
                                               [0 env]))))
                 [:OpExp] (let [[exp1 oper exp2] (rest exp)
                                exp1 (first (concrete exp1 env))
@@ -98,11 +98,11 @@
   (match [(first exp)]
     [:INT] [(read-string (second exp)) pc state]
     [:OPER] [(read-string (second exp)) pc state]
-    [:Error] [::Error pc state]
+    [:Error] (do (reset! reset :error) [::Error pc state])
     [:VarExp] (match [(first (second exp))]
                 [:SimpleVar] (let [value (get state (read-string (second (second exp))))]
                                (if (nil? value)
-                                 [::Error pc state]
+                                 (do (reset! reset :error) [::Error pc state])
                                  [value pc state]))
                 [:ArrayVar] (let [arr (get state (read-string (second (second exp))))
                                   array-index (first (symbolic (second (last (second exp))) pc state path))
@@ -110,8 +110,12 @@
                                          (if (nil? (get state (str arr n)))
                                            n
                                            (recur (inc n))))]
-                              ; FIXME: Loops forever on concrete values
-                              [[] (conj pc (z3/assert array-index (read-string "<") size)) state]))
+                              (if (and (number? array-index)
+                                       (not (< array-index size)))
+                                (do (println "Out of bounds for array " arr)
+                                    (reset! reset :halt)
+                                    [[] pc state])
+                                [[] (conj pc (z3/assert array-index (read-string "<") size)) state])))
     [:OpExp] (let [[_ exp1 oper exp2] exp
                    e1 (first (symbolic exp1 pc state path))
                    op (first (symbolic oper pc state path))
@@ -165,11 +169,7 @@
   (let [[res new-env] (concrete exp env)
         path (-> res meta :path)
         s (symbolic exp pc state path)]
-    (if @reset
-      (do
-        (reset! reset false)
-        (with-meta (conj (conj [:reset] (vec (rest s))) new-env) {:path path}))
-      (with-meta (conj s new-env) {:path path}))))
+      (with-meta (conj s new-env) {:path path})))
 
 (defn- transition
   [node path]
@@ -185,29 +185,35 @@
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
           path (-> evaluated meta :path)]
       (cfg/mark-edge node path)
-      (if (isa? :reset err)
-        (let [new-inputs (conj *root-env* (z3/solve new-pc))]
-          (println "new-inputs: " new-inputs)
-          (swap! inputs conj new-inputs)
-          (recur *root* *root-pc* *root-state* new-inputs strategy))
-        (do (when (isa? err ::Error)
-              (println "Reached error state on line: " (.start node)
-                       "," (.end node)
-                       " for expression: " exp
-                       " for: " @inputs))
-            (if (= (first exp) :OpExp)
-              (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
-                       (not (cfg/get-edge node (not path)))
-                       (not (.contains strategy (conj pc (z3/not (last new-pc))))))
-                (recur (transition node path)
-                       new-pc new-state new-env
-                       (conj strategy (conj pc (z3/not (last new-pc)))))
-                (recur (transition node path)
-                       new-pc new-state new-env
-                       strategy))
-              (recur (transition node path)
-                     new-pc new-state new-env
-                     strategy)))))
+      (case @reset
+        :reset (let [new-inputs (conj *root-env* (z3/solve new-pc))]
+                 (reset! reset :none)
+                 (println "new-inputs: " new-inputs)
+                 (swap! inputs conj new-inputs)
+                 (recur *root* *root-pc* *root-state* new-inputs strategy))
+        :halt (do 
+                (reset! reset :none)
+                (recur [] pc state env strategy))
+        :error (do 
+                 (reset! reset :none)
+                 (println "Reached error state on line: " (.start node)
+                          "," (.end node)
+                          " for expression: " exp
+                          " for: " @inputs) 
+                 (recur [] pc state env strategy))
+        :none  (if (= (first exp) :OpExp)
+                 (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
+                          (not (cfg/get-edge node (not path)))
+                          (not (.contains strategy (conj pc (z3/not (last new-pc))))))
+                   (recur (transition node path)
+                          new-pc new-state new-env
+                          (conj strategy (conj pc (z3/not (last new-pc)))))
+                   (recur (transition node path)
+                          new-pc new-state new-env
+                          strategy))
+                 (recur (transition node path)
+                        new-pc new-state new-env
+                        strategy))))
     (when-let [new-pc (peek strategy)]
       (let [new-inputs (conj *root-env* (z3/solve new-pc))]
         (println "new-inputs: " new-inputs)
@@ -233,7 +239,8 @@
     (println "it is a-okay, my dudes")))
 
 ;(execute (cfg/build "(a:=array(4); a[2]:=input())"))
-(execute (cfg/build "(a:= array(5); x := input(); a[x])"))
+;(execute (cfg/build "(a:= array(5); x :=input(); a[x])"))
+;(execute (cfg/build "(a:= array(5); x :=5; a[x])"))
 ;(execute (cfg/build "(a:=3;b:=a)"))
 ;(execute (cfg/build "x := input(); x"))
 ;(execute (cfg/build "(x:=array(4); x[2]:=input())"))
