@@ -18,6 +18,13 @@
   (set-f [this node])
   (print-path [this node]))
 
+(defn next
+  [n node]
+  (loop [node node itr 0]
+    (if (= itr n)
+      node
+      (recur (get-t node) (inc itr)))))
+
 (deftype Node [nam exp ^:volatile-mutable t ^:volatile-mutable f start end
                ^:volatile-mutable flag-t ^:volatile-mutable flag-f]
   CFGNode
@@ -133,5 +140,5 @@
 ;(println (grm "(x := 3; x := 2+x; x)"))
 ;(println (grm "(a:=array(4); x:=input(); a[2]:=x; if a[2] = 7 then error() else 1)"))
 ;(println (get-f (get-t (get-t (build "(a:=array(4); a[0])")))))
-;(println (get-t (get-t (get-t(get-t  (build "(a:=array(4); a[0]:=2)"))))))
+;(println (next 2 (build "(a:=array(4); a[0])")))
 ;(clojure.pprint/pprint (grm "(a:=array(5); a[3]:=7; x:=input(); if a[x] > 3 then error() else 0)"))
