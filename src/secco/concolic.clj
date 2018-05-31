@@ -44,6 +44,7 @@
                                           (if (< array-index size)
                                             [value env]
                                             (do
+                                              (println array-index size)
                                               (println "Symbolic out of bounds")
                                               (reset! reset :reset)
                                               [0 env]))))
@@ -114,7 +115,7 @@
                                  [value pc state]))
                 [:ArrayVar] (let [arr-name (read-string (second (second exp)))
                                   uid (get state arr-name)
-                                  array-index (first (symbolic (second (last (second exp))) env pc state path))
+                                  array-index (evaluate-index (first (symbolic (second (last (second exp))) env pc state path)) state)
                                   size (loop [n 0]
                                          (if (nil? (get state (str uid n)))
                                            n
@@ -126,16 +127,15 @@
                                 (do (println "Out of bounds for array " arr-name)
                                     (reset! reset :halt)
                                     [[] pc state])
-                                (do 
+                                (do
                                   (doseq [i (range size)]
-                                    (let [
-                                          new-pc (conj pc (z3/assert array-index (read-string "=") i))]
+                                    (let [new-pc (conj pc (z3/assert array-index (read-string "=") i))]
                                       (when (and (z3/check-sat new-pc)
                                                  (not (.contains pc (last new-pc))))
                                         (swap! array-loop conj new-pc))))
-                                 (if (.contains pc new-pc)
-                                   [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index)))) pc state]
-                                   [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index)))) (conj pc new-pc) state])))))
+                                  (if (.contains pc new-pc)
+                                    [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index)))) pc state]
+                                    [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index)))) (conj pc new-pc) state])))))
     [:OpExp] (let [[_ exp1 oper exp2] exp
                    [e1 pc1 _] (symbolic exp1 env pc state path)
                    op (first (symbolic oper env pc state path))
@@ -175,8 +175,7 @@
                      (if (= (first (last varexp)) :ArrayVar)
                        (let [l_value (second (last (second (second exp))))
                              idx (first (symbolic  l_value env pc state path))
-                             idx2 (evaluate-index idx env)
-                             _ (println ":" idx idx2)]
+                             idx2 (evaluate-index idx env)]
                          [body pc (conj state {(str uid idx2) body})])
                        [body pc (conj state {varname body})])
                      (if (= (first (second (second exp))) :ArrayVar)
@@ -191,7 +190,7 @@
   (let [[res new-env :as xyz] (concrete exp env)
         path (-> xyz meta :path)
         s (symbolic exp env pc state path)]
-      (with-meta (conj s new-env) {:path path})))
+    (with-meta (conj s new-env) {:path path})))
 
 (defn- transition
   [node path]
@@ -203,15 +202,15 @@
   [node pc state env strategy]
   {:pre [(map? state) (map? env) (vector? pc)]}
   (reset! array-loop [])
-  (println "state" state "env " env)
+  ;(println "state" state "\n env " env)
   (if (cfg/node? node)
     (let [exp (.exp node)
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
           path (-> evaluated meta :path)
-          strategy (if-not (or (cfg/get-edge node path) 
+          strategy (if-not (or (cfg/get-edge node path)
                                (cfg/get-edge node (not path)))
-                    (reduce conj strategy @array-loop)
-                    strategy)]
+                     (reduce conj strategy @array-loop)
+                     strategy)]
       (cfg/mark-edge node path)
       (case @reset
         :reset (let [new-inputs (conj *root-env* (z3/solve new-pc))]
@@ -219,16 +218,16 @@
                  (println "new-inputs: " new-inputs)
                  (swap! inputs conj new-inputs)
                  (recur *root* *root-pc* *root-state* new-inputs strategy))
-        :halt (do 
+        :halt (do
                 (reset! reset :none)
                 (recur [] pc state env strategy))
         (do
-          (when (isa? @reset :error) 
+          (when (isa? @reset :error)
             (reset! reset :none)
             (println "Reached error state on line: " (.start node)
                      "," (.end node)
                      " for expression: " exp
-                     " for: " @inputs) 
+                     " for: " @inputs)
             (traverse [] pc state env strategy))
           (if (= (first exp) :OpExp)
             (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
@@ -245,7 +244,7 @@
                    strategy)))))
     (when-let [new-pc (peek strategy)]
       (let [new-inputs (conj *root-env* (z3/solve new-pc))]
-        (println "new-inputs: " new-inputs)
+        (println "new-inputs: " new-inputs  " -- old env: " env)
         (swap! inputs conj new-inputs)
         (recur *root* *root-pc* *root-state* new-inputs (pop strategy))))))
 
@@ -286,11 +285,11 @@
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
 ;(execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
-;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/sort.sec"))))
+(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/bubblesort.sec"))))
 ;(execute (cfg/build "(a:=array(10); x:=2; a[x+1+x]:=2)"))
 ;(execute (cfg/build "(a:=array(4); x:=input(); a[2])"))
 ;(execute (cfg/build "(a:=array(4); a[2])"))
-;(execute (cfg/build "(a:=array(4); x:=2; a[x]:=2)"))
+; (execute (cfg/build "(a:=array(4); x:=2; a[x+1]:=2)"))
 ;(execute (cfg/build "(x:=input(); a:=array(4); a[0]:=1; a[1]:=x; a[2]:=3)"))
 ;(execute (cfg/build "(a:=array(4); x:=3; a[2]:=1; a[x]:=5)"))
 ;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x)"))
