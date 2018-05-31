@@ -1,6 +1,6 @@
 (
-n := input();
-arr := array(n);
+n := 10;
+a := array(10);
 
 i := 0;
 while i < n do
@@ -25,5 +25,5 @@ while swapped > 0 do
   n := n - 1 
   ) 
 end;
-arr
+a
 )
