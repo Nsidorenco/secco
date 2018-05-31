@@ -1,21 +1,21 @@
 %insertion sort%
 (a:=array(10);
- a[0]:=4;
- a[1]:=2;
- a[2]:=5;
- a[3]:=8;
- a[4]:=9;
- a[5]:=0;
- a[6]:=1;
- a[7]:=3;
- a[8]:=6;
- a[9]:=7;
+ a[0]:=input();
+ a[1]:=input();
+ a[2]:=input();
+ a[3]:=input();
+ a[4]:=input();
+ a[5]:=input();
+ a[6]:=input();
+ a[7]:=input();
+ a[8]:=input();
+ a[9]:=input();
 
  i:=1; 
  while i<10 do
   if a[i-1]>a[i] then
    (j:=i;
-    while j>1 do
+    while j>0 do
       if a[j-1]>a[j] then
         (z:=a[j-1];
         a[j-1]:=a[j];
