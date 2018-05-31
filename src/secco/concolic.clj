@@ -131,7 +131,8 @@
                                   (doseq [i (range size)]
                                     (let [new-pc (conj pc (z3/assert array-index (read-string "=") i))]
                                       (when (and (z3/check-sat new-pc)
-                                                 (not (.contains pc (last new-pc))))
+                                                 (not (.contains pc (last new-pc)))
+                                                 (not (number? array-index)))
                                         (swap! array-loop conj new-pc))))
                                   (if (.contains pc new-pc)
                                     [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index)))) pc state]
@@ -285,7 +286,7 @@
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
 ;(execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
-(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/bubblesort.sec"))))
+; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/bubblesort.sec"))))
 ;(execute (cfg/build "(a:=array(10); x:=2; a[x+1+x]:=2)"))
 ;(execute (cfg/build "(a:=array(4); x:=input(); a[2])"))
 ;(execute (cfg/build "(a:=array(4); a[2])"))
