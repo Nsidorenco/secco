@@ -176,8 +176,11 @@
                      (if (= (first (last varexp)) :ArrayVar)
                        (let [l_value (second (last (second (second exp))))
                              idx (first (symbolic  l_value env pc state path))
-                             idx2 (evaluate-index idx env)]
-                         [body pc (conj state {(str uid idx2) body})])
+                             idx2 (evaluate-index idx env)
+                             evaluate_array (symbolic (second exp) env pc state path)]
+                         (if (nil? (first evaluate_array))
+                             (do (reset! reset :error) [::Error pc state])
+                             [body pc (conj state {(str uid idx2) body})]))
                        [body pc (conj state {varname body})])
                      (if (= (first (second (second exp))) :ArrayVar)
                        (let [l_value (second (last (second (second exp))))
@@ -207,6 +210,7 @@
   (if (cfg/node? node)
     (let [exp (.exp node)
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
+          ;_ (println "env" new-env)
           path (-> evaluated meta :path)
           strategy (if-not (or (cfg/get-edge node path)
                                (cfg/get-edge node (not path)))
@@ -264,7 +268,7 @@
               *root-pc* pc
               *root-state* state
               *root-env* env]
-      (traverse node pc state env (clojure.lang.PersistentQueue/EMPTY)))
+      (traverse node pc state env '()))
     (println "it is a-okay, my dudes")))
 
 ;(execute (cfg/build "(a:=array(4); a[2]:=input())"))
@@ -286,7 +290,7 @@
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
 ;(execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
-; (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/bubblesort.sec"))))
+;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/insertionsort.sec"))))
 ;(execute (cfg/build "(a:=array(10); x:=2; a[x+1+x]:=2)"))
 ;(execute (cfg/build "(a:=array(4); x:=input(); a[2])"))
 ;(execute (cfg/build "(a:=array(4); a[2])"))
@@ -295,4 +299,6 @@
 ;(execute (cfg/build "(a:=array(4); x:=3; a[2]:=1; a[x]:=5)"))
 ;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x)"))
 ;(execute (cfg/build "(a:=array(5); a[3]:=7; x:=input(); if a[x] > 3 then error() else 0)"))
-;(execute (cfg/build "(a:=array(24); size(a))"))
+
+;(execute (cfg/build "(x:=input(); a:=array(10); a[x]:=5)"))
+;(execute (cfg/build "(x:=input(); a:=array(10); a[x]:=2; if a[2]=2 then error() else 1)"))
