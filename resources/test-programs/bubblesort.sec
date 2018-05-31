@@ -1,0 +1,29 @@
+(
+n := input();
+arr := array(n);
+
+i := 0;
+while i < n do
+  (
+  a[i] := input();
+  i := i+1
+  )
+end;
+
+swapped := 1;
+
+while swapped > 0 do
+  (
+  swapped := 0;
+  i := 1;
+  while i < n do
+    if a[i-1] > a[i] then
+      (tmp := a[i-1]; a[i-1] := a[i]; a[i] := tmp; swapped := 1)
+    else
+      0
+  end;
+  n := n - 1 
+  ) 
+end;
+arr
+)
