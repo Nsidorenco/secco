@@ -1,7 +1,17 @@
 (
-n := 10;
-a := array(10);
+n := 8;
+a := array(8);
 
+a[0] := input();
+a[1] := input();
+a[2] := input();
+a[3] := input();
+a[4] := input();
+a[5] := input();
+a[6] := input();
+a[7] := input();
+
+%
 i := 0;
 while i < n do
   (
@@ -9,6 +19,7 @@ while i < n do
   i := i+1
   )
 end;
+%
 
 swapped := 1;
 
@@ -18,9 +29,9 @@ while swapped > 0 do
   i := 1;
   while i < n do
     if a[i-1] > a[i] then
-      (tmp := a[i-1]; a[i-1] := a[i]; a[i] := tmp; swapped := 1)
+      (tmp := a[i-1]; a[i-1] := a[i]; a[i] := tmp; swapped := 1; i := i + 1)
     else
-      0
+      i := i + 1
   end;
   n := n - 1 
   ) 
