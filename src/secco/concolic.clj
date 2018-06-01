@@ -128,12 +128,13 @@
                                     (reset! reset :halt)
                                     [[] pc state])
                                 (do
-                                  (doseq [i (range size)]
-                                    (let [new-pc (conj pc (z3/assert array-index (read-string "=") i))]
-                                      (when (and (not (.contains pc (last new-pc)))
-                                                 (not (number? array-index))
-                                                 (z3/check-sat new-pc))
-                                        (swap! array-loop conj new-pc))))
+                                  (when-not (number? array-index)
+                                    (doseq [i (range size)]
+                                      (let [new-pc (conj pc (z3/assert array-index (read-string "=") i))]
+                                        (when (and (not (.contains pc (last new-pc)))
+                                                   (not (number? array-index))
+                                                   (z3/check-sat new-pc))
+                                          (swap! array-loop conj new-pc)))))
                                   (if (.contains pc new-pc)
                                     [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index))))
                                      pc state]
