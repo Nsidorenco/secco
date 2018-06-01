@@ -11,16 +11,6 @@ a[5] := input();
 a[6] := input();
 a[7] := input();
 
-%
-i := 0;
-while i < n do
-  (
-  a[i] := input();
-  i := i+1
-  )
-end;
-%
-
 swapped := 1;
 
 while swapped > 0 do
@@ -37,9 +27,11 @@ while swapped > 0 do
   ) 
 end;
 
+if a[4] = 350 then a[2] := a[4] else 0;
+
 i := 1;
 while i < size(a) do
-  if a[i-1] > a[i] then error() else i := i + 1
+  (if a[i-1] > a[i] then error() else 0; i := i + 1)
 end;
 a
 )
