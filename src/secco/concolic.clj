@@ -59,7 +59,7 @@
                 [:ParenExp] (concrete (second exp) env)
                 [:Size] (let [arr (get env (read-string (second (second (second exp)))))
                               size (loop [n 0]
-                                     (if (= nil (get env (str arr n)))
+                                     (if (nil? (get env (str arr n)))
                                        n
                                        (recur (inc n))))]
                           [size env])
@@ -130,13 +130,15 @@
                                 (do
                                   (doseq [i (range size)]
                                     (let [new-pc (conj pc (z3/assert array-index (read-string "=") i))]
-                                      (when (and (z3/check-sat new-pc)
-                                                 (not (.contains pc (last new-pc)))
-                                                 (not (number? array-index)))
+                                      (when (and (not (.contains pc (last new-pc)))
+                                                 (not (number? array-index))
+                                                 (z3/check-sat new-pc))
                                         (swap! array-loop conj new-pc))))
                                   (if (.contains pc new-pc)
-                                    [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index)))) pc state]
-                                    [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index)))) (conj pc new-pc) state])))))
+                                    [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index))))
+                                     pc state]
+                                    [(if (number? array-index) (get state (str uid array-index)) (get state (str uid (get env array-index))))
+                                     (conj pc new-pc) state])))))
     [:OpExp] (let [[_ exp1 oper exp2] exp
                    [e1 pc1 _] (symbolic exp1 env pc state path)
                    op (first (symbolic oper env pc state path))
@@ -151,7 +153,7 @@
                [uid pc (conj state (reduce (fn [acc e] (conj acc {e 0})) {} array))])
     [:Size] (let [arr (get state (read-string (second (second (second exp)))))
                   size (loop [n 0]
-                         (if (= nil (get state (str arr n)))
+                         (if (nil? (get state (str arr n)))
                            n
                            (recur (inc n))))]
               [size pc state])
@@ -179,8 +181,8 @@
                              idx2 (evaluate-index idx env)
                              evaluate_array (symbolic (second exp) env pc state path)]
                          (if (nil? (first evaluate_array))
-                             (do (reset! reset :error) [::Error pc state])
-                             [body pc (conj state {(str uid idx2) body})]))
+                           (do (reset! reset :error) [::Error pc state])
+                           [body pc (conj state {(str uid idx2) body})]))
                        [body pc (conj state {varname body})])
                      (if (= (first (second (second exp))) :ArrayVar)
                        (let [l_value (second (last (second (second exp))))
@@ -235,9 +237,9 @@
                      " for: " @inputs)
             (traverse [] pc state env strategy))
           (if (= (first exp) :OpExp)
-            (if (and (z3/check-sat (conj pc (z3/not (last new-pc))))
-                     (not (cfg/get-edge node (not path)))
-                     (not (.contains strategy (conj pc (z3/not (last new-pc))))))
+            (if (and (not (cfg/get-edge node (not path)))
+                     (not (.contains strategy (conj pc (z3/not (last new-pc)))))
+                     (z3/check-sat (conj pc (z3/not (last new-pc)))))
               (recur (transition node path)
                      new-pc new-state new-env
                      (conj strategy (conj pc (z3/not (last new-pc)))))
@@ -249,7 +251,7 @@
                    strategy)))))
     (when-let [new-pc (peek strategy)]
       (let [new-inputs (conj *root-env* (z3/solve new-pc))]
-        (println "new-inputs: " new-inputs  " -- old env: " env)
+        (println "new-inputs: " new-inputs)
         (swap! inputs conj new-inputs)
         (recur *root* *root-pc* *root-state* new-inputs (pop strategy))))))
 
