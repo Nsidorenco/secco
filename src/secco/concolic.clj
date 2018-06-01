@@ -64,7 +64,7 @@
                                        (recur (inc n))))]
                           [size env])
                 [:Array] (let [uid (gensym)
-                               arraysize (read-string (second (second exp)))
+                               arraysize (first (concrete (second (second exp)) env))
                                array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
                            [uid (conj env (reduce (fn [acc e] (conj acc {e 0})) {} array))])
                 [:AssignExp] (if (not= (first (last exp)) :UserInput)
@@ -149,7 +149,9 @@
                  [condition (conj pc2 condition) state]
                  [condition (conj pc2 (z3/not condition)) state]))
     [:Array] (let [uid (gensym)
-                   arraysize (read-string (second (second exp)))
+                   arraysize (first (symbolic (second (second exp)) env pc state path))
+                   arraysize (evaluate-index arraysize env)
+                   ;arraysize (if (number? arraysize) arraysize (get env arraysize))
                    array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
                [uid pc (conj state (reduce (fn [acc e] (conj acc {e 0})) {} array))])
     [:Size] (let [arr (get state (read-string (second (second (second exp)))))
@@ -265,7 +267,7 @@
   (let [sym-vars (util/findSym node)
         pc (vec (map #(z3/const % Int) sym-vars))
         state (reduce conj {} (map #(vector % %) sym-vars))
-        env (reduce conj {} (map #(vector % (rand-int 1000)) sym-vars))]
+        env (reduce conj {} (map #(vector % (rand-int 20)) sym-vars))]
     (reset! inputs env)
     (binding [*root* node
               *root-pc* pc
@@ -293,7 +295,7 @@
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
 ;(execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
-;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/insertionsort.sec"))))
+;(time (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/mergesort.sec")))))
 ;(execute (cfg/build "(a:=array(10); x:=2; a[x+1+x]:=2)"))
 ;(execute (cfg/build "(a:=array(4); x:=input(); a[2])"))
 ;(execute (cfg/build "(a:=array(4); a[2])"))
@@ -304,4 +306,6 @@
 ;(execute (cfg/build "(a:=array(5); a[3]:=7; x:=input(); if a[x] > 3 then error() else 0)"))
 
 ;(execute (cfg/build "(x:=input(); a:=array(10); a[x]:=5)"))
+;(execute (cfg/build "(x:=10; a:=array(x); a[x-1]:=5)"))
+;(execute (cfg/build "(i:=0; while i<5 do (a:=array(i); i:=i+1) end)"))
 ;(execute (cfg/build "(x:=input(); a:=array(10); a[x]:=2; if a[2]=2 then error() else 1)"))

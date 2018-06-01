@@ -42,7 +42,7 @@ IFEXP = <'if'> exp <'then'> exp <'else'> exp
 
 AssignExp = VarExp <':='> exp
 
-Array = <'array('> INT <')'>
+Array = <'array('> lvalue <')'>
 
 ParenExp = <'('> OptParenExp <')'>
 <OptParenExp> = exp | eps
