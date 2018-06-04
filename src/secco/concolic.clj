@@ -96,8 +96,7 @@
 
 (defn evaluate-index [exp env]
   (if (list? exp)
-    (do
-      (apply (resolve (first exp)) (map #(evaluate-index % env) (rest exp))))
+    (apply (resolve (first exp)) (map #(evaluate-index % env) (rest exp)))
     (if (number? exp)
       exp
       (get env exp))))
@@ -237,7 +236,8 @@
             (reset! reset :none)
             (println "Reached error state on line: " (.start node)
                      "," (.end node)
-                     " for expression: " exp
+                     " for ex
+                     pression: " exp
                      " for: " @inputs)
             (traverse [] pc state env strategy))
           (if (= (first exp) :OpExp)
