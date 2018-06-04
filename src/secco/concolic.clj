@@ -44,7 +44,6 @@
                                           (if (< array-index size)
                                             [value env]
                                             (do
-                                              (println array-index size)
                                               (println "Symbolic out of bounds")
                                               (reset! reset :reset)
                                               [0 env]))))
@@ -129,7 +128,7 @@
                                     [[] pc state])
                                 (do
                                   (when-not (number? array-index)
-                                    (doseq [i (range size)]
+                                    (doseq [i (range (+ 1 size))]
                                       (let [new-pc (conj pc (z3/assert array-index (read-string "=") i))]
                                         (when (and (not (.contains pc (last new-pc)))
                                                    (not (number? array-index))
@@ -295,7 +294,7 @@
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
 ;(execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
-;(time (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/mergesort.sec")))))
+;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/arraycopy.sec"))))
 ;(execute (cfg/build "(a:=array(10); x:=2; a[x+1+x]:=2)"))
 ;(execute (cfg/build "(a:=array(4); x:=input(); a[2])"))
 ;(execute (cfg/build "(a:=array(4); a[2])"))
@@ -305,6 +304,7 @@
 ;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x)"))
 ;(execute (cfg/build "(a:=array(5); a[3]:=7; x:=input(); if a[x] > 3 then error() else 0)"))
 
+;(execute (cfg/build "(x:=input(); a:=array(4); a[x])"))
 ;(execute (cfg/build "(x:=input(); a:=array(10); a[x]:=5)"))
 ;(execute (cfg/build "(x:=10; a:=array(x); a[x-1]:=5)"))
 ;(execute (cfg/build "(i:=0; while i<5 do (a:=array(i); i:=i+1) end)"))
