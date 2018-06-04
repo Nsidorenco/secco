@@ -96,7 +96,8 @@
 
 (defn evaluate-index [exp env]
   (if (list? exp)
-    (apply (resolve (first exp)) (map #(evaluate-index % env) (rest exp)))
+    (do
+      (apply (resolve (first exp)) (map #(evaluate-index % env) (rest exp))))
     (if (number? exp)
       exp
       (get env exp))))
@@ -114,7 +115,7 @@
                                  [value pc state]))
                 [:ArrayVar] (let [arr-name (read-string (second (second exp)))
                                   uid (get state arr-name)
-                                  array-index (evaluate-index (first (symbolic (second (last (second exp))) env pc state path)) state)
+                                  array-index (evaluate-index (first (symbolic (second (last (second exp))) env pc state path)) env)
                                   size (loop [n 0]
                                          (if (nil? (get state (str uid n)))
                                            n
@@ -215,6 +216,7 @@
     (let [exp (.exp node)
           [err new-pc new-state new-env :as evaluated] (evaluate-node exp pc env state)
           ;_ (println "env" new-env)
+          ;_ (println "state" new-state)
           path (-> evaluated meta :path)
           strategy (if-not (or (cfg/get-edge node path)
                                (cfg/get-edge node (not path)))
@@ -309,3 +311,5 @@
 ;(execute (cfg/build "(x:=10; a:=array(x); a[x-1]:=5)"))
 ;(execute (cfg/build "(i:=0; while i<5 do (a:=array(i); i:=i+1) end)"))
 ;(execute (cfg/build "(x:=input(); a:=array(10); a[x]:=2; if a[2]=2 then error() else 1)"))
+;(execute (cfg/build "(x:=input(); y:=input(); a:=array(x); a[y]:=x)"))
+;(execute (cfg/build "(x:=input(); a:=array(x); a[x-1]:=x)"))
