@@ -140,8 +140,8 @@
                                         (reset! reset :halt)
                                         [[] pc state])
                                     (if (.contains pc new-pc)
-                                      [(str uid index-eval) pc state]
-                                      [(str uid index-eval) (conj pc new-pc) state])))))
+                                      [(get state(str uid index-eval)) pc state]
+                                      [(get state(str uid index-eval)) (conj pc new-pc) state])))))
     [:OpExp] (let [[_ exp1 oper exp2] exp
                    [e1 pc1 _] (symbolic exp1 env pc state path)
                    op (first (symbolic oper env pc state path))
