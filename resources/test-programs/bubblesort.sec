@@ -1,6 +1,6 @@
 (
 n := 8;
-a := array(8);
+a := array(n);
 
 a[0] := input();
 a[1] := input();

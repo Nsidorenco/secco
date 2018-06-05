@@ -1,7 +1,7 @@
 % For personal use only! No responsibility given for blowing up your computer %
 (
 n := 8;
-a := array(8);
+a := array(n);
 
 a[0] := input();
 a[1] := input();
@@ -20,7 +20,7 @@ while currsize <= n-1 do
     while leftstart <= n-1 do
        (mid := leftstart + currsize - 1;
         min := leftstart + 2 * currsize - 1;
-        if min < n-1 then rightend := n-1 else rightend := min; 
+        if min < n-1 then rightend := min else rightend := n-1; 
 
         % merge function %
         nl := mid - leftstart + 1;
@@ -75,9 +75,19 @@ while currsize <= n-1 do
             k := k + 1)
         end;
 
-        leftstart = leftstart + 2 * currsize)
+        leftstart := leftstart + 2 * currsize)
     end;
 
     currsize := currsize * 2)
-end
+end;
+
+% create error to force permutation to 350 %
+if a[4] = 350 then a[2] := a[4] else 0;
+
+% check if array is sorted %
+i := 1;
+while i < size(a) do
+  (if a[i-1] > a[i] then error() else 0; i := i + 1)
+end;
+a
 )

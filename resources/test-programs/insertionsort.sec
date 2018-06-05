@@ -1,5 +1,6 @@
 %insertion sort%
-(a:=array(10);
+(n:=8;
+ a:=array(n);
  a[0]:=input();
  a[1]:=input();
  a[2]:=input();
@@ -8,11 +9,9 @@
  a[5]:=input();
  a[6]:=input();
  a[7]:=input();
- a[8]:=input();
- a[9]:=input();
 
  i:=1; 
- while i<10 do
+ while i<n do
   if a[i-1]>a[i] then
    (j:=i;
     while j>0 do
@@ -28,4 +27,13 @@
   else
    i:=i+1
  end;
- a)
+ a;
+
+if a[4] = 350 then a[2] := a[4] else 0;
+
+i := 1;
+while i < size(a) do
+  (if a[i-1] > a[i] then error() else 0; i := i + 1)
+end;
+a
+)

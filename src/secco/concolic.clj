@@ -2,7 +2,9 @@
   (:require [z3.solver :as z3]
             [secco.cfg :as cfg]
             [secco.util :as util]
-            [clojure.core.match :refer [match]]))
+            [clojure.pprint]
+            [clojure.core.match :refer [match]]
+            ))
 
 (def inputs (atom {}))
 (def ^:dynamic *root* [])
@@ -212,6 +214,7 @@
 (defn- traverse
   [node pc state env strategy]
   {:pre [(map? state) (map? env) (vector? pc)]}
+  ;(clojure.pprint/pprint state)
   (reset! array-loop [])
   (if (cfg/node? node)
     (let [exp (.exp node)
@@ -296,7 +299,11 @@
 ; (execute (cfg/build "(x := input(); while x<10 do x := x + 1)"))
 ; (execute (cfg/build "x := 5"))
 ;(execute (cfg/build "(x:=input(); if x>20 then if x<50 then error() else error() else error())"))
-;(execute (cfg/build (slurp (clojure.java.io/resource "test-programs/bubblesort.sec"))))
+
+;(time (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/bubblesort.sec")))))
+;(time (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/insertionsort.sec")))))
+;(time (execute (cfg/build (slurp (clojure.java.io/resource "test-programs/mergesort.sec")))))
+
 ;(execute (cfg/build "(a:=array(10); x:=2; a[x+1+x]:=2)"))
 ;(execute (cfg/build "(a:=array(4); x:=input(); a[2])"))
 ;(execute (cfg/build "(a:=array(4); a[2])"))
