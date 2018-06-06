@@ -3,8 +3,7 @@
             [secco.cfg :as cfg]
             [secco.util :as util]
             [clojure.pprint]
-            [clojure.core.match :refer [match]]
-            ))
+            [clojure.core.match :refer [match]]))
 
 (def inputs (atom {}))
 (def ^:dynamic *root* [])
@@ -129,21 +128,21 @@
                                            n
                                            (recur (inc n))))
                                   new-pc (z3/assert index-sym (read-string "<") size)]
-                                (do
-                                  (when-not (number? index-sym)
-                                    (doseq [i (range (+ 1 size))]
-                                      (let [new-pc (conj pc (z3/assert index-sym (read-string "=") i))]
-                                        (when (and (not (.contains pc (last new-pc)))
-                                                   (not (number? index-sym))
-                                                   (z3/check-sat new-pc))
-                                          (swap! array-loop conj new-pc)))))
-                                  (if (not (< index-eval size))
-                                    (do (println "Out of bounds for array" arr-name ", index: " index-eval ", size: " size)
-                                        (reset! reset :halt)
-                                        [[] pc state])
-                                    (if (.contains pc new-pc)
-                                      [(get state(str uid index-eval)) pc state]
-                                      [(get state(str uid index-eval)) (conj pc new-pc) state])))))
+                              (do
+                                (when-not (number? index-sym)
+                                  (doseq [i (range (inc size))]
+                                    (let [new-pc (conj pc (z3/assert index-sym (read-string "=") i))]
+                                      (when (and (not (.contains pc (last new-pc)))
+                                                 (not (number? index-sym))
+                                                 (z3/check-sat new-pc))
+                                        (swap! array-loop conj new-pc)))))
+                                (if (not (< index-eval size))
+                                  (do (println "Out of bounds for array" arr-name ", index: " index-eval ", size: " size)
+                                      (reset! reset :halt)
+                                      [[] pc state])
+                                  (if (.contains pc new-pc)
+                                    [(get state (str uid index-eval)) pc state]
+                                    [(get state (str uid index-eval)) (conj pc new-pc) state])))))
     [:OpExp] (let [[_ exp1 oper exp2] exp
                    [e1 pc1 _] (symbolic exp1 env pc state path)
                    op (first (symbolic oper env pc state path))
@@ -278,6 +277,7 @@
               *root-state* state
               *root-env* env]
       (traverse node pc state env '()))
+    (println "z3-time: " @z3/z3-time)
     (println "it is a-okay, my dudes")))
 
 ;(execute (cfg/build "(a:=array(4); a[2]:=input())"))

@@ -38,3 +38,9 @@
            (findSym (cfg/get-t node) (conj visited node) acc)
            (recur (cfg/get-f node) (conj visited node) acc))))
      acc)))
+
+(defmacro time-with-return
+  [exp]
+  `(let [start# (. System (nanoTime))
+         ret# ~exp]
+     [ret# (/ (double (- (. System (nanoTime)) start#)) 1000000.0)]))
