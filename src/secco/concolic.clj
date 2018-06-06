@@ -272,12 +272,14 @@
         state (reduce conj {} (map #(vector % %) sym-vars))
         env (reduce conj {} (map #(vector % (rand-int 20)) sym-vars))]
     (reset! inputs env)
+    (reset! array-loop [])
+    (reset! reset :none)
     (binding [*root* node
               *root-pc* pc
               *root-state* state
               *root-env* env]
       (traverse node pc state env '()))
-    (println "z3-time: " @z3/z3-time)
+    ; (println "z3-time: " @z3/z3-time)
     (println "it is a-okay, my dudes")))
 
 ;(execute (cfg/build "(a:=array(4); a[2]:=input())"))
