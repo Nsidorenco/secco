@@ -1,0 +1,16 @@
+(x := input();
+ if x=20 then
+  error()
+ else 
+  (a := array(x); 
+ 
+ if x>0 then
+  a[x-1]:=x*2
+ else
+  a:=array(5);
+  
+ i:=0;
+ while i<x do
+  (if a[i]<0 then error() else 0;
+   i:=i+1)
+ end))
