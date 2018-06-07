@@ -34,5 +34,12 @@
                                                   #(last (time-with-return (conc/execute (cfg/build file))))))]
              (println "Total time: " (/ total-time n))
              (println "z3-time: " (/ @z3/z3-time n)))
+           (clojure.string/includes? opt "-heur")
+           (let [n 100 
+                 dfs (reduce + (repeatedly n #(last (time-with-return (conc/execute (cfg/build file) '() )))))
+                 bfs (reduce + (repeatedly n #(last (time-with-return (conc/execute (cfg/build file) '[] )))))
+                 ]
+             (println "Total time (DFS): " (/ dfs n))
+             (println "Total time (BFS): " (/ bfs n)))
            (clojure.string/includes? opt "-conc")
            (conc/execute (cfg/build file))))))

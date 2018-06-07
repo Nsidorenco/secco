@@ -262,7 +262,8 @@
         (recur *root* *root-pc* *root-state* new-inputs (pop strategy))))))
 
 (defn execute
-  [node]
+  ([node] (execute node '()))
+  ([node strategy]
   ; Find all symbolic values
   ; Add them z3
   ; solve z3 to get initial values
@@ -278,9 +279,9 @@
               *root-pc* pc
               *root-state* state
               *root-env* env]
-      (traverse node pc state env '()))
+      (traverse node pc state env strategy))
     ; (println "z3-time: " @z3/z3-time)
-    (println "it is a-okay, my dudes")))
+    (println "it is a-okay, my dudes"))))
 
 ;(execute (cfg/build "(a:=array(4); a[2]:=input())"))
 ;(execute (cfg/build "(a:= array(5); x :=input(); a[x])"))
