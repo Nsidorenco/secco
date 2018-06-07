@@ -27,12 +27,14 @@
                        [(read-string (read-line)) env])
       [:Error] (throw (Exception. "Error state reached"))
       [:VarExp] (match [(first (second exp))]
-                       [:SimpleVar] (let [value (get env (second (second exp)))]
+                       [:SimpleVar] (let [value (get env (read-string (second (second exp))))]
                                       (assert (not= value nil) "Variable not declared")
                                       [value env])
-                       [:ArrayVar] (let [arr (get env (second (second exp)))
-                                         array-index (read-string (second (last (second exp))))]
-                                     [(nth arr array-index) env]))
+                       [:ArrayVar] (let [arr (get env (read-string (second (second exp))))
+                                         array-index (read-string (second (last (second exp))))
+                                         val (get env (str arr array-index))]
+                                     (assert (not= val nil) "Variable not declared")
+                                     [val env]))
       [:OpExp] (let [[exp1 oper exp2] (rest exp)
                      exp1 (first (expression exp1 env))
                      exp2 (first (expression exp2 env))
@@ -40,21 +42,26 @@
                      res (op-exp exp1 oper exp2)]
                  [res env])
       [:ParenExp] (recur (second exp) env)
-      [:Array] (let [arraysize (read-string (second (second exp)))]
-                 [(vec (repeat arraysize nil)) (vec (repeat arraysize nil))])
+      [:Array] (let [uid (gensym)
+                     arraysize (read-string (second (second exp)))
+                     array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
+                  [uid (conj env (reduce (fn [acc e] (conj acc {e 0})) {} array))])
       [:AssignExp] (let [[varexp body] (rest exp)
                          varname (second (second varexp))
-                         body (first (expression body env))]
-                     (if (= (first (second varexp)) :ArrayVar)
-                       (let [arr (get env varname)
-                             array-index (read-string (second (last (second varexp))))]
-                         [body (conj env {varname (assoc arr array-index body)})])
-                       [body (conj env {varname body})]))
+                         [body env'] (expression body env)]
+                        (if (= :ArrayVar (first (second (second exp))))
+                          (let [l_value (second (last (second (second exp))))
+                                idx (first (expression l_value env))
+                                uid (get env (read-string varname))]
+                            [body (conj env env' {(str uid idx) body})])
+                          [body (conj env env' {(read-string varname) body})]))
+
       [_] [0 env])))
 
 (defn interpret
   ([node] (interpret node {}))
   ([node env]
+   (println env)
    (if (cfg/node? node)
      (let [[res env] (expression (.exp node) env)
            env (with-meta env {:res res})]
@@ -63,8 +70,12 @@
          (recur (cfg/get-t node) env)))
      (-> env meta :res))))
 
-;(println (interpret (cfg/build "x := array(4); x[1] := 2; if x[1] = 2 then error() else 2")))
-;(println (interpret (cfg/build "x := 3; x")))
-; (interpret (cfg/build "(x := input(); if x > 2 then 2 else 4)"))
-; (interpret (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
-;(interpret (cfg/build "x := input(); while x < 10 do x := x+1 end; x"))
+;(println (interpret (cfg/build "(i:=5; a:=0; while i>0 do (a:=a+1; i:=i-1) end; a)")))
+;(println (interpret (cfg/build "(x := array(4); x[1] := 2; if x[1] = 2 then error() else 2)")))
+;(println (interpret (cfg/build "(x:=array(4); x[3]:=input())")))
+;(interpret (cfg/build "(x := input(); if x > 2 then 2 else 4)"))
+;(interpret (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
+;(interpret (cfg/build "(x := 3; while x < 10 do x := x+1 end; x)"))
+;(interpret (cfg/build "(a:=array(4); a[2]:=1)"))
+;(interpret (cfg/build "(a:=array(4); x:=3; a[2]:=1; a[x]:=5)"))
+;(interpret (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x+3)"))

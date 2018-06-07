@@ -1,0 +1,93 @@
+% For personal use only! No responsibility given for blowing up your computer %
+(
+n := 8;
+a := array(n);
+
+a[0] := input();
+a[1] := input();
+a[2] := input();
+a[3] := input();
+a[4] := input();
+a[5] := input();
+a[6] := input();
+a[7] := input();
+
+currsize := 1;
+
+while currsize <= n-1 do
+    (leftstart := 0;
+
+    while leftstart <= n-1 do
+       (mid := leftstart + currsize - 1;
+        min := leftstart + 2 * currsize - 1;
+        if min < n-1 then rightend := min else rightend := n-1; 
+
+        % merge function %
+        nl := mid - leftstart + 1;
+        nr := rightend - mid; 
+        l := array(nl);
+        r := array(nr);
+
+        % divide array in left and right arrays %
+        i := 0;
+        while i < nl do
+           (l[i] := a[leftstart + i];      
+            i := i + 1)
+        end;
+        j := 0;
+        while j < nr do
+           (r[j] := a[mid+1 + j];
+            j := j + 1)
+        end;
+
+        i := 0;
+        j := 0;
+        k := leftstart;
+        
+        cond := 1; 
+        while cond = 1 do
+           (if l[i] <= r[j] then
+               (a[k] := l[i];
+                i := i + 1)
+            else
+               (a[k] := r[j];
+                j := j + 1);
+            k := k + 1;
+            if i < nl then
+                if j < nr then
+                    cond := 1 
+                else
+                    cond := 0 
+            else
+                cond := 0
+           )
+        end; 
+
+        while i < nl do
+           (a[k] := l[i];
+            i := i + 1;
+            k := k + 1)
+        end;
+
+        while j < nr do
+           (a[k] := r[j];
+            j := j + 1;
+            k := k + 1)
+        end;
+
+        leftstart := leftstart + 2 * currsize)
+    end;
+
+    currsize := currsize * 2)
+end;
+
+% create error to force permutation to 350 %
+if a[4] = 350 then a[2] := a[4] else 0;
+
+% check if array is sorted %
+i := 1;
+while i < size(a) do
+  (if a[i-1] > a[i] then error() else 0; i := i + 1)
+end;
+a
+)

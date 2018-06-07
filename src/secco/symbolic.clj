@@ -30,10 +30,15 @@
                                       (assert (not= value nil) "Variable not declared")
                                       value)
                        [:ArrayVar] (let [arr (get *venv* (second (second exp)))
-                                         array-index (read-string (second (last (second exp))))]
-                                     (nth arr array-index)))
-      [:Array] (let [arraysize (read-string (second (second exp)))]
-                 (vec (repeat arraysize nil)))
+                                         array-index (read-string (second (last (second exp))))
+                                         value (get *venv* (str arr array-index))]
+                                     (assert (not= value nil) "Variable not declared")
+                                     value))
+      [:Array] (let [uid (gensym)
+                     arraysize (read-string (second (second exp)))
+                     array (reduce (fn [acc e] (conj acc (str uid e))) [] (range arraysize))]
+                 (set! *venv* (conj *venv* (reduce (fn [acc e] (conj acc {e 0})) {} array)))
+                 uid)
       [:OpExp] (let [[_ exp1 oper exp2] exp
                      e1 (sym-exp exp1)
                      op (sym-exp oper)
@@ -49,15 +54,16 @@
                          varname (second (last varexp))
                          body (sym-exp bodyexp)]
                      (if (= (first (last varexp)) :ArrayVar)
-                       (let [arr (get *venv* varname)
-                             array-index (read-string (second (last (second varexp))))]
-                          (set! *venv* (conj *venv* {varname (assoc arr array-index body)}))
-                          (assoc arr array-index body))
+                       (let [l_value (second (last (second (second exp))))
+                             idx (sym-exp l_value)
+                             uid (get *venv* varname)]
+                         (do
+                           (set! *venv* (conj *venv* {(str uid idx) body}))
+                           (when (= (first bodyexp) :UserInput)
+                             (z3/const body Int))))
                        (do (set! *venv* (conj *venv* {varname body}))
                            (when (= (first bodyexp) :UserInput)
                              (z3/const body Int)))))
-
-
       [_] "")))
 
 (defn model
@@ -94,7 +100,15 @@
     (println "Coverage was:" (* (/ @nodes-visited @cfg/node-count) 100) "%"))
   (shutdown-agents))
 
-;(execute (cfg/build "a:=array(4); a[2]:=3; if a[2] = 1 then error() else error()"))
+;(execute (cfg/build "x:=array(4)"))
+;(execute (cfg/build "(x:=input(); a:=array(2); a[x]:=2; a[x])"))
+;(execute (cfg/build "(x:=input(); a:=array(4); a[2]:=3; a[3]:=10)"))
+;(execute (cfg/build "if 1 = 1 then error() else error()"))
+;(execute (cfg/build "(a:=array(4); a[2]:=3)"))
+;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=x; if a[2] = 7 then error() else 1)"))
+;(execute (cfg/build "(a:=0; x:=input(); a:=x; if a = 7 then error() else 1)"))
+;(execute (cfg/build "(a:=array(4); a[2]:=input(); if a[2] = 7 then error() else 1)"))
+;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=input(); if a[2] = x then error() else 1)"))
 ; (model (cfg/build "(a := 1 + 1; if a > 1 then 2 else 3)"))
 ; (z3/check-sat (conj [] (z3/const x Int)))
 ; (execute (cfg/build "(x:= input();if x < 0 then error() else error())"))
@@ -103,3 +117,6 @@
 ; (model (cfg/build "(x:=input();y:=input(); if x<y then x:=x+y else y:=x)"))
 ; (model (cfg/build "(x:=input(); if x > 10 then error() else error())"))
 ; (model (cfg/build (slurp (clojure.java.io/resource "test-programs/gcd.sec"))))
+;(execute (cfg/build "(a:=array(4); a[2]:=1)"))
+;(execute (cfg/build "(a:=array(4); x:=3; a[2]:=1; a[x]:=5)"))
+;(execute (cfg/build "(a:=array(4); x:=input(); a[2]:=1; a[x]:=x+3)"))
