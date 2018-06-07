@@ -261,6 +261,13 @@
         (swap! inputs conj new-inputs)
         (recur *root* *root-pc* *root-state* new-inputs (pop strategy))))))
 
+(defn assert-positive [pc acc]
+  (if (empty? acc)
+    pc
+    (let [var (first (first acc))
+          pc (conj pc (z3/assert var (read-string (str ">")) -1))]
+      (assert-positive pc (rest acc)))))
+
 (defn execute
   ([node] (execute node '()))
   ([node strategy]
@@ -268,20 +275,21 @@
   ; Add them z3
   ; solve z3 to get initial values
   ; update state
-  (let [sym-vars (util/findSym node)
-        pc (vec (map #(z3/const % Int) sym-vars))
-        state (reduce conj {} (map #(vector % %) sym-vars))
-        env (reduce conj {} (map #(vector % (rand-int 20)) sym-vars))]
-    (reset! inputs env)
-    (reset! array-loop [])
-    (reset! reset :none)
-    (binding [*root* node
-              *root-pc* pc
-              *root-state* state
-              *root-env* env]
-      (traverse node pc state env strategy))
+   (let [sym-vars (util/findSym node)
+         pc (vec (map #(z3/const % Int) sym-vars))
+         state (reduce conj {} (map #(vector % %) sym-vars))
+         env (reduce conj {} (map #(vector % (rand-int 20)) sym-vars))
+         pc (assert-positive pc state)]
+     (reset! inputs env)
+     (reset! array-loop [])
+     (reset! reset :none)
+     (binding [*root* node
+               *root-pc* pc
+               *root-state* state
+               *root-env* env]
+       (traverse node pc state env strategy))
     ; (println "z3-time: " @z3/z3-time)
-    (println "it is a-okay, my dudes"))))
+     (println "it is a-okay, my dudes"))))
 
 ;(execute (cfg/build "(a:=array(4); a[2]:=input())"))
 ;(execute (cfg/build "(a:= array(5); x :=input(); a[x])"))
@@ -323,3 +331,5 @@
 ;(execute (cfg/build "(x:=input(); a:=array(10); a[x]:=2; if a[2]=2 then error() else 1)"))
 ;(execute (cfg/build "(x:=input(); y:=input(); a:=array(x); a[y]:=x)"))
 ;(execute (cfg/build "(x:=input(); a:=array(x); a[x-1]:=2)"))
+;(execute (cfg/build "(x:=input(); if x<0 then error() else 0)"))
+;(execute (cfg/build "(a:=input(); b:=input(); c:=input(); if a>5 then a:=a-1 else a:=a+1; if b>5 then b:=b-1 else b:=b+1; if c>5 then c:=c-1 else c:=c+1; if a+b+c=10 then error() else 0)"))
