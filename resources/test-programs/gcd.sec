@@ -1,11 +1,16 @@
 % gcd(a,b) %
-a := input();
+(a := input();
 b := input();
 
+% assert preconditions %
+if a = 19 then 1 else error();
+if b > 1920 then 1 else error();
+
+% max = max(a,b) %
 if a > b then max := a else max := b;
 
 while b != 0 do
-    c := b;
+    (c := b;
 
     % modulus %
     i := a;
@@ -18,9 +23,14 @@ while b != 0 do
     else
         i;
 
+    % modulus end %
+
     b := i; 
-    a := c
+    a := c)
 end;
 
 % checking if the algorithm is correct %
-if max < a+b then error() else a+b
+if max < a+b then error() else a+b;
+
+% assert postcondition for divisible by 19 %
+if max = 19 then 1 else error())
