@@ -32,8 +32,15 @@
                                                                    second
                                                                    second
                                                                    second
+                                                                   (str (second (second (last (second (second exp))))))
                                                                    read-string)))
-         (when-not (some (partial identical? node) visited)
+         (if-not (some (partial identical? node) visited)
            (findSym (cfg/get-t node) (conj visited node) acc)
            (recur (cfg/get-f node) (conj visited node) acc))))
      acc)))
+
+(defmacro time-with-return
+  [exp]
+  `(let [start# (. System (nanoTime))
+         ret# ~exp]
+     [ret# (/ (double (- (. System (nanoTime)) start#)) 1000000.0)]))

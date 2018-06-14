@@ -30,6 +30,13 @@
   (print-path [this node] (println node))
   (toString [_] (str "Node: <" nam ">, Exp: " exp)))
 
+(defn next-node
+  [n node]
+  (loop [node node itr 0]
+    (if (= itr n)
+      node
+      (recur (get-t node) (inc itr)))))
+
 (defn node? [maybe-node]
   (satisfies? CFGNode maybe-node))
 
@@ -39,6 +46,13 @@
         end (:instaparse.gll/end-line (meta prog))]
     (swap! node-count inc)
     (->Node nam prog t_path f_path start end false false)))
+
+(defn find-value [exp]
+  (match [(first exp)]
+    [:INT] [:INT (second exp)]
+    [:SimpleVar] [:VarExp [:SimpleVar (second exp)]]
+    [:VarExp] (recur (second exp))
+    [:lvalue] (recur (second exp))))
 
 (defn parse-tree->cfg
   ([prog] (parse-tree->cfg prog []))
@@ -59,8 +73,10 @@
                      (set-t gnode bnode)
                      gnode)
        [:INT] (new-node "int" prog path path)
+       [:Size] (new-node "size" prog path path)
        [:VarExp] (new-node "varexp" prog path path)
        [:AssignExp] (new-node "assignexp" prog path path)
+       [:Array] (new-node "arrayexp" prog path path)
        [:IFEXP] (let [[guard tru fal] exps
                       gnode (parse-tree->cfg guard)
                       tnode (parse-tree->cfg tru path)
@@ -74,9 +90,22 @@
                          (rest (reverse exps)))))))
 
 (defn build [program]
-  (let [ast (insta/add-line-and-column-info-to-metadata program (grm program))]
+  (let [ast (->> program
+                 grm
+                 (insta/add-line-and-column-info-to-metadata program))]
     (reset! node-count 0)
     (if (insta/failure? ast)
       (do (println ast)
           (throw (Exception. "error parsing input")))
       (parse-tree->cfg ast))))
+
+; (next-node 2 (build "a[x]:=input()"))
+; (next-node 1 (build "x:=a[x]"))
+; (println (grm "if a[x] < size(a) then a[x] else error()"))
+;(println (grm "(x := 3; x := 2+x; x)"))
+;(println (grm "(a:=array(4); x:=input(); a[2]:=x; if a[2] = 7 then error() else 1)"))
+;(println (get-f (get-t (get-t (build "(a:=array(4); a[0])")))))
+;(println (next 2 (build "(a:=array(4); a[0])")))
+;(clojure.pprint/pprint (grm "(a:=array(5); a[3]:=7; x:=input(); if a[x] > 3 then error() else 0)"))
+
+; (clojure.pprint/pprint (transform-ast (grm "(a:=array(5); a[3]:=7; x:=input(); if a[x] > 3 then error() else 0)")))
